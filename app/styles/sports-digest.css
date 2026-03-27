@@ -194,7 +194,7 @@ footer{background:#070707;color:#555;padding:clamp(36px,5vw,64px) 0 clamp(20px,3
   .dlinks{display:none}
   .hbg{display:flex}
   .hero{grid-template-columns:1fr}
-  .hright{display:none}
+  /* .hright{display:none} */
   .fgrid{grid-template-columns:1fr}
   .fstack{display:grid;grid-template-columns:1fr 1fr}
   .fcard{min-height:180px}
