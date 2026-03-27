@@ -23,9 +23,9 @@
     });
 
     const contactInfo = [
-        { i: "📍", l: "Address", v: "34 Liberty House, Media District, Accra, Ghana" },
+        { i: "📍", l: "Address", v: "Millennium City, Central Region, Ghana" },
         { i: "✉️", l: "Editorial", v: "editorial@thesportsdigest.com" },
-        { i: "📞", l: "Newsroom", v: "+233 30 291 4400" },
+        { i: "📞", l: "Newsroom", v: "+233 20 130 9212" },
         { i: "🕐", l: "Hours", v: "Monday – Friday, 8:00am – 6:00pm GMT" },
     ];
 
