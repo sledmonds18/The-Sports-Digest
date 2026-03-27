@@ -76,10 +76,7 @@
                         From GPL matchdays to Champions League nights, we bring you closer to the action,
                         the players, and the stories that matter.  
                 </p>
-                <p>
-                    Our <strong>award-winning correspondents</strong> take you inside locker rooms, boardrooms and training grounds. We don&apos;t
-                    simply report results — we excavate the stories beneath them.
-                </p>
+                
                 <p>
                     Our investigative features have sparked conversations at the
                     highest levels of sport governance. Our long-form writing has
