@@ -65,12 +65,12 @@
                 <p>
                     <strong>The Sports Digest</strong> was founded by a 22-year-old football journalist 
                     on the belief that sports journalism could be more honest, more
-                    analytical and more literary. We cover global sport in full —
+                    analytical and more literary. We cover global sport in full,
                     from the stadiums of Accra to Wimbledons grass courts and
                     beyond. 
                 </p>
                 <p>
-                    <strong>The Sports Digest</strong> was built to chaalenge the status quo of sports
+                    <strong>The Sports Digest</strong> was built to challenge the status quo of sports
                         media, by focusing on authentic storytelling, youth-driven energy, and real football culture.
                         We're not just covering the game, we live it.
                         From GPL matchdays to Champions League nights, we bring you closer to the action,
