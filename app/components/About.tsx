@@ -77,8 +77,7 @@
                         the players, and the stories that matter.  
                 </p>
                 <p>
-                    Our <strong>award-winning correspondents</strong> take you
-                    inside locker rooms, boardrooms and training grounds. We don&apos;t
+                    Our <strong>award-winning correspondents</strong> take you inside locker rooms, boardrooms and training grounds. We don&apos;t
                     simply report results — we excavate the stories beneath them.
                 </p>
                 <p>
@@ -90,7 +89,7 @@
                 </p>
 
                 <p>
-                    <strong>Our Mission</strong> is tobecome the go-to platform for football fans across the globe,
+                    <strong>Our Mission</strong> is to become the go-to platform for football fans across the globe,
                     especially in Africa, by providing credible, engaging, and original football content.
                     Whether you're into local league dram or European transfer battles, we've got you covered. 
                 </p>
