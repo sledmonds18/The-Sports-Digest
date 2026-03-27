@@ -26,7 +26,7 @@
         { i: "📍", l: "Address", v: "Millennium City, Central Region, Ghana" },
         { i: "✉️", l: "Editorial", v: "editorial@thesportsdigest.com" },
         { i: "📞", l: "Newsroom", v: "+233 20 130 9212" },
-        { i: "🕐", l: "Hours", v: "Monday – Friday, 8:00am – 6:00pm GMT" },
+        { i: "🕐", l: "Hours", v: "Sunday – Friday, 8:00am – 6:00pm GMT" },
     ];
 
     const handleSubmit = (e: FormEvent) => {
