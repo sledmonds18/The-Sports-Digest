@@ -88,6 +88,12 @@
                     <strong>Sports Journalists&apos; Association</strong> and the{" "}
                     <strong>African Media Awards</strong> three years running.
                 </p>
+
+                <p>
+                    <strong>Our Mission</strong> To become the go-to platform for football fans across the globe,
+                    especially in Africa, by providing credible, engaging, and original football content.
+                    Whether you're into local league dram or European transfer battles, we've got you covered. 
+                </p>
                 <p>
                     Today more than <strong>850,000 readers</strong> across 40
                     countries trust The Sports Digest for coverage that is rigorous,
