@@ -11,7 +11,7 @@
 
     export const CATS = ["All","Football","Basketball","Athletics","Tennis","Cricket","Motorsport"];
 
-    export const TICKER = ["⚽ Chelsea 2–1 Arsenal · PL GW29","🏀 Lakers 114–108 Celtics · NBA","🎾 Alcaraz QF Roland Garros","🏈 Chiefs blockbuster WR trade","🏏 India 287/4 vs South Africa","🏎️ Verstappen pole Bahrain GP"];
+    export const TICKER = ["⚽ Chelsea 2–1 Arsenal · PL GW29", "⚽ Real Madrid 2–1 Barcelona · La Liga","🏀 Lakers 114–108 Celtics · NBA","🎾 Alcaraz QF Roland Garros","🏈 Chiefs blockbuster WR trade","🏏 India 287/4 vs South Africa","🏎️ Verstappen pole Bahrain GP"];
 
     export const TEAM = [
     { name:"Shem Bravon Lamptey", role:"Founder & Editor-in-Chief",   bio:"15 years covering global sport.",         img:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80" },
