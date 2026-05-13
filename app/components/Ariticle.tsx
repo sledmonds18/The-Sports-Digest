@@ -27,9 +27,10 @@
             </h1>
             <div className="rule" />
             <nav className="frow2" aria-label="Filter by sport category">
-                {CATS.map((c) => (
+              {CATS.map((c) => (
                 <button
                     key={c}
+                    type="button"
                     className={`fb${fcat === c ? " act" : ""}`}
                     onClick={() => setFcat(c)}
                     aria-pressed={fcat === c}

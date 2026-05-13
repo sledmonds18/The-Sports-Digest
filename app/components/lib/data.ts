@@ -14,10 +14,8 @@
     export const TICKER = ["⚽ Chelsea 2–1 Arsenal · PL GW29","🏀 Lakers 114–108 Celtics · NBA","🎾 Alcaraz QF Roland Garros","🏈 Chiefs blockbuster WR trade","🏏 India 287/4 vs South Africa","🏎️ Verstappen pole Bahrain GP"];
 
     export const TEAM = [
-    { name:"Emmanuel Asante", role:"Founder & Editor-in-Chief",   bio:"15 years covering global sport. Former BBC Sport Africa correspondent.",         img:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80" },
-    { name:"Marcus Osei",     role:"Football Correspondent",       bio:"UEFA-accredited. Covers Champions League, AFCON and the Premier League.",         img:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&q=80" },
-    { name:"Priya Nkosi",     role:"Basketball & Olympics Editor", bio:"Ringside in three Olympics. NBA Finals press credentials since 2016.",            img:"https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=400&q=80" },
-    { name:"Elena Voss",      role:"Motorsport & Cycling",         bio:"Formula 1 paddock regular. Covered seven consecutive Tours de France.",           img:"https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80" },
+    { name:"Shem Bravon Lamptey", role:"Founder & Editor-in-Chief",   bio:"15 years covering global sport.",         img:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80" },
+
     ];
 
     export const SEO = {

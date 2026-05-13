@@ -15,6 +15,12 @@
 
     const socialLinks = ["𝕏", "f", "in", "▶"];
     const socialLabels = ["X / Twitter", "Facebook", "LinkedIn", "YouTube"];
+    const socialUrls = [
+        "https://x.com/sportsdigesthub?s=20t",
+        "https://facebook.com/thesportsdigest",
+        "https://linkedin.com/company/the-sports-digest",
+        "http://www.youtube.com/@sportsdigesthub",
+    ];
 
     return (
         <footer role="contentinfo">
@@ -39,10 +45,13 @@
             </div>
             <div className="fbot">
             <span>© 2026 The Sports Digest. All rights reserved.</span>
+
             <div className="socs" aria-label="Social media">
                 {socialLinks.map((s, i) => (
                 <div key={i} className="soc" aria-label={socialLabels[i]}>
-                    {s}
+                    <a href={socialUrls[i]} target="_blank" rel="noopener noreferrer">
+                        {s}
+                    </a>
                 </div>
                 ))}
             </div>
@@ -51,3 +60,5 @@
         </footer>
     );
     }
+
+

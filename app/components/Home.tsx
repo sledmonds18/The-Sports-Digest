@@ -3,6 +3,8 @@
     import { ARTICLES } from "./lib/data";
     import { Newsletter } from "./Newsletter";
     import { About } from "./About";
+    import { useEffect } from "react";
+    import { getFixtures }  from "./lib/api-clients";
 
     interface HomeProps {
     onNavigate: (page: string) => void;
@@ -13,6 +15,12 @@
     const handleNewsletterSubmit = () => {
         onToast("✓ Subscribed! Your first digest arrives tomorrow.");
     };
+
+    useEffect(() => {
+        getFixtures()
+        .then((data) => console.log("Fixtures:", data))
+        .catch((error) => console.error("Error fetching fixtures:", error));
+    }, []);
 
     return (
         <main id="mc" aria-label="Homepage">
@@ -55,8 +63,8 @@
         </section>
 
         {/* FEATURED */}
-        <section className="sec fbg" aria-labelledby="feat-h" style={{ paddingTop: 0 }}>
-            <div className="wrap" style={{ paddingTop: "clamp(40px,5vw,72px)" }}>
+        <section className="sec fbg" aria-labelledby="feat-h">
+            <div className="wrap wrap--pt-clamp">
             <p className="slbl">Editor&apos;s Picks</p>
             <h2 id="feat-h" className="sh2 lt">
                 Featured Stories
@@ -93,7 +101,7 @@
                     <div className="fov">
                         <p className="fcat">{a.cat}</p>
                         <h3 className="ftitle">{a.title}</h3>
-                        <p className="fmeta" style={{ fontSize: 10, color: "#666" }}>
+                        <p className="fmeta fmeta--compact">
                         {a.author} · {a.date}
                         </p>
                     </div>
@@ -156,7 +164,7 @@
                 </article>
                 ))}
             </div>
-            <div style={{ textAlign: "center", marginTop: 44 }}>
+            <div className="section-actions">
                 <button className="bred" onClick={() => onNavigate("articles")}>
                 View All Features
                 </button>

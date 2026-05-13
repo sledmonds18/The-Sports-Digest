@@ -47,18 +47,20 @@
                 {label}
                 </a>
             ))}
-            <button
-                className="ncta"
-                onClick={() => handleNavigate("contact")}
-            >
+            </div>
+            <div className="dend">
+                <button
+                    className="ncta"
+                    onClick={() => handleNavigate("contact")}
+                >
                 Subscribe
-            </button>
+                </button>
             </div>
             <button
             className={`hbg${menu ? " op" : ""}`}
             onClick={() => setMenu((o) => !o)}
             aria-label={menu ? "Close menu" : "Open menu"}
-            aria-expanded={menu}
+            aria-expanded={menu ? "true" : "false"}
             aria-controls="mmenu"
             >
             <span />

@@ -6,9 +6,9 @@ import { SEO } from "./components/lib/data";
 import { Articles } from "./components/Ariticle";
 import { Toast } from "./components/Toast";
 
+
 import {
   Navigation,
-  Ticker,
   Home,
   Contact,
   Footer,
@@ -33,22 +33,16 @@ export default function SportsDigest() {
 
   return (
     <>
-      {/* Accessibility skip link */}
-      <a
-        href="#mc"
-        style={{ position: "absolute", left: "-9999px", zIndex: 999 }}
-      >
+      {/* Skip link */}
+      <a href="#mc" style={{ position: "absolute", left: "-9999px" }}>
         Skip to main content
       </a>
 
       {/* Navigation */}
       <Navigation currentPage={page} onNavigate={navigate} />
 
-      {/* Live Ticker */}
-      <Ticker />
-
-      {/* Page Content */}
-      <div className="page">
+           {/* Page Content */}
+      <div className="page" id="mc">
         {page === "home" && <Home onNavigate={navigate} onToast={showToast} />}
         {page === "about" && <About onNavigate={navigate} onToast={showToast} />}
         {page === "articles" && <Articles onToast={showToast} />}
@@ -56,7 +50,7 @@ export default function SportsDigest() {
         <Footer onNavigate={navigate} />
       </div>
 
-      {/* JSON-LD Structured Data for SEO */}
+      {/* SEO JSON-LD */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -65,36 +59,11 @@ export default function SportsDigest() {
             "@type": "NewsMediaOrganization",
             name: "The Sports Digest",
             url: "https://thesportsdigest.com",
-            description:
-              "Africa's premier sports journalism platform — fearless analysis and investigative features.",
-            foundingDate: "2018",
-            sameAs: [
-              "https://twitter.com/sportsdigest",
-              "https://facebook.com/sportsdigest",
-            ],
-            address: {
-              "@type": "PostalAddress",
-              addressLocality: "Accra",
-              addressCountry: "GH",
-            },
-            contactPoint: {
-              "@type": "ContactPoint",
-              contactType: "editorial",
-              email: "editorial@thesportsdigest.com",
-            },
-            knowsAbout: [
-              "Football",
-              "Basketball",
-              "Athletics",
-              "Tennis",
-              "Cricket",
-              "Motorsport",
-            ],
           }),
         }}
       />
 
-      {/* Toast Notification */}
+      {/* Toast */}
       <Toast message={toast.msg} isOpen={toast.on} />
     </>
   );
