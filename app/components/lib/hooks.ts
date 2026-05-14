@@ -2,6 +2,7 @@
 
     import { useEffect } from "react";
     import type { SEOData } from "./data";
+    import { Ticker } from "../Ticker"; 
 
     /* ─── SEO HEAD MANAGER ──────────────────────────────────────── */
     export function useSEO({ title, description, keywords }: SEOData) {

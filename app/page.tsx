@@ -11,6 +11,7 @@ import {
   Navigation,
   Home,
   Contact,
+  Ticker,
   Footer,
 } from "@/app/components";
 import { About } from "./components/About";
@@ -40,6 +41,10 @@ export default function SportsDigest() {
 
       {/* Navigation */}
       <Navigation currentPage={page} onNavigate={navigate} />
+
+
+      <Ticker />
+
 
            {/* Page Content */}
       <div className="page" id="mc">

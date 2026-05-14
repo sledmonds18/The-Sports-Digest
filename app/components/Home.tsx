@@ -5,6 +5,7 @@
     import { About } from "./About";
     import { useEffect } from "react";
     import { getFixtures }  from "./lib/api-clients";
+    import { Ticker } from "./Ticker";  
 
     interface HomeProps {
     onNavigate: (page: string) => void;
@@ -16,11 +17,11 @@
         onToast("✓ Subscribed! Your first digest arrives tomorrow.");
     };
 
-    useEffect(() => {
-        getFixtures()
-        .then((data) => console.log("Fixtures:", data))
-        .catch((error) => console.error("Error fetching fixtures:", error));
-    }, []);
+    // useEffect(() => {
+    //     getFixtures()
+    //     .then((data) => console.log("Fixtures:", data))
+    //     .catch((error) => console.error("Error fetching fixtures:", error));
+    // }, []);
 
     return (
         <main id="mc" aria-label="Homepage">

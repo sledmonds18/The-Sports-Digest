@@ -3,6 +3,7 @@
     import { TICKER } from "./lib/data";
 
     export function Ticker() {
+        console.log("Ticker rendered");
     return (
         <div className="ticker" role="marquee" aria-label="Live sports scores">
         <div className="tlbl">Live</div>
