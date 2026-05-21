@@ -1,62 +1,62 @@
-    import OpenAI from "openai";
+        import OpenAI from "openai";
 
     const client = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
     });
 
-    export async function POST(req: Request) {
-    try {
-        let body;
-
-        // safely read body
+        export async function POST(req: Request) {
         try {
-        body = await req.json();
-        } catch {
-        body = {
-            home: "Manchester City",
-            away: "Arsenal",
-        };
-        }
+            let body;
 
-        const prompt = `
-        Analyze this football match:
+            // safely read body
+            try {
+            body = await req.json();
+            } catch {
+            body = {
+                home: "Manchester City",
+                away: "Arsenal",
+            };
+            }
 
-        ${body.home} vs ${body.away}
+            const prompt = `
+            Analyze this football match:
 
-        Include:
-        - likely winner
-        - predicted score
-        - tactical insight
-        - key player
-        `;
+            ${body.home} vs ${body.away}
 
-        // OpenAI request
-        const response = await client.chat.completions.create({
-        model: "gpt-4.1-mini",
-        messages: [
-            {
-            role: "user",
-            content: prompt,
-            },
-        ],
-        });
+            Include:
+            - likely winner
+            - predicted score
+            - tactical insight
+            - key player
+            `;
 
-        return Response.json({
-        insight:
-            response.choices[0].message.content ||
-            "AI insight unavailable.",
-        });
-    } catch (error) {
-        console.error(error);
+            // OpenAI request
+            const response = await client.chat.completions.create({
+            model: "gpt-4.1-mini",
+            messages: [
+                {
+                role: "user",
+                content: prompt,
+                },
+            ],
+            });
 
-        return Response.json(
-        {
+            return Response.json({
             insight:
-            "Manchester City are likely to dominate possession while Arsenal rely on counter attacks.",
-        },
-        {
-            status: 200,
+                response.choices[0].message.content ||
+                "AI insight unavailable.",
+            });
+        } catch (error) {
+            console.error(error);
+
+            return Response.json(
+            {
+                insight:
+                "Manchester City are likely to dominate possession while Arsenal rely on counter attacks.",
+            },
+            {
+                status: 200,
+            }
+            );
         }
-        );
-    }
-    }
+        }

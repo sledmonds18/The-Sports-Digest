@@ -11,7 +11,7 @@
         <h2 className="sec-title">Live Matches</h2>
 
         <div className="live-grid">
-            {matches.map((m: any) => (
+            {matches?.map((m: any) => (
             <MatchCard
                 key={m.fixture.id}
                 home={m.teams.home.name}

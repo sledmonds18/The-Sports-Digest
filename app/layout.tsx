@@ -5,6 +5,7 @@ import "./styles/match-card.css";
 import "./styles/poll.css";
 
 
+
 export const metadata: Metadata = {
   title: "The Sports Digest — Africa's Premier Sports Journalism Platform",
   description:
