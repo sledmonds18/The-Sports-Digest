@@ -3,7 +3,6 @@
     import { useEffect, useState } from "react";
     import axios from "axios";
 
-
     export function useLiveMatches() {
     const [matches, setMatches] = useState<any[]>([]);
 
@@ -11,12 +10,17 @@
         async function loadMatches() {
         try {
             const response = await axios.get(
-            "/api/live-matches"
-            );
+            "https://v3.football.api-sports.io/fixtures?live=all",
+            {
+                headers: {
+                "x-apisports-key": process.env.NEXT_PUBLIC_API_KEY,
+                },
+            }
+                );
 
             setMatches(response.data.response || []);
-        } catch (error) {
-            console.error("Live match error:", error);
+        } catch (err) {
+            console.error(err);
         }
         }
 
