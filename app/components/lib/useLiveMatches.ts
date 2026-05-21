@@ -1,28 +1,32 @@
     "use client";
 
     import { useEffect, useState } from "react";
-
-    export type Match = {
-    id: number;
-    participants: { name: string }[];
-    scores: { description: string; score: { goals: number } }[];
-    time?: { minute?: number };
-    };
+    import axios from "axios";
 
     export function useLiveMatches() {
-    const [matches, setMatches] = useState<Match[]>([]);
+    const [matches, setMatches] = useState<any[]>([]);
 
     useEffect(() => {
-        const fetchLive = async () => {
-        console.log("Fetching live matches...");
-        const res = await fetch("/api/live");
-        console.log("Response status:", res.status);
-        const data = await res.json();
-        setMatches(data);
-        };
+        async function loadMatches() {
+        try {
+            const response = await axios.get(
+            "https://v3.football.api-sports.io/fixtures?live=all",
+            {
+                headers: {
+                "x-apisports-key": process.env.NEXT_PUBLIC_API_KEY,
+                },
+            }
+                );
 
-        fetchLive();
-        const interval = setInterval(fetchLive, 10000);
+            setMatches(response.data.response || []);
+        } catch (err) {
+            console.error(err);
+        }
+        }
+
+        loadMatches();
+
+        const interval = setInterval(loadMatches, 30000);
 
         return () => clearInterval(interval);
     }, []);

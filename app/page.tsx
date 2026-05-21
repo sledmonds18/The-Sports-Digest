@@ -3,59 +3,106 @@
 import { useState } from "react";
 import { useSEO } from "./components/lib/hooks";
 import { SEO } from "./components/lib/data";
-import { Articles } from "./components/Ariticle";
+
+import { Articles } from "./components/Articles";
 import { Toast } from "./components/Toast";
+import { Home } from "./components/Home";
+import { About } from "./components/About";
 
 
 import {
   Navigation,
-  Home,
   Contact,
   Ticker,
   Footer,
+
 } from "@/app/components";
-import { About } from "./components/About";
 
 export default function SportsDigest() {
-  const [page, setPage] = useState<"home" | "about" | "articles" | "contact">("home");
-  const [toast, setToast] = useState({ on: false, msg: "" });
+  const [page, setPage] = useState<
+    "home" | "about" | "articles" | "contact"
+  >("home");
+
+  const [toast, setToast] = useState({
+    on: false,
+    msg: "",
+  });
 
   useSEO(SEO[page] || SEO.home);
 
   const navigate = (p: string) => {
     setPage(p as "home" | "about" | "articles" | "contact");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   const showToast = (msg: string) => {
-    setToast({ on: true, msg });
-    setTimeout(() => setToast({ on: false, msg: "" }), 3600);
+    setToast({
+      on: true,
+      msg,
+    });
+
+    setTimeout(() => {
+      setToast({
+        on: false,
+        msg: "",
+      });
+    }, 3600);
   };
 
   return (
     <>
-      {/* Skip link */}
-      <a href="#mc" style={{ position: "absolute", left: "-9999px" }}>
+      {/* Skip Link */}
+      <a
+        href="#mc"
+        style={{
+          position: "absolute",
+          left: "-9999px",
+        }}
+      >
         Skip to main content
       </a>
 
       {/* Navigation */}
-      <Navigation currentPage={page} onNavigate={navigate} />
+      <Navigation
+        currentPage={page}
+        onNavigate={navigate}
+      />
 
-
+      {/* Ticker */}
       <Ticker />
 
-
-           {/* Page Content */}
+      {/* Main Content */}
       <div className="page" id="mc">
-        {page === "home" && <Home onNavigate={navigate} onToast={showToast} />}
-        {page === "about" && <About onNavigate={navigate} onToast={showToast} />}
-        {page === "articles" && <Articles onToast={showToast} />}
-        {page === "contact" && <Contact onToast={showToast} />}
+        {page === "home" && (
+          <Home
+            onNavigate={navigate}
+            onToast={showToast}
+          />
+        )}
+
+        {page === "about" && (
+          <About
+            onNavigate={navigate}
+            onToast={showToast}
+          />
+        )}
+
+        {page === "articles" && (
+          <Articles onToast={showToast} />
+        )}
+
+        {page === "contact" && (
+          <Contact onToast={showToast} />
+        )}
+
         <Footer onNavigate={navigate} />
       </div>
 
-      {/* SEO JSON-LD */}
+      {/* SEO */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -69,7 +116,10 @@ export default function SportsDigest() {
       />
 
       {/* Toast */}
-      <Toast message={toast.msg} isOpen={toast.on} />
+      <Toast
+        message={toast.msg}
+        isOpen={toast.on}
+      />
     </>
   );
 }

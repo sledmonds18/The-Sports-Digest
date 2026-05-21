@@ -31,3 +31,39 @@ body {
 .animate-marquee {
   animation: marquee 20s linear infinite;
 }
+
+.ticker {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: #020617;
+  color: white;
+  padding: 14px 0;
+}
+
+.tlbl {
+  padding:0% 20px;
+  color: red;
+  font-weight: bold;  
+}
+
+.tinner {
+  display: flex;
+  gap: 52px;
+  width: max-content;
+  white-space: nowrap;
+  animation: tickerMove 30s linear infinite;  
+}
+
+.titem {
+  flex:auto;
+}
+
+@keyframes tickerMove {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}

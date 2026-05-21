@@ -2,10 +2,10 @@
 
     import { ARTICLES } from "./lib/data";
     import { Newsletter } from "./Newsletter";
-    import { About } from "./About";
-    import { useEffect } from "react";
-    import { getFixtures }  from "./lib/api-clients";
-    import { Ticker } from "./Ticker";  
+    import InsightCard from "./InsightCard";
+    import { PollCard } from "./PollCard";
+    import { Ticker } from "./Ticker";
+    import { LiveBar } from "./LiveBar";
 
     interface HomeProps {
     onNavigate: (page: string) => void;
@@ -17,60 +17,87 @@
         onToast("✓ Subscribed! Your first digest arrives tomorrow.");
     };
 
-    // useEffect(() => {
-    //     getFixtures()
-    //     .then((data) => console.log("Fixtures:", data))
-    //     .catch((error) => console.error("Error fetching fixtures:", error));
-    // }, []);
-
     return (
         <main id="mc" aria-label="Homepage">
+        {/* LIVE TICKER */}
+        <Ticker />
+
         {/* HERO */}
         <section className="hero" aria-label="Hero">
             <div className="hleft">
-            <p className="heyebrow fu d1">Breaking Coverage · Est. 2018</p>
+            <p className="heyebrow fu d1">
+                Breaking Coverage · Est. 2018
+            </p>
+
             <h1 className="hh1 fu d2">
-                Where<br />
-                Sport<br />
+                Where
+                <br />
+                Sport
+                <br />
                 Meets <em>Story.</em>
             </h1>
+
             <p className="hsub fu d3">
-                Fearless analysis, investigative features and the voices that define
-                the game — delivered daily from Accra to the world.
+                Fearless analysis, investigative features and the voices that
+                define the game — delivered daily from Accra to the world.
             </p>
+
             <div className="hacts fu d4">
-                <button className="bred" onClick={() => onNavigate("articles")}>
+                <button
+                className="bred"
+                onClick={() => onNavigate("articles")}
+                >
                 Read Features
                 </button>
-                <button className="bghost" onClick={() => onNavigate("about")}>
+
+                <button
+                className="bghost"
+                onClick={() => onNavigate("about")}
+                >
                 Our Story
                 </button>
             </div>
+
             <div className="hbadges fu d4" aria-hidden="true">
-                {["12+ Sports", "850K Readers", "SJA Award 2025"].map((b) => (
-                <span key={b} className="hbadge">
-                    {b}
-                </span>
-                ))}
+                {["12+ Sports", "850K Readers", "SJA Award 2025"].map(
+                (badge) => (
+                    <span key={badge} className="hbadge">
+                    {badge}
+                    </span>
+                )
+                )}
             </div>
             </div>
+
             <div className="hright" aria-hidden="true">
             <img
                 src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1400&q=80"
-                alt="afan sports journalists at work"
+                alt="sports journalists at work"
                 loading="eager"
             />
             </div>
         </section>
 
+        {/* LIVE MATCHES */}
+        <LiveBar />
+
+        {/* AI INSIGHT */}
+        <InsightCard />
+
+        {/* FAN POLL */}
+        <PollCard />
+
         {/* FEATURED */}
         <section className="sec fbg" aria-labelledby="feat-h">
             <div className="wrap wrap--pt-clamp">
-            <p className="slbl">Editor&apos;s Picks</p>
+            <p className="slbl">Editor's Picks</p>
+
             <h2 id="feat-h" className="sh2 lt">
                 Featured Stories
             </h2>
+
             <div className="rule" />
+
             <div className="fgrid">
                 <article
                 className="fmain"
@@ -78,17 +105,28 @@
                 tabIndex={0}
                 aria-label={ARTICLES[0].title}
                 >
-                <img src={ARTICLES[0].img} alt={ARTICLES[0].title} loading="lazy" />
+                <img
+                    src={ARTICLES[0].img}
+                    alt={ARTICLES[0].title}
+                    loading="lazy"
+                />
+
                 <div className="fov">
                     <p className="fcat">
                     {ARTICLES[0].cat} · {ARTICLES[0].tag}
                     </p>
-                    <h3 className="ftitle">{ARTICLES[0].title}</h3>
+
+                    <h3 className="ftitle">
+                    {ARTICLES[0].title}
+                    </h3>
+
                     <p className="fmeta">
-                    {ARTICLES[0].author} · {ARTICLES[0].date} · {ARTICLES[0].rt} read
+                    {ARTICLES[0].author} · {ARTICLES[0].date} ·{" "}
+                    {ARTICLES[0].rt} read
                     </p>
                 </div>
                 </article>
+
                 <div className="fstack">
                 {ARTICLES.slice(1, 4).map((a) => (
                     <article
@@ -98,10 +136,17 @@
                     tabIndex={0}
                     aria-label={a.title}
                     >
-                    <img src={a.img} alt={a.title} loading="lazy" />
+                    <img
+                        src={a.img}
+                        alt={a.title}
+                        loading="lazy"
+                    />
+
                     <div className="fov">
                         <p className="fcat">{a.cat}</p>
+
                         <h3 className="ftitle">{a.title}</h3>
+
                         <p className="fmeta fmeta--compact">
                         {a.author} · {a.date}
                         </p>
@@ -114,7 +159,11 @@
         </section>
 
         {/* STATS */}
-        <div className="sband" role="region" aria-label="Key statistics">
+        <div
+            className="sband"
+            role="region"
+            aria-label="Key statistics"
+        >
             <div className="wrap">
             <div className="srow">
                 {[
@@ -122,10 +171,10 @@
                 ["850K+", "Monthly Readers"],
                 ["200+", "Articles Published"],
                 ["18", "Award Wins"],
-                ].map(([n, l]) => (
-                <div key={l} className="stat">
-                    <div className="sn">{n}</div>
-                    <div className="sl">{l}</div>
+                ].map(([number, label]) => (
+                <div key={label} className="stat">
+                    <div className="sn">{number}</div>
+                    <div className="sl">{label}</div>
                 </div>
                 ))}
             </div>
@@ -136,10 +185,13 @@
         <section className="sec abg" aria-labelledby="rec-h">
             <div className="wrap">
             <p className="slbl">Latest Features</p>
+
             <h2 id="rec-h" className="sh2">
                 Recent Stories
             </h2>
+
             <div className="rule" />
+
             <div className="agrid">
                 {ARTICLES.slice(0, 3).map((a, i) => (
                 <article
@@ -150,12 +202,20 @@
                     aria-label={a.title}
                 >
                     <div className="aimg">
-                    <img src={a.img} alt={a.title} loading="lazy" />
+                    <img
+                        src={a.img}
+                        alt={a.title}
+                        loading="lazy"
+                    />
                     </div>
+
                     <div className="abody">
                     <p className="acat">{a.cat}</p>
+
                     <h3 className="atitle">{a.title}</h3>
+
                     <p className="aexc">{a.excerpt}</p>
+
                     <div className="aftr">
                         <span>{a.author}</span>
                         <span>{a.date}</span>
@@ -165,14 +225,19 @@
                 </article>
                 ))}
             </div>
+
             <div className="section-actions">
-                <button className="bred" onClick={() => onNavigate("articles")}>
+                <button
+                className="bred"
+                onClick={() => onNavigate("articles")}
+                >
                 View All Features
                 </button>
             </div>
             </div>
         </section>
 
+        {/* NEWSLETTER */}
         <Newsletter onSubmit={handleNewsletterSubmit} />
         </main>
     );

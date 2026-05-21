@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import "./styles/sports-digest.css";
+import "./styles/insight.css";
+import "./styles/match-card.css";
+import "./styles/poll.css";
+
 
 export const metadata: Metadata = {
   title: "The Sports Digest — Africa's Premier Sports Journalism Platform",

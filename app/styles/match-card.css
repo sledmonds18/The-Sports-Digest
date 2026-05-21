@@ -1,0 +1,32 @@
+    .live-wrap {
+    padding: 60px 20px;
+    }
+
+    .live-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    }
+    .match-card {
+    background: #111827;
+    border-radius: 20px;
+    padding: 24px;
+    color: white;
+    transition: 0.3s;
+    }
+
+    .match-card:hover {
+    transform: translateY(-5px);
+    }
+    .live-pill {
+    display: inline-block;
+    background: red;
+    padding: 5px 12px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+    }
+
+    .match-score {
+    font-size: 34px;
+    font-weight: bold;
+    }

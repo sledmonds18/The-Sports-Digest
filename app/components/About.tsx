@@ -2,7 +2,7 @@
 
     import { TEAM } from "./lib/data";
     import { Newsletter } from "./Newsletter";
-    import { Articles } from "./Ariticle";          
+    import { Articles } from "./Articles";          
     import { Ticker } from "./Ticker";
 
     interface AboutProps {
