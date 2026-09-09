@@ -1,14 +1,13 @@
-    "use client";
+"use client";
 
-    import { TEAM } from "./lib/data";
-    import { Newsletter } from "./Newsletter";
-    import { Articles } from "./Articles";          
-    import { Ticker } from "./Ticker";
+import { TEAM } from "./lib/data";
+import { Newsletter } from "./Newsletter";
 
-    interface AboutProps {
-    onNavigate: (page: string) => void;
-    onToast: (message: string) => void;
-    }
+interface AboutProps {
+  onNavigate: (page: string) => void;
+  onToast: (message: string) => void;
+}
+
 
     export function About({ onNavigate, onToast }: AboutProps) {
     const handleNewsletterSubmit = () => {

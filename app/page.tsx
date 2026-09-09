@@ -3,20 +3,17 @@
 import { useState } from "react";
 import { useSEO } from "./components/lib/hooks";
 import { SEO } from "./components/lib/data";
-
-import { Articles } from "./components/Articles";
-import { Toast } from "./components/Toast";
-import { Home } from "./components/Home";
-import { About } from "./components/About";
-
-
 import {
   Navigation,
-  Contact,
   Ticker,
+  Home,
+  About,
+  Articles,
+  Contact,
   Footer,
+  Toast,
+} from "./components";
 
-} from "@/app/components";
 
 export default function SportsDigest() {
   const [page, setPage] = useState<

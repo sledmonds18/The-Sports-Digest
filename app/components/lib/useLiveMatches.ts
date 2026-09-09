@@ -1,35 +1,37 @@
-    "use client";
+"use client";
 
-    import { useEffect, useState } from "react";
-    import axios from "axios";
+import { useEffect, useState } from "react";
 
-    export function useLiveMatches() {
-    const [matches, setMatches] = useState<any[]>([]);
+export function useLiveMatches() {
+  const [matches, setMatches] = useState<any[]>([]);
 
-    useEffect(() => {
-        async function loadMatches() {
-        try {
-            const response = await axios.get(
-            "https://v3.football.api-sports.io/fixtures?live=all",
-            {
-                headers: {
-                "x-apisports-key": process.env.NEXT_PUBLIC_API_KEY,
-                },
-            }
-                );
+  useEffect(() => {
+    let isMounted = true;
 
-            setMatches(response.data.response || []);
-        } catch (err) {
-            console.error(err);
+    async function loadMatches() {
+      try {
+        const response = await fetch("/api/matches");
+        if (!response.ok) {
+          throw new Error("Failed to fetch matches");
         }
+        const data = await response.json();
+        if (isMounted) {
+          setMatches(Array.isArray(data.response) ? data.response : []);
         }
-
-        loadMatches();
-
-        const interval = setInterval(loadMatches, 30000);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    return matches;
+      } catch (err) {
+        console.warn("Live matches unavailable:", err);
+      }
     }
+
+    loadMatches();
+
+    const interval = setInterval(loadMatches, 30000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
+  return matches;
+}

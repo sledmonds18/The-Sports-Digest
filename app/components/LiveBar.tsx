@@ -1,26 +1,39 @@
-    "use client";
+"use client";
 
-    import { useLiveMatches } from "./lib/useLiveMatches";
-    import { MatchCard } from "./MatchCard";
+import { useLiveMatches } from "./lib/useLiveMatches";
+import { MatchCard } from "./MatchCard";
 
-    export function LiveBar() {
-    const matches = useLiveMatches();
+export function LiveBar() {
+  const matches = useLiveMatches();
 
-    return (
-        <section className="live-wrap">
-        <h2 className="sec-title">Live Matches</h2>
+  if (!matches || matches.length === 0) {
+    return null;
+  }
 
-        <div className="live-grid">
-            {matches?.map((m: any) => (
+  return (
+    <section className="live-wrap">
+      <h2 className="sec-title">Live Matches</h2>
+
+      <div className="live-grid">
+        {matches.map((m: any, idx: number) => {
+          const homeName = m?.teams?.home?.name || "Home Team";
+          const awayName = m?.teams?.away?.name || "Away Team";
+          const homeGoals = m?.goals?.home ?? 0;
+          const awayGoals = m?.goals?.away ?? 0;
+          const minute = m?.fixture?.status?.elapsed || 0;
+          const key = m?.fixture?.id || idx;
+
+          return (
             <MatchCard
-                key={m.fixture.id}
-                home={m.teams.home.name}
-                away={m.teams.away.name}
-                score={`${m.goals.home} - ${m.goals.away}`}
-                minute={m.fixture.status.elapsed || 0}
+              key={key}
+              home={homeName}
+              away={awayName}
+              score={`${homeGoals} - ${awayGoals}`}
+              minute={minute}
             />
-            ))}
-        </div>
-        </section>
-    );
-    }
+          );
+        })}
+      </div>
+    </section>
+  );
+}
