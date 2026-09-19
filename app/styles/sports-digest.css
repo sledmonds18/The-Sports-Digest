@@ -12,7 +12,7 @@ img{max-width:100%;height:auto;display:block}button,input,textarea,select{font-f
 ::-webkit-scrollbar-thumb{background:var(--red)}
 
 /* NAV */
-.nav{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--ink);height:var(--nh);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,56px);border-bottom:3px solid var(--red);transition:box-shadow .3s}
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--ink);height:var(--nh);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,56px);border-bottom:3px solid var(--red);overflow:hidden;transition:box-shadow .3s}
 .nav.sc{box-shadow:0 4px 28px rgba(0,0,0,.55)}
 .logo{font-family:'Oswald',sans-serif;font-size:clamp(18px,3vw,24px);font-weight:700;letter-spacing:3px;color:#fff;cursor:pointer;white-space:nowrap;flex-shrink:0;-webkit-user-select:none;user-select:none}
 .logo em{color:var(--red);font-style:normal}
