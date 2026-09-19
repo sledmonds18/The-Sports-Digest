@@ -6,12 +6,14 @@ interface LogoProps {
 
 export function Logo({ onClick }: LogoProps) {
   return (
-    <img
-      src="/logo-app 2.png"
-      alt="The Sports Digest"
-      className="h-3 w-auto"
-      style={{ cursor: onClick ? "pointer" : "default" }}
-      onClick={onClick}
-    />
+    <div className="flex h-14 w-48 items-center overflow-hidden">
+  <img
+    src="/logo-app 2.png"
+    alt="The Sports Digest"
+    className="max-h-full max-w-full object-contain"
+    style={{ cursor: onClick ? "pointer" : "default" }}
+    onClick={onClick}
+  />
+</div>
   );
 }
