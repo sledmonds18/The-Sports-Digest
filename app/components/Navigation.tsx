@@ -48,14 +48,7 @@
                 </a>
             ))}
             </div>
-            <div className="dend">
-                <button
-                    className="ncta"
-                    onClick={() => handleNavigate("contact")}
-                >
-                Subscribe
-                </button>
-            </div>
+            
             <button
             className={`hbg${menu ? " op" : ""}`}
             onClick={() => setMenu((o) => !o)}
