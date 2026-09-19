@@ -9,7 +9,7 @@ export function Logo({ onClick }: LogoProps) {
     <img
       src="/logo-app 2.png"
       alt="The Sports Digest"
-      className="h-8 w-auto"
+      className="h-5 w-auto"
       style={{ cursor: onClick ? "pointer" : "default" }}
       onClick={onClick}
     />
