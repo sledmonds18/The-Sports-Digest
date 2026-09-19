@@ -7,7 +7,7 @@ interface LogoProps {
 export function Logo({ onClick }: LogoProps) {
   return (
     <img
-      src="/logo-app 1.png"
+      src="/logo-app 2.png"
       alt="The Sports Digest"
       className="h-8 w-auto"
       style={{ cursor: onClick ? "pointer" : "default" }}
