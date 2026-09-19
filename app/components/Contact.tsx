@@ -24,16 +24,41 @@
 
     const contactInfo = [
         { i: "📍", l: "Address", v: "Millennium City, Central Region, Ghana" },
-        { i: "✉️", l: "Editorial", v: "editorial@thesportsdigest.com" },
+        { i: "✉️", l: "Editorial", v: "sylvesteredmonds18@gmail.com" },
         { i: "📞", l: "Newsroom", v: "+233 20 130 9212" },
         { i: "🕐", l: "Hours", v: "Monday – Friday, 8:00am – 6:00pm GMT" },
     ];
+const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
 
-    const handleSubmit = (e: FormEvent) => {
-        e.preventDefault();
+    try {
+        const response = await fetch("/api/contact", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(form),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to send message.");
+        }
+
         onToast("✓ Message sent — we'll reply within 24 hours.");
-        setForm({ name: "", email: "", subject: "", message: "" });
-    };
+
+        setForm({
+            name: "",
+            email: "",
+            subject: "",
+            message: "",
+        });
+    } catch (error) {
+        console.error("Contact form error:", error);
+        onToast("✕ Message could not be sent. Please try again.");
+    }
+};
 
     const handleNewsletterSubmit = () => {
         onToast("✓ Subscribed! Your first digest arrives tomorrow.");
@@ -110,7 +135,7 @@
                     <input
                         id="fe"
                         type="email"
-                        placeholder="you@example.com"
+                        placeholder="sylvesteredmonds18@gmail.com"
                         value={form.email}
                         onChange={handleFormChange}
                         required
@@ -159,4 +184,4 @@
         <Newsletter onSubmit={handleNewsletterSubmit} />
         </main>
     );
-    }
+}
