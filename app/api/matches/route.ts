@@ -62,7 +62,7 @@ export async function GET() {
 
   try {
     const response = await axios.get(
-      "https://v3.football.api-sports.io/fixtures?live=all",
+      "https:///fixtures?live=all",
       {
         headers: {
           "x-apisports-key": apiKey,
