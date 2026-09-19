@@ -135,7 +135,7 @@ const handleSubmit = async (e: FormEvent) => {
                     <input
                         id="fe"
                         type="email"
-                        placeholder="sylvesteredmonds18@gmail.com"
+                        placeholder="your.email@example.com"
                         value={form.email}
                         onChange={handleFormChange}
                         required
