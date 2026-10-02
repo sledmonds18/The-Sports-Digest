@@ -21,13 +21,14 @@
         <main id="mc">
         <section className="sec abg" aria-labelledby="art-h">
             <div className="wrap">
-            <p className="slbl">All Features</p>
+            <p className="slbl">Latest Articles</p>
+
             <h1 id="art-h" className="sh2">
-                Stories & Analysis
+                Stories, News & Analysis
             </h1>
             <div className="rule" />
-            <nav className="frow2" aria-label="Filter by sport category">
-              {CATS.map((c) => (
+            <nav className="frow2" aria-label="Filter articles by sport category">
+            {CATS.map((c) => (
                 <button
                     key={c}
                     type="button"

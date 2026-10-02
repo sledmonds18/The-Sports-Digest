@@ -57,12 +57,14 @@ export async function GET() {
     apiKey === "your_api_sports_key" ||
     apiKey.trim() === ""
   ) {
-    return Response.json({ response: FALLBACK_MATCHES });
+    return Response.json({
+      response: FALLBACK_MATCHES,
+    });
   }
 
   try {
     const response = await axios.get(
-      "https:///fixtures?live=all",
+      "https://v3.football.api-sports.io/fixtures?live=all",
       {
         headers: {
           "x-apisports-key": apiKey,
@@ -72,13 +74,23 @@ export async function GET() {
     );
 
     const matchData = response.data?.response;
+
     if (Array.isArray(matchData) && matchData.length > 0) {
-      return Response.json({ response: matchData });
+      return Response.json({
+        response: matchData,
+      });
     }
 
-    return Response.json({ response: FALLBACK_MATCHES });
+    return Response.json({
+      response: FALLBACK_MATCHES,
+    });
   } catch (error) {
-    console.warn("External live sports API unavailable, using fallback data.");
-    return Response.json({ response: FALLBACK_MATCHES });
+    console.warn(
+      "External live sports API unavailable, using fallback data."
+    );
+
+    return Response.json({
+      response: FALLBACK_MATCHES,
+    });
   }
 }

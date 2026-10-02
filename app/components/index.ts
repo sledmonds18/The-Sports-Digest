@@ -11,4 +11,8 @@ export { LiveBar } from "./LiveBar";
 export { MatchCard } from "./MatchCard";
 export { PollCard } from "./PollCard";
 export { Toast } from "./Toast";
-
+export { SportsCategories } from "./SportsCategories";
+export { SportsMenuScreens } from "./SportsMenuScreens";
+export type { MenuScreen } from "./SportsMenuScreens";
+export { default as SportsPage } from "./SportsPage";
+export { default as GhanaPremierLeague } from "./GhanaPremierLeague";
