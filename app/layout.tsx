@@ -38,14 +38,16 @@ export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-  analytics: typeof Analytics;
 }>) {
   return (
     <html lang="en">
       <head>
         <link rel="canonical" href="https://thesportsdigest.com" />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+    {children}
+    <Analytics />
+  </body>
     </html>
   );
 }
