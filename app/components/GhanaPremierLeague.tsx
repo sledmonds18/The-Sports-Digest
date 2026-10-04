@@ -7,6 +7,23 @@
     onToast?: (message: string) => void;
     }
 
+        const tableHeaderStyle: React.CSSProperties = {
+    border: "1px solid #444",
+    padding: "16px",
+    textAlign: "center",
+    color: "#aaa",
+    fontSize: "12px",
+    fontWeight: 800,
+    textTransform: "uppercase",
+    };
+
+    const tableCellStyle: React.CSSProperties = {
+    border: "1px solid #333",
+    padding: "16px",
+    textAlign: "center",
+    color: "#ccc",
+    };
+
     const stats = [
     {
         number: "1956",
@@ -47,6 +64,207 @@
         year: "2020s",
         title: "A Modern League",
         text: "The competition has continued to develop through stronger administration, club licensing and commercial structures.",
+    },
+    ];
+
+        const leagueTable = [
+    {
+        position: 1,
+        team: "Medeama SC",
+        shortName: "Medeama",
+        played: 4,
+        won: 2,
+        drawn: 2,
+        lost: 0,
+        gd: "+4",
+        points: 8,
+    },
+    {
+        position: 2,
+        team: "FC Samartex 1996",
+        shortName: "Samartex",
+        played: 4,
+        won: 2,
+        drawn: 2,
+        lost: 0,
+        gd: "+3",
+        points: 8,
+    },
+    {
+        position: 3,
+        team: "Hearts of Oak",
+        shortName: "Hearts",
+        played: 4,
+        won: 2,
+        drawn: 1,
+        lost: 1,
+        gd: "+4",
+        points: 7,
+    },
+    {
+        position: 4,
+        team: "FC AshantiGold 04",
+        shortName: "AshantiGold",
+        played: 4,
+        won: 2,
+        drawn: 1,
+        lost: 1,
+        gd: "+2",
+        points: 7,
+    },
+    {
+        position: 5,
+        team: "Port City FC",
+        shortName: "Port City",
+        played: 4,
+        won: 2,
+        drawn: 1,
+        lost: 1,
+        gd: "+2",
+        points: 7,
+    },
+    {
+        position: 6,
+        team: "Aduana FC",
+        shortName: "Aduana",
+        played: 4,
+        won: 2,
+        drawn: 1,
+        lost: 1,
+        gd: "+2",
+        points: 7,
+    },
+    {
+        position: 7,
+        team: "Bechem United",
+        shortName: "Bechem",
+        played: 4,
+        won: 2,
+        drawn: 1,
+        lost: 1,
+        gd: "0",
+        points: 7,
+    },
+    {
+        position: 8,
+        team: "Karela United",
+        shortName: "Karela",
+        played: 4,
+        won: 2,
+        drawn: 0,
+        lost: 2,
+        gd: "0",
+        points: 6,
+    },
+    {
+        position: 9,
+        team: "Basake Holy Stars",
+        shortName: "Holy Stars",
+        played: 4,
+        won: 2,
+        drawn: 0,
+        lost: 2,
+        gd: "-2",
+        points: 6,
+    },
+    {
+        position: 10,
+        team: "Vision FC",
+        shortName: "Vision",
+        played: 4,
+        won: 1,
+        drawn: 2,
+        lost: 1,
+        gd: "+1",
+        points: 5,
+    },
+    {
+        position: 11,
+        team: "Heart of Lions",
+        shortName: "Heart of Lions",
+        played: 4,
+        won: 1,
+        drawn: 2,
+        lost: 1,
+        gd: "0",
+        points: 5,
+    },
+    {
+        position: 12,
+        team: "Swedru All Blacks",
+        shortName: "All Blacks",
+        played: 4,
+        won: 1,
+        drawn: 2,
+        lost: 1,
+        gd: "0",
+        points: 5,
+    },
+    {
+        position: 13,
+        team: "Asante Kotoko",
+        shortName: "Kotoko",
+        played: 4,
+        won: 1,
+        drawn: 2,
+        lost: 1,
+        gd: "-1",
+        points: 5,
+    },
+    {
+        position: 14,
+        team: "Debibi United",
+        shortName: "Debibi",
+        played: 4,
+        won: 1,
+        drawn: 1,
+        lost: 2,
+        gd: "+1",
+        points: 4,
+    },
+    {
+        position: 15,
+        team: "Berekum Chelsea",
+        shortName: "Berekum Chelsea",
+        played: 4,
+        won: 1,
+        drawn: 1,
+        lost: 2,
+        gd: "-3",
+        points: 4,
+    },
+    {
+        position: 16,
+        team: "Bibiani Gold Stars",
+        shortName: "Gold Stars",
+        played: 4,
+        won: 1,
+        drawn: 0,
+        lost: 3,
+        gd: "-3",
+        points: 3,
+    },
+    {
+        position: 17,
+        team: "Young Apostles",
+        shortName: "Young Apostles",
+        played: 4,
+        won: 1,
+        drawn: 0,
+        lost: 3,
+        gd: "-6",
+        points: 3,
+    },
+    {
+        position: 18,
+        team: "Dreams FC",
+        shortName: "Dreams",
+        played: 4,
+        won: 0,
+        drawn: 1,
+        lost: 3,
+        gd: "-4",
+        points: 1,
     },
     ];
 
@@ -196,6 +414,108 @@
             </div>
             </div>
             </section>
+
+                <section className="border-y border-white/10 bg-[#080808]">
+            <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+                <div className="mb-10">
+                    <p className="text-xs font-black uppercase tracking-[0.25em] text-red-500">
+                        2026/27 Standings
+                    </p>
+
+                    <h2 className="mt-3 text-4xl font-black sm:text-5xl">
+                        The League Table
+                    </h2>
+
+                    <p className="mt-4 max-w-2xl leading-7 text-gray-400">
+                        Follow the latest Ghana Premier League standings and see how
+                        the title race is taking shape.
+                    </p>
+                </div>
+
+                <div className="overflow-hidden rounded-3xl border border-white/10 bg-black">
+                    <div className="overflow-x-auto">
+                        <table
+                            className="w-full min-w-[750px] border-collapse text-white"
+                            style={{ borderCollapse: "collapse" }}
+                        >
+                            <thead>
+                                <tr className="bg-[#1a1a1a]">
+                                    <th style={tableHeaderStyle}>Pos</th>
+                                    <th style={{ ...tableHeaderStyle, textAlign: "left" }}>
+                                        Club
+                                    </th>
+                                    <th style={tableHeaderStyle}>P</th>
+                                    <th style={tableHeaderStyle}>W</th>
+                                    <th style={tableHeaderStyle}>D</th>
+                                    <th style={tableHeaderStyle}>L</th>
+                                    <th style={tableHeaderStyle}>GD</th>
+                                    <th style={tableHeaderStyle}>Pts</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {leagueTable.map((team) => (
+                                    <tr
+                                        key={team.position}
+                                        style={{
+                                            backgroundColor:
+                                                team.position === 1 ? "rgba(239,68,68,0.08)" : "#000",
+                                        }}
+                                    >
+                                        <td style={tableCellStyle}>
+                                            <strong
+                                                style={{
+                                                    color: team.position <= 4 ? "#ef4444" : "#aaa",
+                                                }}
+                                            >
+                                                {team.position}
+                                            </strong>
+                                        </td>
+
+                                        <td
+                                            style={{
+                                                ...tableCellStyle,
+                                                textAlign: "left",
+                                                fontWeight: 700,
+                                            }}
+                                        >
+                                            {team.team}
+                                        </td>
+
+                                        <td style={tableCellStyle}>{team.played}</td>
+                                        <td style={tableCellStyle}>{team.won}</td>
+                                        <td style={tableCellStyle}>{team.drawn}</td>
+                                        <td style={tableCellStyle}>{team.lost}</td>
+                                        <td style={tableCellStyle}>{team.gd}</td>
+
+                                        <td
+                                            style={{
+                                                ...tableCellStyle,
+                                                fontWeight: 900,
+                                                color: "white",
+                                            }}
+                                        >
+                                            {team.points}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div
+                        className="flex flex-wrap gap-5 px-5 py-5 text-[12px] text-[#777]"
+                    >
+                        <span> P = Played  </span>
+                        <span> W = Won  </span>
+                        <span> D = Drawn  </span>
+                        <span> L = Lost  </span>
+                        <span> GD = Goal Difference  </span>
+                        <span> Pts = Points  </span>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         {/* =========================================
             HONOURS + RIVALRY

@@ -11,7 +11,7 @@
         author: "The Sports Digest",
         date: "Oct 1, 2026",
         rt: "6 min",
-        img: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80",
+        img: "/gpl-race-heating-up.png.png",
     },
 
     {
