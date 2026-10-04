@@ -3,6 +3,7 @@ import "./styles/sports-digest.css";
 import "./styles/insight.css";
 import "./styles/match-card.css";
 import "./styles/poll.css";
+import { Analytics } from "@vercel/analytics/next";
 
 
 
@@ -37,6 +38,7 @@ export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
+  analytics: typeof Analytics;
 }>) {
   return (
     <html lang="en">
