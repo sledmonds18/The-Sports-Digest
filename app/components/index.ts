@@ -16,3 +16,4 @@ export { SportsMenuScreens } from "./SportsMenuScreens";
 export type { MenuScreen } from "./SportsMenuScreens";
 export { default as SportsPage } from "./SportsPage";
 export { default as GhanaPremierLeague } from "./GhanaPremierLeague";
+export { default as BlackStars } from "./BlackStars";

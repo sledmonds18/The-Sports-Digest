@@ -17,6 +17,7 @@
     Toast,
     SportsPage,
     GhanaPremierLeague,
+    BlackStars,
     type MenuScreen,
   } from "./components";
 
@@ -221,14 +222,21 @@
             <Contact onToast={showToast} />
           )}
 
-                {page === "ghana-premier-league" && (
-        <GhanaPremierLeague
-          onNavigate={navigate}
-          onToast={showToast}
-        />
-      )}
+                    {page === "ghana-premier-league" && (
+            <GhanaPremierLeague
+              onNavigate={navigate}
+              onToast={showToast}
+            />
+          )}
 
-                {!["home", "about", "articles", "contact", "ghana-premier-league"].includes(page) && (
+                {page === "black-stars" && (
+            <BlackStars
+              onNavigate={navigate}
+              onToast={showToast}
+            />
+          )}
+
+                {!["home", "about", "articles", "contact", "ghana-premier-league", "black-stars"].includes(page) && (
         <SportsPage
           section={page}
           onNavigate={navigate}
