@@ -8,6 +8,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 
 
 
+
+
 export const metadata: Metadata = {
   title: "The Sports Digest — Africa's Premier Sports Journalism Platform",
   description:
@@ -42,9 +44,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="canonical" href="https://thesportsdigest.com" />
-      </head>
+    <head>
+  <link rel="canonical" href="https://thesportsdigest.com" />
+  <link rel="icon" href="/favicon_io/favicon.ico" />
+</head>
       <body className="min-h-full flex flex-col">
     {children}
     <Analytics />
