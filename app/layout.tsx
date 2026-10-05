@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "./globals.css";
 import "./styles/sports-digest.css";
 import "./styles/insight.css";
 import "./styles/match-card.css";

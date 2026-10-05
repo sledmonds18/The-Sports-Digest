@@ -280,7 +280,7 @@
         {/* HERO */}
         <section className="relative overflow-hidden rounded-[2rem] border-4 border-red-500 bg-yellow-300">
         <Image
-            src="/Ghana-Premier-League-Graphics/gpl-hero.png"
+            src="/Ghana-Premier-League-Graphics/gpl-hero 1.png"
             alt="Ghana Premier League"
             width={1920}
             height={700}
@@ -288,14 +288,12 @@
             className="h-auto w-full object-cover"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-        <div className="absolute inset-x-0 bottom-0 z-10 p-6 md:p-10">
-        
-
-            <h1 className="text-4xl font-black text-white md:text-6xl">
+        <div className="absolute inset-x-0 bottom-0 z-5 px-1 pb-1 text-center md:p-0">
+        <h1 className="text-xl font-black leading-tight text-white md:text-4xl">
             The Story of Ghana's Top Flight
-            </h1>
+        </h1>
         </div>
         </section>
 
@@ -405,7 +403,7 @@
             {/* Main graphic */}
             <div className="mb-8 overflow-hidden rounded-3xl border border-white/10">
                 <Image
-                src="/Ghana-Premier-League-Graphics/gpl-clubs.png"
+                src="/Ghana-Premier-League-Graphics/gpl-clubs 1.png"
                 alt="Ghana Premier League clubs and championship celebration"
                 width={1024}
                 height={1536}
@@ -534,7 +532,7 @@
 
             <div className="overflow-hidden rounded-3xl border border-white/10">
             <Image
-                src="/Ghana-Premier-League-Graphics/gpl-rivalry-honours.png"
+                src="/Ghana-Premier-League-Graphics/gpl-rivalry-honours 1.png"
                 alt="Ghana Premier League honours and Super Clash"
                 width={1024}
                 height={1536}
@@ -609,9 +607,8 @@
             <p className="text-xs font-black uppercase tracking-[0.25em] text-red-500">
                 Current Campaign
             </p>
-
-            <h2 className="mt-3 text-4xl font-black sm:text-6xl">
-                2026/27
+            <h2 className="mt-3 whitespace-nowrap text-4xl font-black sm:text-6xl">
+            2026/27
             </h2>
 
             <p className="mt-3 text-gray-500">
@@ -621,7 +618,7 @@
 
             <div className="overflow-hidden rounded-3xl border border-white/10">
             <Image
-                src="/Ghana-Premier-League-Graphics/gpl-season.png"
+                src="/Ghana-Premier-League-Graphics/gpl-season 1.png"
                 alt="2026/27 Ghana Premier League season"
                 width={1024}
                 height={1536}

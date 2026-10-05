@@ -53,8 +53,46 @@ img{max-width:100%;height:auto;display:block}button,input,textarea,select{font-f
 .mmenu .mcta{display:block;width:100%;background:var(--red);color:#fff;text-align:center;padding:14px;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-top:20px;cursor:pointer;border:none}
 
 /* TICKER */
-.ticker{position:fixed;top:var(--nh);left:0;right:0;z-index:198;background:var(--red);height:34px;display:flex;align-items:center;overflow:hidden}
-.tlbl{background:var(--ink);color:#fff;font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:800;padding:0 14px;height:100%;display:flex;align-items:center;flex-shrink:0;white-space:nowrap}
+.ticker {
+  position: fixed;
+  top: var(--nh);
+  left: 0;
+  right: 0;
+  z-index: 198;
+
+  background: var(--red);
+
+  height: 34px;
+  min-height: 34px;
+  max-height: 34px;
+
+  display: flex;
+  align-items: center;
+
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.tlbl {
+  background: var(--ink);
+  color: #fff;
+
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-weight: 800;
+
+  padding: 0 14px;
+
+  height: 34px;
+  min-height: 34px;
+
+  display: flex;
+  align-items: center;
+
+  flex-shrink: 0;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
 .ttrack{flex:1;overflow:hidden}
 .tinner{display:flex;gap:52px;white-space:nowrap;animation:tick 22s linear infinite}
 .tinner span{font-size:10px;letter-spacing:1.5px;color:#fff;font-weight:700}
