@@ -158,41 +158,6 @@
 
             <button
                 className="menu-parent"
-                onClick={() => handleNavigate("ghana-basketball")}
-            >
-                <span>🏀 Ghana Basketball</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("ghana-athletics")}
-            >
-                <span>🏃 Ghana Athletics</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("ghana-boxing")}
-            >
-                <span>🥊 Ghana Boxing</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("ghana-volleyball")}
-            >
-                <span>🏐 Ghana Volleyball</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("ghana-cricket")}
-            >
-                <span>🏏 Ghana Cricket</span>
-            </button>
-
-            <button
-                className="menu-parent"
                 onClick={() => handleNavigate("ghana-sports")}
             >
                 <span>📰 Latest Ghana Sports News</span>
