@@ -156,12 +156,7 @@
                 <span>📰 Ghana Football News</span>
             </button>
 
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("ghana-sports")}
-            >
-                <span>📰 Latest Ghana Sports News</span>
-            </button>
+            
             </div>
         )}
 
