@@ -829,7 +829,40 @@
         </div>
     </div>
     </section>
-    </main>
+        {/* =========================================
+            BACK HOME
+        ========================================= */}
+        <section className="border-t border-white/10 bg-[#080808]">
+
+            <div className="mx-auto flex max-w-7xl flex-col justify-between gap-5 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:px-8">
+
+            <div>
+
+                <p className="text-xs font-bold uppercase tracking-widest text-red-500">
+                The Sports Digest
+                </p>
+
+                <h2 className="mt-2 text-2xl font-black">
+                Where Sport Meets Story.
+                </h2>
+
+            </div>
+
+            {onNavigate && (
+                <button
+                onClick={() => onNavigate("home")}
+                className="rounded-full border border-white/15 px-6 py-3 text-sm font-bold transition hover:bg-white/10"
+                >
+                ← Back to Home
+                </button>
+            )}
+
+            </div>
+
+        </section>
+
+        </main>
     );
-    }
-        
+}
+
+     
