@@ -36,7 +36,7 @@
 
             <div className="absolute inset-x-0 bottom-0 px-6 pb-10 sm:px-10 lg:px-16 lg:pb-14">
             <div className="mx-auto max-w-7xl">
-                <p className="mb-3 text-sm font-semibold uppercase tracking-[0.25em] text-red-500">
+                <p className="mb-3 mt-4 sm:mt-0 text-sm font-semibold uppercase tracking-[0.25em] text-red-500">
                 Ghana Women&apos;s National Team
                 </p>
 
@@ -577,13 +577,13 @@
         <p className="mt-6 leading-7 text-gray-400">
             Ghana entered the 2026 Women&apos;s Africa Cup of Nations looking to
             build on the momentum of its bronze-medal finish. The Black Queens
-            qualified by defeating Egypt 7–0 on aggregate and entered the
+            qualified by defeating Egypt 7 – 0 on aggregate and entered the
             tournament determined to go further.
         </p>
 
         <p className="mt-4 leading-7 text-gray-400">
-            Ghana opened the tournament with a 2–0 victory over Cape Verde before
-            losing 1–0 to Cameroon. A 1–1 draw with Mali in the final group match
+            Ghana opened the tournament with a 2 – 0 victory over Cape Verde before
+            losing 1 – 0 to Cameroon. A 1 – 1 draw with Mali in the final group match
             was enough to send the Black Queens through to the quarter-finals.
         </p>
         </div>
@@ -591,17 +591,17 @@
         {/* Tournament Journey */}
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
         <div className="rounded-2xl border border-white/10 bg-black p-6">
-            <div className="text-2xl font-bold text-white">7–0</div>
+            <div className="text-2xl font-bold text-white">7 – 0</div>
             <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-red-500">
             Qualification
             </p>
             <p className="mt-3 text-sm leading-6 text-gray-400">
-            Ghana defeated Egypt 7–0 on aggregate to qualify for WAFCON 2026.
+            Ghana defeated Egypt 7 – 0 on aggregate to qualify for WAFCON 2026.
             </p>
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-black p-6">
-            <div className="text-2xl font-bold text-white">2–0</div>
+            <div className="text-2xl font-bold text-white">2 – 0</div>
             <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-red-500">
             Cape Verde
             </p>
@@ -611,7 +611,7 @@
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-black p-6">
-            <div className="text-2xl font-bold text-white">0–1</div>
+            <div className="text-2xl font-bold text-white">0 – 1</div>
             <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-red-500">
             Cameroon
             </p>
@@ -621,7 +621,7 @@
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-black p-6">
-            <div className="text-2xl font-bold text-white">1–1</div>
+            <div className="text-2xl font-bold text-white">1 – 1</div>
             <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-red-500">
             Mali
             </p>
@@ -631,7 +631,7 @@
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-black p-6">
-            <div className="text-2xl font-bold text-white">2–1</div>
+            <div className="text-2xl font-bold text-white">2 – 1</div>
             <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-red-500">
             Côte d&apos;Ivoire
             </p>

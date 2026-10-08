@@ -8,22 +8,10 @@
     }
 
     const stats = [
-    {
-        number: "4",
-        label: "AFCON titles",
-    },
-    {
-        number: "5",
-        label: "World Cup appearances",
-    },
-    {
-        number: "2006",
-        label: "First World Cup",
-    },
-    {
-        number: "2010",
-        label: "Best World Cup finish",
-    },
+    { number: "4", label: "AFCON titles", },
+    { number: "5", label: "World Cup appearances", }, 
+    { number: "2006", label: "First World Cup",  },
+    { number: "2010", label: "Best World Cup finish", },   
     ];
 
     const history = [
@@ -951,7 +939,7 @@
             </h2>
 
                             <p className="mt-4 leading-7 text-gray-400">
-                Ghana's sixth World Cup campaign has added another chapter to the
+                Ghana's fifth World Cup campaign has added another chapter to the
                 Black Stars story. The focus now turns towards rebuilding, developing
                 the next generation and preparing for the challenges ahead.
                 </p>
