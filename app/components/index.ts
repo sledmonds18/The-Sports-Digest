@@ -18,3 +18,4 @@ export { default as SportsPage } from "./SportsPage";
 export { default as GhanaPremierLeague } from "./GhanaPremierLeague";
 export { default as BlackStars } from "./BlackStars";
 export { default as BlackQueens } from "./BlackQueens";
+export { default as GhanaFACup } from "./GhanaFACup";
