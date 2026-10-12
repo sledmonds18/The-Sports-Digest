@@ -448,24 +448,33 @@
     onNavigate,
     }: DivisionOneLeagueProps) {
     return (
-        <main className="bg-black text-white">
-        {/* HERO */}
-        <section className="relative min-h-[75vh] overflow-hidden">
-                    <Image
-                    src="/Ghana-Division-One-Graphics/division-one-hero.png"
-                    alt="Ghana Division One League"
-                    fill
-                    priority
-                    className="object-cover"
-                    />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20" />
+    
+    <main className="bg-black text-white">
+    {/* HERO */}
+    <section className="relative min-h-[75vh] overflow-hidden bg-black md:min-h-[75vh]">
 
-            <div className="relative z-10 flex min-h-[75vh] items-end">
-            <div className="mx-auto w-full max-w-7xl px-6 pb-16 md:px-10 lg:px-12">
-                <div className="max-w-4xl">
-                <h1 className="text-4xl font-black uppercase leading-tight tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-                    Ghana Division One League
-                </h1>
+        {/* Hero Image */}
+        <div className="absolute inset-0">
+        <Image
+            src="/Ghana-Division-One-Graphics/division-one-hero.png"
+            alt="Ghana Division One League"
+            fill
+            priority
+            sizes="100vw"
+            className="object-contain md:object-cover"
+        />
+        </div>
+
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20" />
+
+        {/* Hero Content */}
+        <div className="relative z-10 flex min-h-[75vh] items-end">
+        <div className="mx-auto w-full max-w-7xl px-6 pb-16 md:px-10 lg:px-12">
+            <div className="max-w-4xl">
+            <h1 className="text-4xl font-black uppercase leading-tight tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
+                Ghana Division One League
+            </h1>
 
                 <p className="mt-4 max-w-2xl text-lg font-medium text-gray-200 md:text-xl">
                     The Road to the Top
