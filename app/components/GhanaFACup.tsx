@@ -135,22 +135,21 @@
     }: GhanaFACupProps) {
     return (
         <main className="bg-black text-white">
-    {/* HERO */}
-    <section className="relative min-h-[75vh] overflow-hidden bg-black">
-        <Image
-        src="/Ghana-FA-Cup-Graphics/ghana-fa-cup-hero.png"
-        alt="Ghana FA Cup"
-        fill
-        priority
-        sizes="100vw"
-        className="object-contain md:object-cover"
-        />
+        {/* HERO */}
+        <section className="relative min-h-[75vh] overflow-hidden">
+            <Image
+            src="/Ghana-FA-Cup-Graphics/ghana-fa-cup-hero.png"
+            alt="Ghana FA Cup"
+            fill
+            priority
+            className="object-cover"
+            />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/20" />
 
-        <div className="relative z-10 flex min-h-[75vh] items-end">
-        <div className="mx-auto w-full max-w-7xl px-6 pb-16 md:px-10 lg:px-12">
-            <div className="max-w-4xl">
+            <div className="relative z-10 flex min-h-[75vh] items-end">
+            <div className="mx-auto w-full max-w-7xl px-6 pb-16 md:px-10 lg:px-12">
+                <div className="max-w-4xl">
                 
 
                 <h1 className="text-4xl font-black uppercase leading-tight tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
