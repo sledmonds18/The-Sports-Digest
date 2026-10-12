@@ -448,22 +448,19 @@
     onNavigate,
     }: DivisionOneLeagueProps) {
     return (
-    
-    <main className="bg-black text-white">
+        <main className="bg-black text-white">
     {/* HERO */}
     <section className="relative min-h-[75vh] overflow-hidden bg-black md:min-h-[75vh]">
 
         {/* Hero Image */}
-        <div className="absolute inset-0">
         <Image
-            src="/Ghana-Division-One-Graphics/division-one-hero.png"
-            alt="Ghana Division One League"
-            fill
-            priority
-            sizes="100vw"
-            className="object-contain md:object-cover"
+        src="/Ghana-Division-One-Graphics/division-one-hero.png"
+        alt="Ghana Division One League"
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-center md:object-cover"
         />
-        </div>
 
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20" />
