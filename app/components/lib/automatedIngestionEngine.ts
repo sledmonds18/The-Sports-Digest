@@ -347,7 +347,7 @@ export async function runAutomatedIngestion(): Promise<{
 
   // Fallback: If external feeds are blocked or rate-limited in offline/dev sandbox,
   // pick a distinct story from our wire template pool so the engine always produces realistic items
-  if (discoveredStories.length === 0) {
+  if (false && discoveredStories.length === 0) {
     const randomTemplate =
       WIRE_DISCOVERY_TEMPLATES[
         Math.floor(Math.random() * WIRE_DISCOVERY_TEMPLATES.length)
