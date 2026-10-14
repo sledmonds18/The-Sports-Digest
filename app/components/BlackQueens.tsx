@@ -36,9 +36,6 @@
 
             <div className="absolute inset-x-0 bottom-0 px-6  sm:px-10 lg:px-16 ">
             <div className="mx-auto max-w-7xl">
-                <p className="mb-3 mt-4 sm:mt-0 text-sm font-semibold uppercase tracking-[0.25em] text-red-500">
-                Ghana Women&apos;s National Team
-                </p>
 
                 <h1 className="max-w-4xl text-4xl font-bold leading-tight sm:text-5xl lg:text-7xl">
                 Black Queens: The Fight for Glory
