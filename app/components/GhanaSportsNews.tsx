@@ -67,6 +67,38 @@ export default function GhanaSportsNews({
     };
   }, []);
 
+  // Check for new wire stories on page visits and every 30 minutes while the site is open.
+  useEffect(() => {
+    let isMounted = true;
+    const scanForStories = async () => {
+      try {
+        const ingestRes = await fetch("/api/ghana-sports-news", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "ingest_wire" }),
+        });
+        if (!ingestRes.ok) return;
+        const ingestData = await ingestRes.json();
+        const refreshRes = await fetch("/api/ghana-sports-news?status=all");
+        if (!refreshRes.ok) return;
+        const freshJson = await refreshRes.json();
+        if (freshJson.success && Array.isArray(freshJson.data) && isMounted) {
+          setArticles(deduplicateList(freshJson.data));
+          if (ingestData.newStoriesQueued > 0) setIsEditorialDeskOpen(true);
+        }
+      } catch (err) {
+        console.warn("Automatic news check failed:", err);
+      }
+    };
+
+    void scanForStories();
+    const interval = window.setInterval(scanForStories, 30 * 60 * 1000);
+    return () => {
+      isMounted = false;
+      window.clearInterval(interval);
+    };
+  }, []);
+
   // Strict deduplicated articles list
   const uniqueArticles = useMemo(() => deduplicateList(articles), [articles]);
 
@@ -207,7 +239,11 @@ export default function GhanaSportsNews({
     setIsSimulatingWire(true);
 
     try {
-      const res = await fetch("/api/cron/ingest");
+      const res = await fetch("/api/ghana-sports-news", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "ingest_wire" }),
+      });
       if (res.ok) {
         const data = await res.json();
         // Refresh articles from store

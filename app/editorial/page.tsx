@@ -51,6 +51,8 @@ export default function EditorialDeskPage() {
   useEffect(() => {
     if (isAuthenticated) {
       loadAllArticles();
+      const refreshInterval = window.setInterval(loadAllArticles, 60_000);
+      return () => window.clearInterval(refreshInterval);
     }
   }, [isAuthenticated]);
 

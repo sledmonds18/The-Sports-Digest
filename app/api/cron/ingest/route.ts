@@ -6,9 +6,10 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const secret = searchParams.get("secret");
 
-    // Optional environment secret protection for production crons
+    // Vercel sends CRON_SECRET as a bearer token to scheduled functions.
     const expectedSecret = process.env.CRON_SECRET;
-    if (expectedSecret && secret !== expectedSecret) {
+    const bearerToken = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+    if (expectedSecret && secret !== expectedSecret && bearerToken !== expectedSecret) {
       return Response.json(
         { success: false, error: "Unauthorized cron trigger." },
         { status: 401 }

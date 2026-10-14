@@ -345,48 +345,6 @@ export async function runAutomatedIngestion(): Promise<{
     }
   }
 
-  // Fallback: If external feeds are blocked or rate-limited in offline/dev sandbox,
-  // pick a distinct story from our wire template pool so the engine always produces realistic items
-  if (false && discoveredStories.length === 0) {
-    const randomTemplate =
-      WIRE_DISCOVERY_TEMPLATES[
-        Math.floor(Math.random() * WIRE_DISCOVERY_TEMPLATES.length)
-      ];
-
-    const slug = `wire-${randomTemplate.category.toLowerCase()}-${Date.now()}`;
-    discoveredStories.push({
-      id: `gha-auto-wire-${Date.now()}`,
-      title: randomTemplate.title,
-      slug,
-      category: randomTemplate.category,
-      status: "pending",
-      author: `Automated Wire Bot · ${randomTemplate.source}`,
-      publishedAt: "Pending Editorial Approval",
-      readTime: "3 min",
-      image: randomTemplate.image,
-      excerpt: randomTemplate.excerpt,
-      content: [
-        `This wire bulletin was automatically ingested by The Sports Digest crawler on ${new Date().toLocaleDateString()}.`,
-        "The story is held in the staging queue awaiting human editorial verification before publication.",
-      ],
-      discoverySource: {
-        type: "automated_wire",
-        sourceName: randomTemplate.source,
-        sourceUrl: "https://wire.ghanasports.example",
-        discoveredAt: new Date().toISOString(),
-        rawSnippet: randomTemplate.excerpt,
-      },
-      editorialVerification: {
-        verifiedBy: "Pending Verification",
-        verifiedAt: "",
-        factChecked: false,
-        sourceVerified: false,
-        editorialNotes:
-          "Automatic wire alert. Check federation press office for primary source corroboration.",
-      },
-    });
-  }
-
   return {
     success: true,
     discoveredStories,
