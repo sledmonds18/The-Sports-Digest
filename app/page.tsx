@@ -21,6 +21,7 @@ import {
   BlackQueens,
   GhanaFACup,
   DivisionOneLeague,
+  GhanaSportsNews,
   type MenuScreen,
 } from "./components";
 
@@ -260,6 +261,14 @@ export default function SportsDigest() {
           />
         )}
 
+          {page === "ghana-sports" && (
+    <GhanaSportsNews
+      onNavigate={navigate}
+      onToast={showToast}
+    />
+  )}
+        
+
         {![
           "home",
           "about",
@@ -270,6 +279,7 @@ export default function SportsDigest() {
           "black-queens",
           "ghana-fa-cup",
           "division-one",
+          "ghana-sports",
         ].includes(page) && (
           <SportsPage
             section={page}

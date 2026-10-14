@@ -1,0 +1,530 @@
+{
+  "version": "2.0.0",
+  "lastUpdated": "2026-10-14T18:52:16.598Z",
+  "lastIngestedAt": "2026-10-14T18:52:16.597Z",
+  "lastIngestCount": 0,
+  "articles": [
+    {
+      "id": "gha-auto-wire-1792003670371",
+      "title": "[AUTOMATED WIRE] BAL Qualifiers: Customs Braves Secure West Division Group Draw",
+      "slug": "wire-basketball-1792003670371",
+      "category": "Basketball",
+      "status": "pending",
+      "author": "Automated Wire Bot · FIBA Africa RSS Ingestion",
+      "publishedAt": "Pending Editorial Approval",
+      "readTime": "3 min",
+      "image": "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80",
+      "excerpt": "Automated FIBA Africa alert confirms group placements for Ghana's domestic champions in the Basketball Africa League road to BAL.",
+      "content": [
+        "This wire bulletin was automatically ingested by The Sports Digest crawler on 10/14/2026.",
+        "The story is held in the staging queue awaiting human editorial verification before publication."
+      ],
+      "discoverySource": {
+        "type": "automated_wire",
+        "sourceName": "FIBA Africa RSS Ingestion",
+        "sourceUrl": "https://wire.ghanasports.example",
+        "discoveredAt": "2026-10-14T18:47:50.380Z",
+        "rawSnippet": "Automated FIBA Africa alert confirms group placements for Ghana's domestic champions in the Basketball Africa League road to BAL."
+      },
+      "editorialVerification": {
+        "verifiedBy": "Pending Verification",
+        "verifiedAt": "",
+        "factChecked": false,
+        "sourceVerified": false,
+        "editorialNotes": "Automatic wire alert. Check federation press office for primary source corroboration."
+      }
+    },
+    {
+      "id": "gha-auto-1791994701377-331",
+      "title": "[AUTOMATED DISCOVERY] Ghana Sports Fund Administrator promises to support Black Bombers - 3News",
+      "slug": "wire-football-1791994701377-919",
+      "category": "Football",
+      "status": "approved",
+      "author": "Automated Wire Crawler · Google News — Ghana Sports Feed",
+      "publishedAt": "Oct 14, 2026",
+      "readTime": "3 min",
+      "image": "/uploads/1792000741953-images.jpg",
+      "excerpt": "&lt;a href=\"https://news.google.com/rss/articles/CBMilAFBVV95cUxNb1N6NFlCbnMzMEdTU1ZrWGdlNlhMalctTzZQUU8zMFVBTmFySENrOGZVM2xZS0FfMWYwU09mcW5TUnY1ejV6dkVOOVlqaDJ",
+      "content": [
+        "This breaking sports report was automatically discovered from Google News — Ghana Sports Feed on 10/14/2026.",
+        "&lt;a href=\"https://news.google.com/rss/articles/CBMilAFBVV95cUxNb1N6NFlCbnMzMEdTU1ZrWGdlNlhMalctTzZQUU8zMFVBTmFySENrOGZVM2xZS0FfMWYwU09mcW5TUnY1ejV6dkVOOVlqaDJlUEFXYmVjQXVUb2dOWmFRZElWaG5jLWZJR19kUVpZTTFKbXJBLTdBUVkzekczX1p3ZlhZb3pZOWVHal9leVNDNGZVeTV3?oc=5\" target=\"_blank\"&gt;Ghana Sports Fund Administrator promises to support Black Bombers&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color=\"#6f6f6f\"&gt;3News&lt;/font&gt;",
+        "Under our editorial policy, this story will not go live until verified by the editor-in-chief."
+      ],
+      "discoverySource": {
+        "type": "automated_wire",
+        "sourceName": "Google News — Ghana Sports Feed",
+        "sourceUrl": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNb1N6NFlCbnMzMEdTU1ZrWGdlNlhMalctTzZQUU8zMFVBTmFySENrOGZVM2xZS0FfMWYwU09mcW5TUnY1ejV6dkVOOVlqaDJlUEFXYmVjQXVUb2dOWmFRZElWaG5jLWZJR19kUVpZTTFKbXJBLTdBUVkzekczX1p3ZlhZb3pZOWVHal9leVNDNGZVeTV3?oc=5",
+        "discoveredAt": "2026-10-14T16:18:21.384Z",
+        "rawSnippet": "&lt;a href=\"https://news.google.com/rss/articles/CBMilAFBVV95cUxNb1N6NFlCbnMzMEdTU1ZrWGdlNlhMalctTzZQUU8zMFVBTmFySENrOGZVM2xZS0FfMWYwU09mcW5TUnY1ejV6dkVOOVlqaDJlUEFXYmVjQXVUb2dOWmFRZElWaG5jLWZJR19kUVpZTTFKbXJBLTdBUVkzekczX1p3ZlhZb3pZOWVHal9leVNDNGZVeTV3?oc=5\" target=\"_blank\"&gt;Ghana Sports Fund Administrator promises to support Black Bombers&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color=\"#6f6f6f\"&gt;3News&lt;/font&gt;"
+      },
+      "editorialVerification": {
+        "verifiedBy": "Shem Bravon Lamptey (Editor-in-Chief)",
+        "verifiedAt": "2026-10-14T18:21:04.421Z",
+        "factChecked": true,
+        "sourceVerified": true,
+        "editorialNotes": "Verified primary source and match dispatches before publication."
+      }
+    },
+    {
+      "id": "gha-auto-1791994701384-664",
+      "title": "[AUTOMATED DISCOVERY] New Digital Platform Targets Ghana’s Growing Sports Journalism Demand - News Ghana",
+      "slug": "wire-football-1791994701384-902",
+      "category": "Football",
+      "status": "approved",
+      "author": "Automated Wire Crawler · Google News — Ghana Sports Feed",
+      "publishedAt": "Oct 14, 2026",
+      "readTime": "3 min",
+      "image": "/uploads/1792000775771-images__1_.jpg",
+      "excerpt": "&lt;a href=\"https://news.google.com/rss/articles/CBMimgFBVV95cUxObUhDaHFzd2F3RDFuV3JzNEgtWEo2RDVhRlM4YXg4Sm9RcXBlZHd4djdFRy1jOTNxdDF5QW41VVpPd002N191THYtSnN5bU4",
+      "content": [
+        "This breaking sports report was automatically discovered from Google News — Ghana Sports Feed on 10/14/2026.",
+        "&lt;a href=\"https://news.google.com/rss/articles/CBMimgFBVV95cUxObUhDaHFzd2F3RDFuV3JzNEgtWEo2RDVhRlM4YXg4Sm9RcXBlZHd4djdFRy1jOTNxdDF5QW41VVpPd002N191THYtSnN5bU4tR3hWaG5rUkxhcG5XVFhWcGNfbkk4UDlGYmNqRzRJS2RjaGVIWG81MmtsQUU2elZ3SkVCaXVjMHBhdkk4SGRiemFUVEp1UHpiUDlB?oc=5\" target=\"_blank\"&gt;New Digital Platform Targets Ghana’s Growing Sports Journalism Demand&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color=\"#6f6f6f\"&gt;News Ghana&lt;/font&gt;",
+        "Under our editorial policy, this story will not go live until verified by the editor-in-chief."
+      ],
+      "discoverySource": {
+        "type": "automated_wire",
+        "sourceName": "Google News — Ghana Sports Feed",
+        "sourceUrl": "https://news.google.com/rss/articles/CBMimgFBVV95cUxObUhDaHFzd2F3RDFuV3JzNEgtWEo2RDVhRlM4YXg4Sm9RcXBlZHd4djdFRy1jOTNxdDF5QW41VVpPd002N191THYtSnN5bU4tR3hWaG5rUkxhcG5XVFhWcGNfbkk4UDlGYmNqRzRJS2RjaGVIWG81MmtsQUU2elZ3SkVCaXVjMHBhdkk4SGRiemFUVEp1UHpiUDlB?oc=5",
+        "discoveredAt": "2026-10-14T16:18:21.384Z",
+        "rawSnippet": "&lt;a href=\"https://news.google.com/rss/articles/CBMimgFBVV95cUxObUhDaHFzd2F3RDFuV3JzNEgtWEo2RDVhRlM4YXg4Sm9RcXBlZHd4djdFRy1jOTNxdDF5QW41VVpPd002N191THYtSnN5bU4tR3hWaG5rUkxhcG5XVFhWcGNfbkk4UDlGYmNqRzRJS2RjaGVIWG81MmtsQUU2elZ3SkVCaXVjMHBhdkk4SGRiemFUVEp1UHpiUDlB?oc=5\" target=\"_blank\"&gt;New Digital Platform Targets Ghana’s Growing Sports Journalism Demand&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color=\"#6f6f6f\"&gt;News Ghana&lt;/font&gt;"
+      },
+      "editorialVerification": {
+        "verifiedBy": "Shem Bravon Lamptey (Editor-in-Chief)",
+        "verifiedAt": "2026-10-14T18:21:06.858Z",
+        "factChecked": true,
+        "sourceVerified": true,
+        "editorialNotes": "Verified primary source and match dispatches before publication."
+      }
+    },
+    {
+      "id": "gha-auto-1791994701384-704",
+      "title": "[AUTOMATED DISCOVERY] UDS Conquers the World: A New Dawn for Ghanaian Sports - Modern Ghana",
+      "slug": "wire-football-1791994701384-327",
+      "category": "Football",
+      "status": "approved",
+      "author": "Automated Wire Crawler · Google News — Ghana Sports Feed",
+      "publishedAt": "Oct 14, 2026",
+      "readTime": "3 min",
+      "image": "/uploads/1792000802784-929202510949-0g730m4yxs-photo-2025-09-28-15-26-10.jpg",
+      "excerpt": "&lt;a href=\"https://news.google.com/rss/articles/CBMilwFBVV95cUxOS2xCZDRRRG4zSjdQc3h6cjZEa01SdEFmbkRZTUNmRkh0RTZPb01rNWVfNFhjUW5aQjVDSV9QR21rNUlwSzVqWXBSNkFTWUR",
+      "content": [
+        "This breaking sports report was automatically discovered from Google News — Ghana Sports Feed on 10/14/2026.",
+        "&lt;a href=\"https://news.google.com/rss/articles/CBMilwFBVV95cUxOS2xCZDRRRG4zSjdQc3h6cjZEa01SdEFmbkRZTUNmRkh0RTZPb01rNWVfNFhjUW5aQjVDSV9QR21rNUlwSzVqWXBSNkFTWURqYzNpbmV2SDFkUGNCTExlU0VtTm9KaEhLX1o1TFYyZUdPaTdzdkN3S1B0U2puZWZWTGpCdG40LWdBQkdKWEdZTFM4V0h3c01J0gGWAUFVX3lxTE9NS2RZdDJGQjZWLV9DYnNxeUlBWXFIX0QtcU5CNVBSWlBlQ1Z1OXpDM1ZBVjdnZDRWZFdLM1AxMlZDQm4yRWkxYjBJaE1NSTFKdXYtNHMxbUtkcGdselZKUENfUHYwbklIZXpyeHVBRzZfM1VTb2FKbHVlTjJNTlZKZWlMeEVGZjIzaXV6ejVIbUpVblhGdw?oc=5\" target=\"_blank\"&gt;UDS Conquers the World: A New Dawn for Ghanaian Sports&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color=\"#6f6f6f\"&gt;Modern Ghana&lt;/font&gt;",
+        "Under our editorial policy, this story will not go live until verified by the editor-in-chief."
+      ],
+      "discoverySource": {
+        "type": "automated_wire",
+        "sourceName": "Google News — Ghana Sports Feed",
+        "sourceUrl": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOS2xCZDRRRG4zSjdQc3h6cjZEa01SdEFmbkRZTUNmRkh0RTZPb01rNWVfNFhjUW5aQjVDSV9QR21rNUlwSzVqWXBSNkFTWURqYzNpbmV2SDFkUGNCTExlU0VtTm9KaEhLX1o1TFYyZUdPaTdzdkN3S1B0U2puZWZWTGpCdG40LWdBQkdKWEdZTFM4V0h3c01J0gGWAUFVX3lxTE9NS2RZdDJGQjZWLV9DYnNxeUlBWXFIX0QtcU5CNVBSWlBlQ1Z1OXpDM1ZBVjdnZDRWZFdLM1AxMlZDQm4yRWkxYjBJaE1NSTFKdXYtNHMxbUtkcGdselZKUENfUHYwbklIZXpyeHVBRzZfM1VTb2FKbHVlTjJNTlZKZWlMeEVGZjIzaXV6ejVIbUpVblhGdw?oc=5",
+        "discoveredAt": "2026-10-14T16:18:21.384Z",
+        "rawSnippet": "&lt;a href=\"https://news.google.com/rss/articles/CBMilwFBVV95cUxOS2xCZDRRRG4zSjdQc3h6cjZEa01SdEFmbkRZTUNmRkh0RTZPb01rNWVfNFhjUW5aQjVDSV9QR21rNUlwSzVqWXBSNkFTWURqYzNpbmV2SDFkUGNCTExlU0VtTm9KaEhLX1o1TFYyZUdPaTdzdkN3S1B0U2puZWZWTGpCdG40LWdBQkdKWEdZTFM4V0h3c01J0gGWAUFVX3lxTE9NS2RZdDJGQjZWLV9DYnNxeUlBWXFIX0QtcU5CNVBSWlBlQ1Z1OXpDM1ZBVjdnZDRWZFdLM1AxMlZDQm4yRWkxYjBJaE1NSTFKdXYtNHMxbUtkcGdselZKUENfUHYwbklIZXpyeHVBRzZfM1VTb2FKbHVlTjJNTlZKZWlMeEVGZjIzaXV6ejVIbUpVblhGdw?oc=5\" target=\"_blank\"&gt;UDS Conquers the World: A New Dawn for Ghanaian Sports&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color=\"#6f6f6f\"&gt;Modern Ghana&lt;/font&gt;"
+      },
+      "editorialVerification": {
+        "verifiedBy": "Shem Bravon Lamptey (Editor-in-Chief)",
+        "verifiedAt": "2026-10-14T18:24:51.665Z",
+        "factChecked": true,
+        "sourceVerified": true,
+        "editorialNotes": "Primary sources corroborated. Approved for publication."
+      }
+    },
+    {
+      "id": "gha-auto-1791994701384-798",
+      "title": "[AUTOMATED DISCOVERY] #SONA2025: What President Mahama said about current state of Ghana's sports sector - Graphic Online",
+      "slug": "wire-boxing-1791994701384-885",
+      "category": "Boxing",
+      "status": "approved",
+      "author": "Automated Wire Crawler · Google News — Ghana Sports Feed",
+      "publishedAt": "Oct 14, 2026",
+      "readTime": "3 min",
+      "image": "/uploads/1792000822351-images__2_.jpg",
+      "excerpt": "&lt;a href=\"https://news.google.com/rss/articles/CBMiygFBVV95cUxOOEpwbEQ2U1JWWkdESGpBak1VU1g2UWtCbXZoVDkzUVVsQjBTQnU5d1JWY1ZNeDYzaFZFbU5qb3JyWmJjd2dkbE4zUEl6d19",
+      "content": [
+        "This breaking sports report was automatically discovered from Google News — Ghana Sports Feed on 10/14/2026.",
+        "&lt;a href=\"https://news.google.com/rss/articles/CBMiygFBVV95cUxOOEpwbEQ2U1JWWkdESGpBak1VU1g2UWtCbXZoVDkzUVVsQjBTQnU5d1JWY1ZNeDYzaFZFbU5qb3JyWmJjd2dkbE4zUEl6d19saTlYeS10S2ZCQ2NlUkhfZkdCMXRRMk1hbDdyRDY3Mm02emxhS3gtUWI0Q0wycjQ5M3RYTnNzZW8tNlMtdVdQM2hyOHlodW1maXRRc3N3ODZQcGt5VU9JVWRZYzVzWGxLeGliWGpqNXMxR0V4RlI2bkw0dXpEYzVOOGd3?oc=5\" target=\"_blank\"&gt;#SONA2025: What President Mahama said about current state of Ghana's sports sector&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color=\"#6f6f6f\"&gt;Graphic Online&lt;/font&gt;",
+        "Under our editorial policy, this story will not go live until verified by the editor-in-chief."
+      ],
+      "discoverySource": {
+        "type": "automated_wire",
+        "sourceName": "Google News — Ghana Sports Feed",
+        "sourceUrl": "https://news.google.com/rss/articles/CBMiygFBVV95cUxOOEpwbEQ2U1JWWkdESGpBak1VU1g2UWtCbXZoVDkzUVVsQjBTQnU5d1JWY1ZNeDYzaFZFbU5qb3JyWmJjd2dkbE4zUEl6d19saTlYeS10S2ZCQ2NlUkhfZkdCMXRRMk1hbDdyRDY3Mm02emxhS3gtUWI0Q0wycjQ5M3RYTnNzZW8tNlMtdVdQM2hyOHlodW1maXRRc3N3ODZQcGt5VU9JVWRZYzVzWGxLeGliWGpqNXMxR0V4RlI2bkw0dXpEYzVOOGd3?oc=5",
+        "discoveredAt": "2026-10-14T16:18:21.385Z",
+        "rawSnippet": "&lt;a href=\"https://news.google.com/rss/articles/CBMiygFBVV95cUxOOEpwbEQ2U1JWWkdESGpBak1VU1g2UWtCbXZoVDkzUVVsQjBTQnU5d1JWY1ZNeDYzaFZFbU5qb3JyWmJjd2dkbE4zUEl6d19saTlYeS10S2ZCQ2NlUkhfZkdCMXRRMk1hbDdyRDY3Mm02emxhS3gtUWI0Q0wycjQ5M3RYTnNzZW8tNlMtdVdQM2hyOHlodW1maXRRc3N3ODZQcGt5VU9JVWRZYzVzWGxLeGliWGpqNXMxR0V4RlI2bkw0dXpEYzVOOGd3?oc=5\" target=\"_blank\"&gt;#SONA2025: What President Mahama said about current state of Ghana's sports sector&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color=\"#6f6f6f\"&gt;Graphic Online&lt;/font&gt;"
+      },
+      "editorialVerification": {
+        "verifiedBy": "Shem Bravon Lamptey (Editor-in-Chief)",
+        "verifiedAt": "2026-10-14T18:21:10.215Z",
+        "factChecked": true,
+        "sourceVerified": true,
+        "editorialNotes": "Verified primary source and match dispatches before publication."
+      }
+    },
+    {
+      "id": "gha-auto-1791994701385-638",
+      "title": "[AUTOMATED DISCOVERY] These are 5 sports Ghanaians are growing passionate about (beyond football, of course) - Pulse Ghana",
+      "slug": "wire-boxing-1791994701385-353",
+      "category": "Boxing",
+      "status": "approved",
+      "author": "Automated Wire Crawler · Google News — Ghana Sports Feed",
+      "publishedAt": "Oct 14, 2026",
+      "readTime": "3 min",
+      "image": "/uploads/1792000835846-c832d2c0-46c4-44fd-9c77-5fb29f26a7ba.jpg",
+      "excerpt": "&lt;a href=\"https://news.google.com/rss/articles/CBMizwFBVV95cUxPQmxycGJ0dVoyYVRRaDc5cF9mYXNNalA4cm10UzlFaFpiUG9NNE92XzRmVW1zRFhYZ2tTYWtpRkx2VFZONnBXb3AtcUtLOFd",
+      "content": [
+        "This breaking sports report was automatically discovered from Google News — Ghana Sports Feed on 10/14/2026.",
+        "&lt;a href=\"https://news.google.com/rss/articles/CBMizwFBVV95cUxPQmxycGJ0dVoyYVRRaDc5cF9mYXNNalA4cm10UzlFaFpiUG9NNE92XzRmVW1zRFhYZ2tTYWtpRkx2VFZONnBXb3AtcUtLOFdkaVBOTXpQa2huV2hJQkdXNzZqcHRsQVJndnNnU3Y3M1VjZ1hBTDNfdElHVjZaTEwyWWoxcGIxeHV1TFNlSHJSaVpXQUo2WHFYNWJzcnN5bjNQNld5VFd1ZUM5QWJqWXhjblByV3ZSUGVMXzBHZVBvNTRIWEd5MnlweVZveHRSYUk?oc=5\" target=\"_blank\"&gt;These are 5 sports Ghanaians are growing passionate about (beyond football, of course)&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color=\"#6f6f6f\"&gt;Pulse Ghana&lt;/font&gt;",
+        "Under our editorial policy, this story will not go live until verified by the editor-in-chief."
+      ],
+      "discoverySource": {
+        "type": "automated_wire",
+        "sourceName": "Google News — Ghana Sports Feed",
+        "sourceUrl": "https://news.google.com/rss/articles/CBMizwFBVV95cUxPQmxycGJ0dVoyYVRRaDc5cF9mYXNNalA4cm10UzlFaFpiUG9NNE92XzRmVW1zRFhYZ2tTYWtpRkx2VFZONnBXb3AtcUtLOFdkaVBOTXpQa2huV2hJQkdXNzZqcHRsQVJndnNnU3Y3M1VjZ1hBTDNfdElHVjZaTEwyWWoxcGIxeHV1TFNlSHJSaVpXQUo2WHFYNWJzcnN5bjNQNld5VFd1ZUM5QWJqWXhjblByV3ZSUGVMXzBHZVBvNTRIWEd5MnlweVZveHRSYUk?oc=5",
+        "discoveredAt": "2026-10-14T16:18:21.385Z",
+        "rawSnippet": "&lt;a href=\"https://news.google.com/rss/articles/CBMizwFBVV95cUxPQmxycGJ0dVoyYVRRaDc5cF9mYXNNalA4cm10UzlFaFpiUG9NNE92XzRmVW1zRFhYZ2tTYWtpRkx2VFZONnBXb3AtcUtLOFdkaVBOTXpQa2huV2hJQkdXNzZqcHRsQVJndnNnU3Y3M1VjZ1hBTDNfdElHVjZaTEwyWWoxcGIxeHV1TFNlSHJSaVpXQUo2WHFYNWJzcnN5bjNQNld5VFd1ZUM5QWJqWXhjblByV3ZSUGVMXzBHZVBvNTRIWEd5MnlweVZveHRSYUk?oc=5\" target=\"_blank\"&gt;These are 5 sports Ghanaians are growing passionate about (beyond football, of course)&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color=\"#6f6f6f\"&gt;Pulse Ghana&lt;/font&gt;"
+      },
+      "editorialVerification": {
+        "verifiedBy": "Shem Bravon Lamptey (Editor-in-Chief)",
+        "verifiedAt": "2026-10-14T18:24:53.380Z",
+        "factChecked": true,
+        "sourceVerified": true,
+        "editorialNotes": "Primary sources corroborated. Approved for publication."
+      }
+    },
+    {
+      "id": "gha-auto-1791994701385-536",
+      "title": "[AUTOMATED DISCOVERY] Ghana Sports Fund targets broader development, pledges support for boxing - Adomonline.com",
+      "slug": "wire-boxing-1791994701385-112",
+      "category": "Boxing",
+      "status": "approved",
+      "author": "Automated Wire Crawler · Google News — Ghana Sports Feed",
+      "publishedAt": "Oct 14, 2026",
+      "readTime": "3 min",
+      "image": "/uploads/1792000852282-images__3_.jpg",
+      "excerpt": "&lt;a href=\"https://news.google.com/rss/articles/CBMiogFBVV95cUxOcGZkQ0pPZFBYWXN0VGk5bzloRkFUVmk4WGUtd2VhdmFYV0lhLVhhZldjcVZUUW5mZ1BXaHoxSW5HUjZxb2dBVjkyYmIyY3J",
+      "content": [
+        "This breaking sports report was automatically discovered from Google News — Ghana Sports Feed on 10/14/2026.",
+        "&lt;a href=\"https://news.google.com/rss/articles/CBMiogFBVV95cUxOcGZkQ0pPZFBYWXN0VGk5bzloRkFUVmk4WGUtd2VhdmFYV0lhLVhhZldjcVZUUW5mZ1BXaHoxSW5HUjZxb2dBVjkyYmIyY3JRdm9fd3VxcVpaMWpvRVFXMS1vcXdZaEUydGFuUUoxeHdfNzU2cjRYclFkQnh1Vmtrc3dMRnJTc3JSd1VOWXczTTB5d1dBa3N5R1l6ZTFKZ0NoWUE?oc=5\" target=\"_blank\"&gt;Ghana Sports Fund targets broader development, pledges support for boxing&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color=\"#6f6f6f\"&gt;Adomonline.com&lt;/font&gt;",
+        "Under our editorial policy, this story will not go live until verified by the editor-in-chief."
+      ],
+      "discoverySource": {
+        "type": "automated_wire",
+        "sourceName": "Google News — Ghana Sports Feed",
+        "sourceUrl": "https://news.google.com/rss/articles/CBMiogFBVV95cUxOcGZkQ0pPZFBYWXN0VGk5bzloRkFUVmk4WGUtd2VhdmFYV0lhLVhhZldjcVZUUW5mZ1BXaHoxSW5HUjZxb2dBVjkyYmIyY3JRdm9fd3VxcVpaMWpvRVFXMS1vcXdZaEUydGFuUUoxeHdfNzU2cjRYclFkQnh1Vmtrc3dMRnJTc3JSd1VOWXczTTB5d1dBa3N5R1l6ZTFKZ0NoWUE?oc=5",
+        "discoveredAt": "2026-10-14T16:18:21.385Z",
+        "rawSnippet": "&lt;a href=\"https://news.google.com/rss/articles/CBMiogFBVV95cUxOcGZkQ0pPZFBYWXN0VGk5bzloRkFUVmk4WGUtd2VhdmFYV0lhLVhhZldjcVZUUW5mZ1BXaHoxSW5HUjZxb2dBVjkyYmIyY3JRdm9fd3VxcVpaMWpvRVFXMS1vcXdZaEUydGFuUUoxeHdfNzU2cjRYclFkQnh1Vmtrc3dMRnJTc3JSd1VOWXczTTB5d1dBa3N5R1l6ZTFKZ0NoWUE?oc=5\" target=\"_blank\"&gt;Ghana Sports Fund targets broader development, pledges support for boxing&lt;/a&gt;&amp;nbsp;&amp;nbsp;&lt;font color=\"#6f6f6f\"&gt;Adomonline.com&lt;/font&gt;"
+      },
+      "editorialVerification": {
+        "verifiedBy": "Shem Bravon Lamptey (Editor-in-Chief)",
+        "verifiedAt": "2026-10-14T18:21:13.964Z",
+        "factChecked": true,
+        "sourceVerified": true,
+        "editorialNotes": "Verified primary source and match dispatches before publication."
+      }
+    },
+    {
+      "id": "gha-fb-002",
+      "title": "Women's Premier League: Ampem Darkoa and Hasaacas Ladies Set for Showdown",
+      "slug": "womens-premier-league-ampem-darkoa-hasaacas-ladies",
+      "category": "Football",
+      "featured": false,
+      "status": "approved",
+      "author": "Selorm Agyemang · Domestic Football",
+      "publishedAt": "Oct 14, 2026",
+      "readTime": "4 min",
+      "image": "/uploads/1792002491086-hasaacas-ladies.jpg",
+      "excerpt": "Ghana's preeminent women's football rivalry takes center stage as Northern and Southern zone champions clash with continental qualification on the line.",
+      "content": [
+        "The Ghana Women's Premier League continues to demonstrate significant technical elevation. Ampem Darkoa Ladies and Hasaacas Ladies have both dominated their regional zones, setting up an eagerly anticipated championship playoff.",
+        "Both squads feature key national team players who starred in recent African Olympic qualifiers, providing an elite tactical benchmark for domestic women's football.",
+        "Match commissioners have confirmed that the fixture will feature full broadcast coverage and certified match analytics tracking."
+      ],
+      "discoverySource": {
+        "type": "federation_dispatch",
+        "sourceName": "Ghana FA Women's Desk",
+        "sourceUrl": "https://ghanafa.org/wpl-championship-2026",
+        "discoveredAt": "2026-10-13T14:00:00Z"
+      },
+      "editorialVerification": {
+        "verifiedBy": "Shem Bravon Lamptey (Editor-in-Chief)",
+        "verifiedAt": "2026-10-14T18:28:47.131Z",
+        "factChecked": true,
+        "sourceVerified": true,
+        "editorialNotes": "Confirmed with GFA Women's Competitions Committee."
+      }
+    },
+    {
+      "id": "gha-bx-002",
+      "title": "Bukom Fight Night: Rising Featherweight Sensation Secures WBO Africa Title Shot",
+      "slug": "bukom-fight-night-featherweight-wbo-africa",
+      "category": "Boxing",
+      "featured": false,
+      "status": "approved",
+      "author": "Nii Ayitey Hammond · Combat Sports Correspondent",
+      "publishedAt": "Oct 13, 2026",
+      "readTime": "4 min",
+      "image": "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=800&q=80",
+      "excerpt": "A pulsating 10-round slugfest at the Bukom Boxing Arena has produced Ghana's next world title challenger, cementing Accra's enduring legacy as the cradle of African boxing champions.",
+      "content": [
+        "The Bukom Boxing Arena erupted in thunderous applause on Saturday as 22-year-old Emmanuel Tagoe Jr. dismantled his seasoned continental rival with a masterclass in counter-punching and ring generalship.",
+        "Ghana Boxing Authority (GBA) officials confirmed post-bout that sanctioning documents for an official WBO Africa Featherweight eliminator bout have been completed, with an international staging targeted for December.",
+        "Accra's coastal boxing enclave continues to supply world-class pugilists, keeping alive the lineage pioneered by legends like Azumah Nelson, Ike Quartey, and Joshua Clottey."
+      ],
+      "discoverySource": {
+        "type": "federation_dispatch",
+        "sourceName": "Ghana Boxing Authority (GBA) Media Desk",
+        "sourceUrl": "https://ghanaboxing.org/news/title-eliminator",
+        "discoveredAt": "2026-10-13T22:15:00Z"
+      },
+      "editorialVerification": {
+        "verifiedBy": "Sports Desk Verification Team",
+        "verifiedAt": "2026-10-14T07:15:00Z",
+        "factChecked": true,
+        "sourceVerified": true,
+        "editorialNotes": "Scorecards cross-checked with certified GBA ringside judges. Sanctioning fee deposit confirmed."
+      }
+    },
+    {
+      "id": "gha-bx-003",
+      "title": "Golden Gloves Academy: Azumah Nelson Foundation Expands Youth Gyms Across Volta",
+      "slug": "golden-gloves-academy-azumah-nelson-volta-gyms",
+      "category": "Boxing",
+      "featured": false,
+      "status": "approved",
+      "author": "Nii Ayitey Hammond · Combat Sports Desk",
+      "publishedAt": "Oct 14, 2026",
+      "readTime": "3 min",
+      "image": "/uploads/1792002780625-images__7_.jpg",
+      "excerpt": "A major grassroots initiative aims to extend Ghana's elite pugilistic training beyond Greater Accra into the Volta and Eastern regions with modern ring facilities.",
+      "content": [
+        "The Azumah Nelson Foundation has officially commissioned two state-of-the-art youth boxing gyms in Ho and Kpando.",
+        "The facilities include international-standard regulation rings, speed bags, and conditioning equipment designed to discover and hone teenage amateur talents.",
+        "Ghana Olympic Committee representatives commended the private-public collaboration for preparing fighters for international tournament qualifications."
+      ],
+      "discoverySource": {
+        "type": "press_release",
+        "sourceName": "Azumah Nelson Foundation Communications",
+        "discoveredAt": "2026-10-11T09:30:00Z"
+      },
+      "editorialVerification": {
+        "verifiedBy": "Shem Bravon Lamptey (Editor-in-Chief)",
+        "verifiedAt": "2026-10-14T18:33:05.470Z",
+        "factChecked": true,
+        "sourceVerified": true,
+        "editorialNotes": "Gym launch verified on site with Ho Municipal Sports Council."
+      }
+    },
+    {
+      "id": "gha-at-003",
+      "title": "National Sprint Camp Opens in Kumasi Ahead of World Athletics Relays",
+      "slug": "ghana-athletics-national-sprint-camp-kumasi",
+      "category": "Athletics",
+      "featured": false,
+      "status": "approved",
+      "author": "Kwame Darko · Athletics Desk",
+      "publishedAt": "Oct 12, 2026",
+      "readTime": "4 min",
+      "image": "https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=800&q=80",
+      "excerpt": "Ghana's men's and women's 4x100m relay pools have assembled at the Paa Joe Stadium in Kumasi, focusing on baton exchanges and top-end speed mechanics.",
+      "content": [
+        "The Ghana Athletics Association (GAA) has officially opened its high-performance residential camp in Kumasi. Sixteen elite sprinters from both domestic clubs and collegiate ranks abroad have reported for technical baton drills.",
+        "Following Ghana's podium finishes at the African Games, technical coaches are emphasizing precision during baton handovers inside the 30-meter changeover box to shave critical tenths of a second off their season-best times.",
+        "With direct qualification for the upcoming World Athletics Championships on the line, the coaching staff expressed strong optimism regarding the squad's physical conditioning."
+      ],
+      "discoverySource": {
+        "type": "federation_dispatch",
+        "sourceName": "Ghana Athletics Association (GAA) Communications",
+        "sourceUrl": "https://ghanaathletics.org/press/relays-2026",
+        "discoveredAt": "2026-10-12T11:00:00Z"
+      },
+      "editorialVerification": {
+        "verifiedBy": "Shem Bravon Lamptey (Editor-in-Chief)",
+        "verifiedAt": "2026-10-12T14:30:00Z",
+        "factChecked": true,
+        "sourceVerified": true,
+        "editorialNotes": "Roster verified directly with GAA Technical Director at Paa Joe Stadium."
+      }
+    },
+    {
+      "id": "gha-at-004",
+      "title": "National Circuit Championship: Northern Athletes Shine in Tamale Field Events",
+      "slug": "national-circuit-championship-tamale-field-events",
+      "category": "Athletics",
+      "featured": false,
+      "status": "approved",
+      "author": "Abena Mensah · Athletics Desk",
+      "publishedAt": "Oct 14, 2026",
+      "readTime": "3 min",
+      "image": "/uploads/1792002848269-images__8_.jpg",
+      "excerpt": "Records fell at the Aliu Mahama Sports Stadium as collegiate athletes set new personal bests in long jump, javelin, and middle-distance steeplechase.",
+      "content": [
+        "Day two of the GAA National Circuit in Tamale delivered outstanding results across track and field categories.",
+        "University of Development Studies (UDS) athletes dominated the men's long jump and women's 800m, earning provisional qualification marks for national trials.",
+        "Coaches highlighted the surging quality of collegiate athletics training facilities across northern Ghana as a vital pipeline for future national teams."
+      ],
+      "discoverySource": {
+        "type": "field_correspondent",
+        "sourceName": "Tamale Stadium Sports Desk",
+        "discoveredAt": "2026-10-09T18:00:00Z"
+      },
+      "editorialVerification": {
+        "verifiedBy": "Shem Bravon Lamptey (Editor-in-Chief)",
+        "verifiedAt": "2026-10-14T18:34:11.164Z",
+        "factChecked": true,
+        "sourceVerified": true,
+        "editorialNotes": "Electronic timing receipts and official score sheets corroborated."
+      }
+    },
+    {
+      "id": "gha-aw-004",
+      "title": "Golden Arms: Ghana Sets Sights on World Armwrestling Championship Podium",
+      "slug": "golden-arms-ghana-world-armwrestling-championship",
+      "category": "Armwrestling",
+      "featured": false,
+      "status": "approved",
+      "author": "Abena Mensah · Olympic & Combat Sports",
+      "publishedAt": "Oct 14, 2026",
+      "readTime": "3 min",
+      "image": "/uploads/1792002385739-images__4_.jpg",
+      "excerpt": "After sweeping 41 medals at the continental showpiece, Ghana's national armwrestling team, the Golden Arms, kicks off final preparations for international competition.",
+      "content": [
+        "Armwrestling remains one of Ghana's fastest-growing and most successful sporting disciplines. President of the Ghana Armwrestling Federation (GAF), Charles Osei Asibey, announced that 12 national pullers will represent the nation at the upcoming global tournament.",
+        "Heavyweight stars Grace Mintah and Edward Asamoah lead the contingent after commanding gold-medal sweeps in both left and right-arm categories during the African Games.",
+        "With grassroots talent discovery programs expanding across Ashanti, Greater Accra, and Western regions, Ghana is positioning itself as the undisputed powerhouse of African pullers."
+      ],
+      "discoverySource": {
+        "type": "press_release",
+        "sourceName": "Ghana Armwrestling Federation (GAF)",
+        "sourceUrl": "https://armwrestlingghana.com/releases/world-champs-prep",
+        "discoveredAt": "2026-10-11T13:20:00Z"
+      },
+      "editorialVerification": {
+        "verifiedBy": "Shem Bravon Lamptey (Editor-in-Chief)",
+        "verifiedAt": "2026-10-14T18:26:30.088Z",
+        "factChecked": true,
+        "sourceVerified": true,
+        "editorialNotes": "Official federation squad list confirmed against Ministry of Youth & Sports clearance."
+      }
+    },
+    {
+      "id": "gha-bk-005",
+      "title": "Accra Basketball League: Braves Edge Reformers in Thrilling Overtime Derby",
+      "slug": "abl-braves-edge-reformers-overtime-thriller",
+      "category": "Basketball",
+      "featured": false,
+      "status": "approved",
+      "author": "Kofi Boateng · Basketball Desk",
+      "publishedAt": "Oct 14, 2026",
+      "readTime": "4 min",
+      "image": "/uploads/1792003341421-images__11_.jpg",
+      "excerpt": "A buzzer-beating floater in extra time sealed an 84-82 victory for Braves of Customs against Prisons Reformers at the Cantonments Basketball Court.",
+      "content": [
+        "The Accra Basketball League (ABL) Men's Division 1 provided pure drama on Friday night as defending champions Braves of Customs overcame a 14-point fourth-quarter deficit to defeat fierce rivals Prisons Reformers.",
+        "Guard Nana Kwame paced the Braves with 26 points and 8 assists, sinking the decisive floating jumper off the glass with just 1.8 seconds remaining in overtime.",
+        "The result tightens the standings at the summit of the ABL table, with the playoff picture coming into sharp focus heading into the final month of the regular season."
+      ],
+      "discoverySource": {
+        "type": "field_correspondent",
+        "sourceName": "ABL Cantonments Court Correspondent",
+        "discoveredAt": "2026-10-10T21:40:00Z"
+      },
+      "editorialVerification": {
+        "verifiedBy": "Shem Bravon Lamptey (Editor-in-Chief)",
+        "verifiedAt": "2026-10-14T18:42:34.097Z",
+        "factChecked": true,
+        "sourceVerified": true,
+        "editorialNotes": "Official score sheet inspected and signed by ABL Chief Scorer and Match Commissioner."
+      }
+    },
+    {
+      "id": "gha-bk-006",
+      "title": "Sprite Ball Championship: High School Powerhouses Prepare for Regional Qualifiers",
+      "slug": "sprite-ball-championship-high-school-qualifiers",
+      "category": "Basketball",
+      "featured": false,
+      "status": "approved",
+      "author": "Selorm Agyemang · High School Sports",
+      "publishedAt": "Oct 14, 2026",
+      "readTime": "3 min",
+      "image": "/uploads/1792003159489-images__10_.jpg",
+      "excerpt": "Western and Eastern region giants Mfantsipim, Prempeh College, and Keta Business College announce their rosters for the prestigious Sprite Ball Championship.",
+      "content": [
+        "Ghana's most renowned high school basketball tournament, Sprite Ball, has announced its qualification schedule spanning six regional centers.",
+        "Defending boys' division champions Mfantsipim School will face stiff competition from Kumasi's Prempeh College, while Sacred Heart Senior High looks to repeat in the girls' division.",
+        "The tournament continues to serve as the single most critical scout recruiting platform for collegiate scholarships and national junior team call-ups."
+      ],
+      "discoverySource": {
+        "type": "press_release",
+        "sourceName": "Rite Sports Organizing Secretariat",
+        "discoveredAt": "2026-10-07T12:00:00Z"
+      },
+      "editorialVerification": {
+        "verifiedBy": "Shem Bravon Lamptey (Editor-in-Chief)",
+        "verifiedAt": "2026-10-14T18:39:21.884Z",
+        "factChecked": true,
+        "sourceVerified": true,
+        "editorialNotes": "Verified with Ghana Education Service (GES) sports coordinator."
+      }
+    },
+    {
+      "id": "gha-hk-006",
+      "title": "Sapholda Hockey League: Ex-Chequers and GRA Ladies Set for Title Clash",
+      "slug": "sapholda-hockey-exchequers-gra-ladies-title-clash",
+      "category": "Hockey",
+      "featured": false,
+      "status": "approved",
+      "author": "The Sports Digest Sports Desk",
+      "publishedAt": "Oct 14, 2026",
+      "readTime": "3 min",
+      "image": "/uploads/1792003090367-images__9_.jpg",
+      "excerpt": "All eyes turn to the Theodosia Okoh National Hockey Stadium in Accra this weekend as the premier hockey clubs in Ghana face off for the league title.",
+      "content": [
+        "The Greater Accra Hockey Association has confirmed the schedule for this weekend's pivotal Sapholda Hockey League fixtures at the National Hockey Stadium.",
+        "In the men's division, table-toppers Ex-Chequers take on Trustees in a match that will determine the destination of the trophy. In the women's division, GRA Ladies look to preserve their unblemished record against Reformers Ladies.",
+        "Both clubs are also using the competition to finalize roster combinations ahead of the African Hockey Club Championship."
+      ],
+      "discoverySource": {
+        "type": "federation_dispatch",
+        "sourceName": "Greater Accra Hockey Association",
+        "sourceUrl": "https://ghanahockey.org/fixtures/oct-2026",
+        "discoveredAt": "2026-10-09T14:15:00Z"
+      },
+      "editorialVerification": {
+        "verifiedBy": "Shem Bravon Lamptey (Editor-in-Chief)",
+        "verifiedAt": "2026-10-14T18:38:12.539Z",
+        "factChecked": true,
+        "sourceVerified": true,
+        "editorialNotes": "Confirmed through GAHA Secretariat fixture bulletin and umpire coordinator."
+      }
+    },
+    {
+      "id": "gha-vb-007",
+      "title": "National Beach Volleyball Camp Established in Ada Ahead of Continental Tour",
+      "slug": "national-beach-volleyball-camp-ada-continental-tour",
+      "category": "Volleyball",
+      "featured": false,
+      "status": "approved",
+      "author": "Selorm Agyemang · Volleyball Desk",
+      "publishedAt": "Oct 08, 2026",
+      "readTime": "3 min",
+      "image": "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=800&q=80",
+      "excerpt": "Ghana Volleyball Association (GVA) convenes a high-intensity sand training camp on the Ada coastline to prepare men's and women's pairs for CAVB qualifiers.",
+      "content": [
+        "The Ghana Volleyball Association has launched a dedicated two-week training camp in Ada for eight national beach volleyball duos.",
+        "The training regimen focuses on wind adaptation, quick lateral transitions on soft sand, and specialized jump-float service reception.",
+        "The head coach noted that recent performances on the West African circuit demonstrate Ghana has the physical presence and agility to compete with the continent's top-seeded pairs."
+      ],
+      "discoverySource": {
+        "type": "press_release",
+        "sourceName": "Ghana Volleyball Association (GVA)",
+        "sourceUrl": "https://ghanavolley.org/ada-camp-2026",
+        "discoveredAt": "2026-10-08T10:45:00Z"
+      },
+      "editorialVerification": {
+        "verifiedBy": "Sports Desk Verification Team",
+        "verifiedAt": "2026-10-08T13:30:00Z",
+        "factChecked": true,
+        "sourceVerified": true,
+        "editorialNotes": "Coach interview and player travel allowances corroborated with GVA General Secretary."
+      }
+    }
+  ]
+}

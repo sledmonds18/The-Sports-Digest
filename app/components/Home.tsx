@@ -193,7 +193,7 @@
             <div className="rule" />
 
             <div className="agrid">
-                {ARTICLES.slice(0, 3).map((a, i) => (
+                {ARTICLES.slice(4, 7).map((a, i) => (
                 <article
                     key={a.id}
                     className={`acard fu d${i + 1}`}

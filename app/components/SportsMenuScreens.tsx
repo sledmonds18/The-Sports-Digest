@@ -149,12 +149,14 @@
                 <span>⚽ Division One League</span>
             </button>
 
+    
             <button
-                className="menu-parent"
-                onClick={() => handleNavigate("ghana-football")}
+            className="menu-parent"
+            onClick={() => handleNavigate("ghana-sports")}
             >
-                <span>📰 Ghana Football News</span>
+            <span>📰 Ghana Sports News</span>
             </button>
+
 
             
             </div>
