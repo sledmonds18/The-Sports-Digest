@@ -24,7 +24,7 @@
         {/* Hero */}
         <section className="relative overflow-hidden">
             <Image
-            src="/Black-Queens-Graphics/black-queens-hero.png"
+            src="/Black-Queens-Graphics/black-queens-hero1.png"
             alt="Ghana Black Queens"
             width={1920}
             height={700}
@@ -34,7 +34,7 @@
 
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
 
-            <div className="absolute inset-x-0 bottom-0 px-6 pb-10 sm:px-10 lg:px-16 lg:pb-14">
+            <div className="absolute inset-x-0 bottom-0 px-6  sm:px-10 lg:px-16 ">
             <div className="mx-auto max-w-7xl">
                 <p className="mb-3 mt-4 sm:mt-0 text-sm font-semibold uppercase tracking-[0.25em] text-red-500">
                 Ghana Women&apos;s National Team
@@ -108,7 +108,7 @@
             {/* Image */}
             <div className="overflow-hidden rounded-2xl border border-white/10 bg-neutral-900">
             <Image
-                src="/Black-Queens-Graphics/black-queens-history.png"
+                src="/Black-Queens-Graphics/black-queens-history1.png"
                 alt="Historic Ghana Black Queens"
                 width={1024}
                 height={1536}

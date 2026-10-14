@@ -133,7 +133,7 @@
         {
         name: "Nsuopon Fidelity",
         location: "Ashanti Region",
-        image: "/Ghana-Division-One-Teams/nsuopon-fidelity.png",
+        image: "/Ghana-Division-One-Teams/nsuopon-fidelity-old.png",
         info: "A competitive side looking to turn consistency into a promotion push.",
         },
         {
@@ -454,7 +454,7 @@
 
         {/* Hero Image */}
         <Image
-        src="/Ghana-Division-One-Graphics/division-one-hero.png"
+        src="/Ghana-Division-One-Graphics/division-one-hero-old.png"
         alt="Ghana Division One League"
         fill
         priority
@@ -466,8 +466,8 @@
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/20" />
 
         {/* Hero Content */}
-        <div className="relative z-10 flex min-h-[75vh] items-end">
-        <div className="mx-auto w-full max-w-7xl px-6 pb-16 md:px-10 lg:px-12">
+        <div className="relative z-10 flex min-h-[80vh] items-end">
+        <div className="mx-auto w-full max-w-7xl px-6  md:px-10 lg:px-12">
             <div className="max-w-4xl">
             <h1 className="text-4xl font-black uppercase leading-tight tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
                 Ghana Division One League
@@ -821,15 +821,7 @@
 
         {/* 2026/27 */}
         <section className="mx-auto max-w-7xl px-6 py-20 md:px-10 lg:px-12">
-            <div className="overflow-hidden rounded-3xl border border-yellow-400/20 bg-gradient-to-br from-yellow-500/10 via-zinc-950 to-black">
-            <div className="grid lg:grid-cols-2">
-                <div className="relative min-h-[420px] bg-zinc-950">
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-600">
-                    2026/27 Season Image
-                    </span>
-                </div>
-                </div>
+            
 
                 <div className="p-8 md:p-12">
                 <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-500">
@@ -852,8 +844,7 @@
                     with every result capable of changing the promotion picture.
                 </p>
                 </div>
-            </div>
-            </div>
+            
         </section>
 
         {/* SEASON ROADMAP */}

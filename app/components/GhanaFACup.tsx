@@ -148,7 +148,7 @@
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/20" />
 
             <div className="relative z-10 flex min-h-[75vh] items-end">
-            <div className="mx-auto w-full max-w-7xl px-6 pb-16 md:px-10 lg:px-12">
+            <div className="mx-auto w-full max-w-7xl px-6  md:px-10 lg:px-12">
                 <div className="max-w-4xl">
                 
 
