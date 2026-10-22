@@ -1,8 +1,20 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import {
+  isEditorialRequestAuthorized,
+  unauthorizedResponse,
+} from "../../components/lib/editorialAuth";
 
 export async function POST(request: Request) {
+  // Uploads land in public/ and are referenced by live articles, so the write
+  // is reserved for the newsroom.
+  if (!isEditorialRequestAuthorized(request)) {
+    return unauthorizedResponse(
+      "Only the editorial desk may upload editorial images."
+    );
+  }
+
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;

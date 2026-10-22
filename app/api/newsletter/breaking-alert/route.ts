@@ -1,6 +1,18 @@
 import { Resend } from "resend";
+import {
+  isEditorialRequestAuthorized,
+  unauthorizedResponse,
+} from "../../../components/lib/editorialAuth";
 
 export async function POST(request: Request) {
+  // Dispatching a bulletin reaches subscribers. It is a publishing action, so
+  // it stays behind the newsroom gate like every other live change.
+  if (!isEditorialRequestAuthorized(request)) {
+    return unauthorizedResponse(
+      "Only the editorial desk may dispatch a breaking bulletin."
+    );
+  }
+
   try {
     const body = await request.json();
     const { title, excerpt, category, author, slug } = body;

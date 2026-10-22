@@ -564,58 +564,6 @@ export const INITIAL_GHANA_ARTICLES: GhanaSportArticle[] = [
   },
 ];
 
-// Curated bank of unique wire discovery templates to prevent duplicate headlines
-export const WIRE_DISCOVERY_TEMPLATES: Array<{
-  category: Exclude<SportCategory, "All Sports">;
-  title: string;
-  excerpt: string;
-  source: string;
-  image: string;
-}> = [
-  {
-    category: "Armwrestling",
-    title: "[AUTOMATED WIRE] Golden Arms Announce 14-Puller National Roster for All-Africa Challenge",
-    excerpt: "Automated crawler captured GAF official secretariat communique listing weight categories for the upcoming continental clash in Cairo.",
-    source: "Pan-African Sports Wire Crawler",
-    image: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800&q=80",
-  },
-  {
-    category: "Boxing",
-    title: "[AUTOMATED WIRE] Commonwealth Boxing Council Approves Accra Title Defense for December",
-    excerpt: "Wire alert: Sanctioning agreement signed for Bukom Arena defense featuring Ghana's super-bantamweight champion.",
-    source: "Commonwealth Boxing Press Feed",
-    image: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=800&q=80",
-  },
-  {
-    category: "Basketball",
-    title: "[AUTOMATED WIRE] BAL Qualifiers: Customs Braves Secure West Division Group Draw",
-    excerpt: "Automated FIBA Africa alert confirms group placements for Ghana's domestic champions in the Basketball Africa League road to BAL.",
-    source: "FIBA Africa RSS Ingestion",
-    image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80",
-  },
-  {
-    category: "Hockey",
-    title: "[AUTOMATED WIRE] African Hockey Club Championship: Trustees Awarded Accra Hosting Bid",
-    excerpt: "Continental federation dispatch indicates National Hockey Stadium in Accra will stage the 2027 club tournament.",
-    source: "African Hockey Federation NewsWire",
-    image: "https://images.unsplash.com/photo-1580748141549-71748dbe0bdc?w=800&q=80",
-  },
-  {
-    category: "Athletics",
-    title: "[AUTOMATED WIRE] NCAA All-American Sprinters Commit to Ghana Olympic Trials Camp",
-    excerpt: "Collegiate tracking bot identified three Ghanaian 200m finalists filing official availability declarations with GAA.",
-    source: "Track & Field Global Scraper",
-    image: "https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=800&q=80",
-  },
-  {
-    category: "Volleyball",
-    title: "[AUTOMATED WIRE] West African Zone 3 Volleyball Tour: Accra Slated for Beach Finals",
-    excerpt: "Regional volleyball bulletin details ten national teams competing at Laboma Beach sports court next month.",
-    source: "CAVB Zone 3 Ingestion Bot",
-    image: "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=800&q=80",
-  },
-];
-
 export const SPORT_PRESET_IMAGES: Record<
   Exclude<SportCategory, "All Sports">,
   Array<{ label: string; url: string }>

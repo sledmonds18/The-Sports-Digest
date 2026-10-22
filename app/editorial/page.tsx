@@ -7,12 +7,45 @@ import {
   SportCategory,
   GHANA_SPORTS_CATEGORIES,
   SPORT_PRESET_IMAGES,
+  DiscoverySourceType,
 } from "../components/lib/ghanaSportsData";
+import {
+  GHANA_FEED_REGISTRY,
+  getCoverageMatrix,
+} from "../components/lib/ghanaFeedRegistry";
+import { EDITORIAL_TOKEN_HEADER } from "../components/lib/editorialAuth";
+
+type SourceHealth = {
+  id: string;
+  name: string;
+  publisher: string;
+  tier: string;
+  status: string;
+  httpStatus?: number;
+  itemsFound: number;
+  itemsFresh: number;
+  itemsQueued: number;
+  durationMs: number;
+  message?: string;
+};
+
+const EMPTY_FILING = {
+  title: "",
+  category: "Football" as Exclude<SportCategory, "All Sports">,
+  author: "",
+  excerpt: "",
+  content: "",
+  image: "",
+  sourceName: "",
+  sourceUrl: "",
+  discoveryType: "field_correspondent" as DiscoverySourceType,
+};
 
 export default function EditorialDeskPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passkeyInput, setPasskeyInput] = useState("");
   const [passkeyError, setPasskeyError] = useState("");
+  const [newsroomToken, setNewsroomToken] = useState("");
 
   const [articles, setArticles] = useState<GhanaSportArticle[]>([]);
   const [activeTab, setActiveTab] = useState<"pending" | "approved">("pending");
@@ -26,22 +59,42 @@ export default function EditorialDeskPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
 
-  // Default Editorial Passkey (can be overridden via environment or entered as "digest2026")
-  const EDITORIAL_PASSKEY = "digest2026";
+  const [isFilingOpen, setIsFilingOpen] = useState(false);
+  const [filing, setFiling] = useState({ ...EMPTY_FILING });
+  const [isFiling, setIsFiling] = useState(false);
+
+  const [sourceHealth, setSourceHealth] = useState<SourceHealth[]>([]);
+  const [isCheckingFeeds, setIsCheckingFeeds] = useState(false);
+
+  const coverageMatrix = useMemo(() => getCoverageMatrix(), []);
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(""), 4000);
   };
 
+  /** Every newsroom request carries the editorial token. */
+  const newsroomHeaders = useMemo(
+    () => ({
+      "Content-Type": "application/json",
+      [EDITORIAL_TOKEN_HEADER]: newsroomToken,
+    }),
+    [newsroomToken]
+  );
+
   const loadAllArticles = async () => {
     try {
-      const res = await fetch("/api/ghana-sports-news?status=all");
+      const res = await fetch("/api/ghana-sports-news?status=all", {
+        headers: { [EDITORIAL_TOKEN_HEADER]: newsroomToken },
+      });
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data)) {
           setArticles(json.data);
         }
+      } else if (res.status === 401) {
+        showToast("⚠ Editorial passkey rejected. Please sign in again.");
+        setIsAuthenticated(false);
       }
     } catch (err) {
       console.error("Failed to load articles:", err);
@@ -54,19 +107,27 @@ export default function EditorialDeskPage() {
       const refreshInterval = window.setInterval(loadAllArticles, 60_000);
       return () => window.clearInterval(refreshInterval);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, newsroomToken]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (
-      passkeyInput.trim().toLowerCase() === EDITORIAL_PASSKEY ||
-      passkeyInput.trim().toLowerCase() === "admin"
-    ) {
-      setIsAuthenticated(true);
-      setPasskeyError("");
-    } else {
-      setPasskeyError("Invalid Editorial Passkey. Try 'digest2026'.");
+    const entered = passkeyInput.trim();
+    if (!entered) {
+      setPasskeyError("Enter your newsroom passkey.");
+      return;
     }
+    // The server performs the real check on the first newsroom request.
+    setNewsroomToken(entered);
+    setIsAuthenticated(true);
+    setPasskeyError("");
+  };
+
+  const handleSignOut = () => {
+    setIsAuthenticated(false);
+    setNewsroomToken("");
+    setPasskeyInput("");
+    setArticles([]);
+    setSourceHealth([]);
   };
 
   // Filtered views
@@ -98,6 +159,7 @@ export default function EditorialDeskPage() {
     try {
       const res = await fetch("/api/upload", {
         method: "POST",
+        headers: { [EDITORIAL_TOKEN_HEADER]: newsroomToken },
         body: formData,
       });
 
@@ -125,7 +187,7 @@ export default function EditorialDeskPage() {
     try {
       const res = await fetch("/api/ghana-sports-news", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: newsroomHeaders,
         body: JSON.stringify({
           action: "approve",
           articleId,
@@ -133,7 +195,7 @@ export default function EditorialDeskPage() {
           notes:
             customNotes ||
             verificationNotes ||
-            "Verified primary source and match dispatches before publication.",
+            "Verified by Sports Digest Editorial Desk before publication.",
           updates:
             updates ||
             (editingArticle?.id === articleId
@@ -152,7 +214,10 @@ export default function EditorialDeskPage() {
           try {
             await fetch("/api/newsletter/breaking-alert", {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: {
+                "Content-Type": "application/json",
+                [EDITORIAL_TOKEN_HEADER]: newsroomToken,
+              },
               body: JSON.stringify({
                 title: editingArticle.title,
                 excerpt: editingArticle.excerpt,
@@ -185,7 +250,7 @@ export default function EditorialDeskPage() {
     try {
       const res = await fetch("/api/ghana-sports-news", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: newsroomHeaders,
         body: JSON.stringify({
           action: "update",
           articleId: editingArticle.id,
@@ -215,7 +280,7 @@ export default function EditorialDeskPage() {
     try {
       const res = await fetch("/api/ghana-sports-news", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: newsroomHeaders,
         body: JSON.stringify({
           action: "reject",
           articleId,
@@ -237,18 +302,103 @@ export default function EditorialDeskPage() {
   const handleRunCrawler = async () => {
     setIsCrawling(true);
     try {
-      const res = await fetch("/api/cron/ingest");
+      const res = await fetch("/api/cron/ingest", {
+        headers: { [EDITORIAL_TOKEN_HEADER]: newsroomToken },
+      });
       if (res.ok) {
         const json = await res.json();
+        if (Array.isArray(json.sourceHealth)) {
+          setSourceHealth(json.sourceHealth);
+        }
         showToast(
           `🤖 Automated Crawler: ${json.newStoriesQueued} new wire stories discovered!`
         );
         await loadAllArticles();
+      } else if (res.status === 401) {
+        showToast("⚠ Editorial passkey rejected. Please sign in again.");
+        setIsAuthenticated(false);
       }
     } catch {
       showToast("⚠ Crawler scan encountered an issue.");
     } finally {
       setIsCrawling(false);
+    }
+  };
+
+  // Action: Verify every monitored feed without creating stories
+  const handleCheckFeeds = async () => {
+    setIsCheckingFeeds(true);
+    try {
+      const res = await fetch("/api/ghana-sports-news", {
+        method: "POST",
+        headers: newsroomHeaders,
+        body: JSON.stringify({ action: "check_feeds" }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setSourceHealth(Array.isArray(json.sourceHealth) ? json.sourceHealth : []);
+        const healthy = (json.sourceHealth || []).filter(
+          (entry: SourceHealth) => entry.status === "ok"
+        ).length;
+        showToast(
+          `🔍 Feed check complete: ${healthy}/${(json.sourceHealth || []).length} sources responding.`
+        );
+      } else if (res.status === 401) {
+        showToast("⚠ Editorial passkey rejected. Please sign in again.");
+        setIsAuthenticated(false);
+      }
+    } catch {
+      showToast("⚠ Feed check failed.");
+    } finally {
+      setIsCheckingFeeds(false);
+    }
+  };
+
+  // Action: File a story manually (the editorial half of hybrid collection)
+  const handleFileStory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!filing.title.trim() || !filing.excerpt.trim()) {
+      showToast("⚠ A headline and an excerpt are required.");
+      return;
+    }
+
+    setIsFiling(true);
+    try {
+      const res = await fetch("/api/ghana-sports-news", {
+        method: "POST",
+        headers: newsroomHeaders,
+        body: JSON.stringify({
+          action: "submit_story",
+          title: filing.title,
+          category: filing.category,
+          author: filing.author || editorName,
+          excerpt: filing.excerpt,
+          content: filing.content,
+          image: filing.image,
+          sourceName: filing.sourceName || "Sports Digest News Desk",
+          sourceUrl: filing.sourceUrl,
+          discoveryType: filing.discoveryType,
+        }),
+      });
+
+      const json = await res.json();
+
+      if (res.ok && json.success) {
+        showToast("✓ Story filed into the verification queue.");
+        setFiling({ ...EMPTY_FILING });
+        setIsFilingOpen(false);
+        setActiveTab("pending");
+        await loadAllArticles();
+      } else if (res.status === 401) {
+        showToast("⚠ Editorial passkey rejected. Please sign in again.");
+        setIsAuthenticated(false);
+      } else {
+        showToast(json.message || "⚠ Could not file the story.");
+      }
+    } catch {
+      showToast("⚠ Could not file the story.");
+    } finally {
+      setIsFiling(false);
     }
   };
 
@@ -258,7 +408,7 @@ export default function EditorialDeskPage() {
     try {
       const res = await fetch("/api/ghana-sports-news", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: newsroomHeaders,
         body: JSON.stringify({ action: "reset" }),
       });
       if (res.ok) {
@@ -353,6 +503,25 @@ export default function EditorialDeskPage() {
           <div className="flex items-center gap-3">
             <button
               type="button"
+              onClick={() => setIsFilingOpen((open) => !open)}
+              className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 py-2 text-xs font-bold text-zinc-200 transition hover:border-red-500 hover:text-white"
+              title="File a story manually from a correspondent, federation desk or press release"
+            >
+              <span>✍️ File Story</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleCheckFeeds}
+              disabled={isCheckingFeeds}
+              className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 py-2 text-xs font-bold text-zinc-200 transition hover:border-zinc-500 hover:text-white disabled:opacity-50"
+              title="Check that every monitored Ghana sports feed is reachable"
+            >
+              <span>{isCheckingFeeds ? "Checking..." : "🔍 Check Feeds"}</span>
+            </button>
+
+            <button
+              type="button"
               onClick={handleRunCrawler}
               disabled={isCrawling}
               className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 py-2 text-xs font-bold text-zinc-200 transition hover:border-zinc-500 hover:text-white disabled:opacity-50"
@@ -375,6 +544,15 @@ export default function EditorialDeskPage() {
             >
               View Public Site →
             </Link>
+
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-zinc-500 hover:border-zinc-600 hover:text-zinc-200"
+              title="Lock the newsroom"
+            >
+              Lock Desk
+            </button>
           </div>
         </div>
       </header>
@@ -421,8 +599,262 @@ export default function EditorialDeskPage() {
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>Active (Every 30m)</span>
             </p>
-            <p className="text-[11px] text-zinc-500">5 Monitored Sports Feeds</p>
+            <p className="text-[11px] text-zinc-500">
+              {GHANA_FEED_REGISTRY.length} Monitored Sources ·{" "}
+              {coverageMatrix.filter((entry) => entry.covered).length}/
+              {coverageMatrix.length} Sports Covered
+            </p>
           </div>
+        </div>
+      </section>
+
+      {/* MANUAL STORY FILING (the editorial half of hybrid collection) */}
+      {isFilingOpen && (
+        <section className="border-b border-zinc-800 bg-zinc-950 px-6 py-6">
+          <form
+            onSubmit={handleFileStory}
+            className="mx-auto max-w-5xl rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="text-base font-black text-white">
+                  File a Story into the Verification Queue
+                </h2>
+                <p className="mt-1 text-xs text-zinc-400">
+                  Field correspondents, federation desks and press releases enter
+                  the same queue as automated discoveries. Nothing is published
+                  until an editor approves it.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsFilingOpen(false)}
+                className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-400 hover:border-zinc-600 hover:text-white"
+              >
+                Close ✕
+              </button>
+            </div>
+
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              <div className="md:col-span-2">
+                <label className="mb-1 block text-xs font-bold text-zinc-300">
+                  Headline
+                </label>
+                <input
+                  type="text"
+                  value={filing.title}
+                  onChange={(e) => setFiling({ ...filing, title: e.target.value })}
+                  placeholder="Hearts of Oak edge Basake Holy Stars to go top of the GPL"
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white placeholder-zinc-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-bold text-zinc-300">
+                  Sport Category
+                </label>
+                <select
+                  value={filing.category}
+                  onChange={(e) =>
+                    setFiling({
+                      ...filing,
+                      category: e.target.value as Exclude<SportCategory, "All Sports">,
+                    })
+                  }
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white"
+                >
+                  {GHANA_SPORTS_CATEGORIES.filter((c) => c !== "All Sports").map(
+                    (sport) => (
+                      <option key={sport} value={sport}>
+                        {sport}
+                      </option>
+                    )
+                  )}
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-bold text-zinc-300">
+                  Discovery Channel
+                </label>
+                <select
+                  value={filing.discoveryType}
+                  onChange={(e) =>
+                    setFiling({
+                      ...filing,
+                      discoveryType: e.target.value as DiscoverySourceType,
+                    })
+                  }
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white"
+                >
+                  <option value="field_correspondent">Field Correspondent</option>
+                  <option value="federation_dispatch">Federation Dispatch</option>
+                  <option value="press_release">Press Release</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-bold text-zinc-300">
+                  Byline
+                </label>
+                <input
+                  type="text"
+                  value={filing.author}
+                  onChange={(e) => setFiling({ ...filing, author: e.target.value })}
+                  placeholder={editorName}
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white placeholder-zinc-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-bold text-zinc-300">
+                  Primary Source Name
+                </label>
+                <input
+                  type="text"
+                  value={filing.sourceName}
+                  onChange={(e) =>
+                    setFiling({ ...filing, sourceName: e.target.value })
+                  }
+                  placeholder="Ghana Football Association Match Commissioner"
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white placeholder-zinc-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-bold text-zinc-300">
+                  Primary Source URL
+                </label>
+                <input
+                  type="url"
+                  value={filing.sourceUrl}
+                  onChange={(e) =>
+                    setFiling({ ...filing, sourceUrl: e.target.value })
+                  }
+                  placeholder="https://..."
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white placeholder-zinc-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-bold text-zinc-300">
+                  Image URL
+                </label>
+                <input
+                  type="text"
+                  value={filing.image}
+                  onChange={(e) => setFiling({ ...filing, image: e.target.value })}
+                  placeholder="Leave blank to use a category preset"
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white placeholder-zinc-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="mb-1 block text-xs font-bold text-zinc-300">
+                  Standfirst / Excerpt
+                </label>
+                <textarea
+                  rows={2}
+                  value={filing.excerpt}
+                  onChange={(e) => setFiling({ ...filing, excerpt: e.target.value })}
+                  placeholder="One or two sentences that carry the story."
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white placeholder-zinc-500"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="mb-1 block text-xs font-bold text-zinc-300">
+                  Body (separate paragraphs with a blank line)
+                </label>
+                <textarea
+                  rows={6}
+                  value={filing.content}
+                  onChange={(e) => setFiling({ ...filing, content: e.target.value })}
+                  placeholder="Paste the verified copy here."
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white placeholder-zinc-500"
+                />
+              </div>
+            </div>
+
+            <div className="mt-5 flex justify-end">
+              <button
+                type="submit"
+                disabled={isFiling}
+                className="rounded-lg bg-red-600 px-5 py-2 text-xs font-bold text-white transition hover:bg-red-500 disabled:opacity-50"
+              >
+                {isFiling ? "Filing..." : "→ File Into Verification Queue"}
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
+
+      {/* SOURCE HEALTH & COVERAGE MATRIX */}
+      <section className="border-b border-zinc-900 bg-zinc-950/40 px-6 py-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-base font-black text-white">
+                Monitored Source Registry & Coverage
+              </h2>
+              <p className="mt-1 text-xs text-zinc-400">
+                Every Ghanaian discipline must have at least one live source.
+                Run “Check Feeds” to verify reachability right now.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {coverageMatrix.map((entry) => (
+                <span
+                  key={entry.sport}
+                  className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
+                    entry.covered
+                      ? "border-emerald-500/30 bg-emerald-950/40 text-emerald-300"
+                      : "border-red-500/40 bg-red-950/40 text-red-300"
+                  }`}
+                  title={`${entry.sourceCount} source(s): ${entry.sources.join(", ")}`}
+                >
+                  {entry.sport} · {entry.sourceCount}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {sourceHealth.length > 0 && (
+            <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {sourceHealth.map((entry) => (
+                <div
+                  key={entry.id}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-bold text-zinc-200">
+                      {entry.name}
+                    </p>
+                    <p className="truncate text-[11px] text-zinc-500">
+                      {entry.tier.replace("_", " ")} · {entry.itemsFresh} fresh /{" "}
+                      {entry.itemsFound} items
+                    </p>
+                    {entry.message && (
+                      <p className="truncate text-[11px] text-amber-400">
+                        {entry.message}
+                      </p>
+                    )}
+                  </div>
+                  <span
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase ${
+                      entry.status === "ok"
+                        ? "bg-emerald-500/15 text-emerald-400"
+                        : entry.status === "empty"
+                          ? "bg-amber-500/15 text-amber-400"
+                          : "bg-red-500/15 text-red-400"
+                    }`}
+                  >
+                    {entry.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
