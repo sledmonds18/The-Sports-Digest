@@ -1,0 +1,47 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["AGENTS.md", "README.md"],
+  "experimental": {
+    "todo": true
+  },
+  "watcher": {
+    "ignore": [
+      "node_modules/**",
+      ".next/**",
+      ".git/**",
+      "public/uploads/**",
+      "Microsoft/**"
+    ]
+  },
+  "permissions": [
+    { "action": "shell", "resource": "git status *", "effect": "allow" },
+    { "action": "shell", "resource": "git diff *", "effect": "allow" },
+    { "action": "shell", "resource": "git log *", "effect": "allow" },
+    { "action": "shell", "resource": "git show *", "effect": "allow" },
+    { "action": "shell", "resource": "git add *", "effect": "allow" },
+    { "action": "shell", "resource": "git commit *", "effect": "allow" },
+    { "action": "shell", "resource": "npm.cmd run *", "effect": "allow" },
+    { "action": "shell", "resource": "npm.cmd install*", "effect": "allow" },
+    { "action": "shell", "resource": "npx.cmd tsc*", "effect": "allow" },
+    { "action": "shell", "resource": "npx.cmd next*", "effect": "allow" },
+    { "action": "shell", "resource": "git push *", "effect": "ask" }
+  ],
+  "commands": {
+    "ship": {
+      "description": "Typecheck, build, and commit the current changes",
+      "template": "Run `npm.cmd run build` to typecheck and build the Next.js app. If it succeeds, review `git status` and `git diff`, then stage and commit the relevant changes with a clear commit message describing what changed. Do not push unless I explicitly ask."
+    },
+    "news": {
+      "description": "Run the automated wire crawler to discover new sports stories",
+      "template": "Trigger the automated ingestion pipeline. Start the dev server if needed, then call the `/api/cron/ingest` endpoint to discover new wire stories, and report how many new pending stories were queued and from which monitored feeds."
+    },
+    "deploy": {
+      "description": "Build and deploy to Vercel preview",
+      "template": "Build the app with `npm.cmd run build`, then deploy it to Vercel as a preview deployment and report the preview URL."
+    },
+    "review": {
+      "description": "Review uncommitted changes for correctness and consistency",
+      "template": "Review the current uncommitted diff for correctness bugs, Next.js 16 API compliance, TypeScript type errors, and consistency with the existing code style in this repo. Report findings grouped by severity and offer to fix them."
+    }
+  }
+}
