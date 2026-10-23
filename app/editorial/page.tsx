@@ -14,6 +14,19 @@ import {
   getCoverageMatrix,
 } from "../components/lib/ghanaFeedRegistry";
 import { EDITORIAL_TOKEN_HEADER } from "../components/lib/editorialAuth";
+import { INTERNATIONAL_FEED_REGISTRY } from "../components/lib/internationalFeedRegistry";
+import { INTERNATIONAL_SPORTS_CATEGORIES } from "../components/lib/internationalSportsData";
+
+type NewsroomArticle = Omit<GhanaSportArticle, "category"> & {
+  category: string;
+  transferStatus?: "confirmed" | "reported";
+  transferType?: "permanent" | "loan" | "free transfer" | "contract extension";
+  playerName?: string;
+  fromClub?: string;
+  toClub?: string;
+  transferFee?: string;
+  transferWindow?: string;
+};
 
 type SourceHealth = {
   id: string;
@@ -31,7 +44,7 @@ type SourceHealth = {
 
 const EMPTY_FILING = {
   title: "",
-  category: "Football" as Exclude<SportCategory, "All Sports">,
+  category: "Football",
   author: "",
   excerpt: "",
   content: "",
@@ -39,18 +52,29 @@ const EMPTY_FILING = {
   sourceName: "",
   sourceUrl: "",
   discoveryType: "field_correspondent" as DiscoverySourceType,
+  transferStatus: "reported" as "confirmed" | "reported",
+  transferType: "permanent" as "permanent" | "loan" | "free transfer" | "contract extension",
+  playerName: "",
+  fromClub: "",
+  toClub: "",
+  transferFee: "",
+  transferWindow: "",
 };
 
 export default function EditorialDeskPage() {
+  const [activeDesk, setActiveDesk] = useState<"ghana" | "international">("ghana");
+  const apiBase = activeDesk === "ghana" ? "/api/ghana-sports-news" : "/api/international-sports-news";
+  const categories: readonly string[] = activeDesk === "ghana" ? GHANA_SPORTS_CATEGORIES : INTERNATIONAL_SPORTS_CATEGORIES;
+  const defaultFilingCategory = activeDesk === "ghana" ? "Football" : "Premier League";
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passkeyInput, setPasskeyInput] = useState("");
   const [passkeyError, setPasskeyError] = useState("");
   const [newsroomToken, setNewsroomToken] = useState("");
 
-  const [articles, setArticles] = useState<GhanaSportArticle[]>([]);
+  const [articles, setArticles] = useState<NewsroomArticle[]>([]);
   const [activeTab, setActiveTab] = useState<"pending" | "approved">("pending");
-  const [selectedSport, setSelectedSport] = useState<SportCategory>("All Sports");
-  const [editingArticle, setEditingArticle] = useState<GhanaSportArticle | null>(null);
+  const [selectedSport, setSelectedSport] = useState<string>("All Sports");
+  const [editingArticle, setEditingArticle] = useState<NewsroomArticle | null>(null);
 
   const [editorName, setEditorName] = useState("Shem Bravon Lamptey (Editor-in-Chief)");
   const [verificationNotes, setVerificationNotes] = useState("");
@@ -84,7 +108,7 @@ export default function EditorialDeskPage() {
 
   const loadAllArticles = async () => {
     try {
-      const res = await fetch("/api/ghana-sports-news?status=all", {
+      const res = await fetch(`${apiBase}?status=all`, {
         headers: { [EDITORIAL_TOKEN_HEADER]: newsroomToken },
       });
       if (res.ok) {
@@ -107,7 +131,7 @@ export default function EditorialDeskPage() {
       const refreshInterval = window.setInterval(loadAllArticles, 60_000);
       return () => window.clearInterval(refreshInterval);
     }
-  }, [isAuthenticated, newsroomToken]);
+  }, [isAuthenticated, newsroomToken, activeDesk]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -143,7 +167,7 @@ export default function EditorialDeskPage() {
 
   const currentTabArticles = useMemo(() => {
     const list = activeTab === "pending" ? pendingQueue : approvedLive;
-    if (selectedSport === "All Sports") return list;
+    if (selectedSport === "All Sports" || selectedSport === "All International") return list;
     return list.filter((a) => a.category === selectedSport);
   }, [activeTab, pendingQueue, approvedLive, selectedSport]);
 
@@ -182,10 +206,10 @@ export default function EditorialDeskPage() {
   const handleApprove = async (
     articleId: string,
     customNotes?: string,
-    updates?: Partial<Pick<GhanaSportArticle, "title" | "excerpt" | "category" | "image">>
+    updates?: Partial<NewsroomArticle>
   ) => {
     try {
-      const res = await fetch("/api/ghana-sports-news", {
+      const res = await fetch(apiBase, {
         method: "POST",
         headers: newsroomHeaders,
         body: JSON.stringify({
@@ -204,6 +228,13 @@ export default function EditorialDeskPage() {
                   excerpt: editingArticle.excerpt,
                   category: editingArticle.category,
                   image: editingArticle.image,
+                  transferStatus: editingArticle.transferStatus,
+                  transferType: editingArticle.transferType,
+                  playerName: editingArticle.playerName,
+                  fromClub: editingArticle.fromClub,
+                  toClub: editingArticle.toClub,
+                  transferFee: editingArticle.transferFee,
+                  transferWindow: editingArticle.transferWindow,
                 }
               : undefined),
         }),
@@ -248,7 +279,7 @@ export default function EditorialDeskPage() {
   const handleSaveEdits = async () => {
     if (!editingArticle) return;
     try {
-      const res = await fetch("/api/ghana-sports-news", {
+      const res = await fetch(apiBase, {
         method: "POST",
         headers: newsroomHeaders,
         body: JSON.stringify({
@@ -259,6 +290,13 @@ export default function EditorialDeskPage() {
             excerpt: editingArticle.excerpt,
             category: editingArticle.category,
             image: editingArticle.image,
+            transferStatus: editingArticle.transferStatus,
+            transferType: editingArticle.transferType,
+            playerName: editingArticle.playerName,
+            fromClub: editingArticle.fromClub,
+            toClub: editingArticle.toClub,
+            transferFee: editingArticle.transferFee,
+            transferWindow: editingArticle.transferWindow,
           },
         }),
       });
@@ -278,7 +316,7 @@ export default function EditorialDeskPage() {
   // Action: Reject Story
   const handleReject = async (articleId: string) => {
     try {
-      const res = await fetch("/api/ghana-sports-news", {
+      const res = await fetch(apiBase, {
         method: "POST",
         headers: newsroomHeaders,
         body: JSON.stringify({
@@ -302,8 +340,10 @@ export default function EditorialDeskPage() {
   const handleRunCrawler = async () => {
     setIsCrawling(true);
     try {
-      const res = await fetch("/api/cron/ingest", {
-        headers: { [EDITORIAL_TOKEN_HEADER]: newsroomToken },
+      const res = await fetch(activeDesk === "ghana" ? "/api/cron/ingest" : apiBase, {
+        method: activeDesk === "ghana" ? "GET" : "POST",
+        ...(activeDesk === "international" ? { body: JSON.stringify({ action: "run_crawler" }), headers: newsroomHeaders } : {}),
+        ...(activeDesk === "ghana" ? { headers: { [EDITORIAL_TOKEN_HEADER]: newsroomToken } } : {}),
       });
       if (res.ok) {
         const json = await res.json();
@@ -311,7 +351,7 @@ export default function EditorialDeskPage() {
           setSourceHealth(json.sourceHealth);
         }
         showToast(
-          `🤖 Automated Crawler: ${json.newStoriesQueued} new wire stories discovered!`
+          `🤖 Automated Crawler: ${json.newStoriesQueued ?? json.added ?? 0} new wire stories discovered!`
         );
         await loadAllArticles();
       } else if (res.status === 401) {
@@ -329,7 +369,7 @@ export default function EditorialDeskPage() {
   const handleCheckFeeds = async () => {
     setIsCheckingFeeds(true);
     try {
-      const res = await fetch("/api/ghana-sports-news", {
+      const res = await fetch(apiBase, {
         method: "POST",
         headers: newsroomHeaders,
         body: JSON.stringify({ action: "check_feeds" }),
@@ -364,7 +404,7 @@ export default function EditorialDeskPage() {
 
     setIsFiling(true);
     try {
-      const res = await fetch("/api/ghana-sports-news", {
+      const res = await fetch(apiBase, {
         method: "POST",
         headers: newsroomHeaders,
         body: JSON.stringify({
@@ -378,6 +418,13 @@ export default function EditorialDeskPage() {
           sourceName: filing.sourceName || "Sports Digest News Desk",
           sourceUrl: filing.sourceUrl,
           discoveryType: filing.discoveryType,
+          transferStatus: filing.transferStatus,
+          transferType: filing.transferType,
+          playerName: filing.playerName,
+          fromClub: filing.fromClub,
+          toClub: filing.toClub,
+          transferFee: filing.transferFee,
+          transferWindow: filing.transferWindow,
         }),
       });
 
@@ -385,7 +432,7 @@ export default function EditorialDeskPage() {
 
       if (res.ok && json.success) {
         showToast("✓ Story filed into the verification queue.");
-        setFiling({ ...EMPTY_FILING });
+        setFiling({ ...EMPTY_FILING, category: defaultFilingCategory });
         setIsFilingOpen(false);
         setActiveTab("pending");
         await loadAllArticles();
@@ -404,15 +451,15 @@ export default function EditorialDeskPage() {
 
   // Action: Reset Staging
   const handleReset = async () => {
-    if (!confirm("Reset all articles back to clean initial verified seed state?")) return;
+    if (!confirm(activeDesk === "ghana" ? "Reset Ghana articles back to the initial verified seed state?" : "Clear all international newsroom articles?")) return;
     try {
-      const res = await fetch("/api/ghana-sports-news", {
+      const res = await fetch(apiBase, {
         method: "POST",
         headers: newsroomHeaders,
         body: JSON.stringify({ action: "reset" }),
       });
       if (res.ok) {
-        showToast("✓ Newsroom reset to clean seed state.");
+        showToast(activeDesk === "ghana" ? "✓ Ghana newsroom reset to clean seed state." : "✓ International queue cleared.");
         await loadAllArticles();
       }
     } catch {
@@ -496,7 +543,7 @@ export default function EditorialDeskPage() {
               Newsroom Desk
             </span>
             <h1 className="text-lg font-black tracking-tight sm:text-xl">
-              Editorial Verification & Publishing Control
+              {activeDesk === "ghana" ? "Ghana" : "International"} Editorial Verification & Publishing Control
             </h1>
           </div>
 
@@ -555,6 +602,23 @@ export default function EditorialDeskPage() {
             </button>
           </div>
         </div>
+        <div className="mx-auto mt-4 flex max-w-7xl gap-2">
+          {(["ghana", "international"] as const).map((desk) => <button key={desk} type="button" onClick={() => { setActiveDesk(desk); setSelectedSport(desk === "ghana" ? "All Sports" : "All International"); setFiling({ ...EMPTY_FILING, category: desk === "ghana" ? "Football" : "Premier League" }); setSourceHealth([]); }} className={`rounded-lg px-4 py-2 text-xs font-black uppercase tracking-wider ${activeDesk === desk ? "bg-red-600 text-white" : "border border-zinc-700 text-zinc-400"}`}>{desk} desk</button>)}
+          <button
+            type="button"
+            onClick={() => { setSelectedSport("Transfers"); setActiveTab("pending"); }}
+            className={`rounded-lg border px-4 py-2 text-xs font-black uppercase tracking-wider transition ${selectedSport === "Transfers" ? "border-amber-500/50 bg-amber-500/15 text-amber-300" : "border-zinc-700 text-zinc-300 hover:border-amber-500/50 hover:text-amber-300"}`}
+          >
+            Transfer Desk · {articles.filter((article) => article.category === "Transfers" && article.status === "pending").length} pending
+          </button>
+          <button
+            type="button"
+            onClick={() => { setFiling({ ...EMPTY_FILING, category: "Transfers" }); setIsFilingOpen(true); }}
+            className="rounded-lg border border-zinc-700 px-4 py-2 text-xs font-black uppercase tracking-wider text-zinc-300 transition hover:border-red-500 hover:text-white"
+          >
+            File Transfer
+          </button>
+        </div>
       </header>
 
       {/* STATS & AUTOMATION HEALTH */}
@@ -588,7 +652,7 @@ export default function EditorialDeskPage() {
               <span className="h-2 w-2 rounded-full bg-emerald-400" />
               <span>Persistent JSON Disk Store</span>
             </p>
-            <p className="text-[11px] text-zinc-500">data/ghana-sports-news.json</p>
+            <p className="text-[11px] text-zinc-500">data/{activeDesk === "ghana" ? "ghana" : "international"}-sports-news.json</p>
           </div>
 
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
@@ -597,12 +661,10 @@ export default function EditorialDeskPage() {
             </p>
             <p className="mt-1 text-sm font-bold text-white flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Active (Every 30m)</span>
+              <span>Daily Scheduled · Manual Scan Available</span>
             </p>
             <p className="text-[11px] text-zinc-500">
-              {GHANA_FEED_REGISTRY.length} Monitored Sources ·{" "}
-              {coverageMatrix.filter((entry) => entry.covered).length}/
-              {coverageMatrix.length} Sports Covered
+              {activeDesk === "ghana" ? GHANA_FEED_REGISTRY.length : INTERNATIONAL_FEED_REGISTRY.length} Monitored Sources · {activeDesk === "ghana" ? `${coverageMatrix.filter((entry) => entry.covered).length}/${coverageMatrix.length} Sports Covered` : `${INTERNATIONAL_SPORTS_CATEGORIES.length - 1} Competitions Covered`}
             </p>
           </div>
         </div>
@@ -658,12 +720,12 @@ export default function EditorialDeskPage() {
                   onChange={(e) =>
                     setFiling({
                       ...filing,
-                      category: e.target.value as Exclude<SportCategory, "All Sports">,
+                      category: e.target.value,
                     })
                   }
                   className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white"
                 >
-                  {GHANA_SPORTS_CATEGORIES.filter((c) => c !== "All Sports").map(
+                  {categories.filter((c) => c !== "All Sports" && c !== "All International").map(
                     (sport) => (
                       <option key={sport} value={sport}>
                         {sport}
@@ -672,6 +734,21 @@ export default function EditorialDeskPage() {
                   )}
                 </select>
               </div>
+
+              {filing.category === "Transfers" && (
+                <div className="md:col-span-2 rounded-xl border border-zinc-800 bg-black/40 p-4">
+                  <p className="mb-3 text-xs font-black uppercase tracking-wider text-red-400">Transfer details · verify before approval</p>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <select value={filing.transferStatus} onChange={(e) => setFiling({ ...filing, transferStatus: e.target.value as "confirmed" | "reported" })} className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white"><option value="reported">Reported / Rumour</option><option value="confirmed">Confirmed by club or player</option></select>
+                    <select value={filing.transferType} onChange={(e) => setFiling({ ...filing, transferType: e.target.value as typeof filing.transferType })} className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white"><option value="permanent">Permanent transfer</option><option value="loan">Loan</option><option value="free transfer">Free transfer</option><option value="contract extension">Contract extension</option></select>
+                    <input value={filing.playerName} onChange={(e) => setFiling({ ...filing, playerName: e.target.value })} placeholder="Player name" className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white" />
+                    <input value={filing.fromClub} onChange={(e) => setFiling({ ...filing, fromClub: e.target.value })} placeholder="From club (optional)" className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white" />
+                    <input value={filing.toClub} onChange={(e) => setFiling({ ...filing, toClub: e.target.value })} placeholder="To club (optional)" className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white" />
+                    <input value={filing.transferFee} onChange={(e) => setFiling({ ...filing, transferFee: e.target.value })} placeholder="Fee (state undisclosed if unknown)" className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white" />
+                    <input value={filing.transferWindow} onChange={(e) => setFiling({ ...filing, transferWindow: e.target.value })} placeholder="Window / season" className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white sm:col-span-2" />
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="mb-1 block text-xs font-bold text-zinc-300">
@@ -798,12 +875,12 @@ export default function EditorialDeskPage() {
                 Monitored Source Registry & Coverage
               </h2>
               <p className="mt-1 text-xs text-zinc-400">
-                Every Ghanaian discipline must have at least one live source.
+                {activeDesk === "ghana" ? "Every Ghanaian discipline must have at least one live source." : "International competition feeds are scanned for recent stories. Leads stay in the queue until verified and approved."}
                 Run “Check Feeds” to verify reachability right now.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {coverageMatrix.map((entry) => (
+              {(activeDesk === "ghana" ? coverageMatrix.map((entry) => ({ sport: entry.sport, sourceCount: entry.sourceCount, covered: entry.covered, sources: entry.sources })) : INTERNATIONAL_SPORTS_CATEGORIES.slice(1).map((category) => ({ sport: category, sourceCount: INTERNATIONAL_FEED_REGISTRY.filter((feed) => feed.category === category).length, covered: INTERNATIONAL_FEED_REGISTRY.some((feed) => feed.category === category), sources: INTERNATIONAL_FEED_REGISTRY.filter((feed) => feed.category === category).map((feed) => feed.name) }))).map((entry) => (
                 <span
                   key={entry.sport}
                   className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
@@ -891,10 +968,10 @@ export default function EditorialDeskPage() {
             <span className="text-zinc-400">Filter Sport:</span>
             <select
               value={selectedSport}
-              onChange={(e) => setSelectedSport(e.target.value as SportCategory)}
+              onChange={(e) => setSelectedSport(e.target.value)}
               className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-xs text-white focus:outline-none"
             >
-              {GHANA_SPORTS_CATEGORIES.map((sport) => (
+              {categories.map((sport) => (
                 <option key={sport} value={sport}>
                   {sport}
                 </option>
@@ -1078,12 +1155,12 @@ export default function EditorialDeskPage() {
                   onChange={(e) =>
                     setEditingArticle({
                       ...editingArticle,
-                      category: e.target.value as Exclude<SportCategory, "All Sports">,
+                      category: e.target.value,
                     })
                   }
                   className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white"
                 >
-                  {GHANA_SPORTS_CATEGORIES.filter((c) => c !== "All Sports").map(
+                  {categories.filter((c) => c !== "All Sports" && c !== "All International").map(
                     (sport) => (
                       <option key={sport} value={sport}>
                         {sport}
@@ -1104,6 +1181,21 @@ export default function EditorialDeskPage() {
                   className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white"
                 />
               </div>
+
+              {editingArticle.category === "Transfers" && (
+                <div className="rounded-xl border border-zinc-800 bg-black/40 p-4">
+                  <p className="mb-3 font-black uppercase tracking-wider text-red-400">Transfer details</p>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <select value={editingArticle.transferStatus || "reported"} onChange={(e) => setEditingArticle({ ...editingArticle, transferStatus: e.target.value as "confirmed" | "reported" })} className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white"><option value="reported">Reported / Rumour</option><option value="confirmed">Confirmed by club or player</option></select>
+                    <select value={editingArticle.transferType || "permanent"} onChange={(e) => setEditingArticle({ ...editingArticle, transferType: e.target.value as NonNullable<NewsroomArticle["transferType"]> })} className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white"><option value="permanent">Permanent transfer</option><option value="loan">Loan</option><option value="free transfer">Free transfer</option><option value="contract extension">Contract extension</option></select>
+                    <input value={editingArticle.playerName || ""} onChange={(e) => setEditingArticle({ ...editingArticle, playerName: e.target.value })} placeholder="Player name" className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white" />
+                    <input value={editingArticle.fromClub || ""} onChange={(e) => setEditingArticle({ ...editingArticle, fromClub: e.target.value })} placeholder="From club" className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white" />
+                    <input value={editingArticle.toClub || ""} onChange={(e) => setEditingArticle({ ...editingArticle, toClub: e.target.value })} placeholder="To club" className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white" />
+                    <input value={editingArticle.transferFee || ""} onChange={(e) => setEditingArticle({ ...editingArticle, transferFee: e.target.value })} placeholder="Fee" className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white" />
+                    <input value={editingArticle.transferWindow || ""} onChange={(e) => setEditingArticle({ ...editingArticle, transferWindow: e.target.value })} placeholder="Window / season" className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-white sm:col-span-2" />
+                  </div>
+                </div>
+              )}
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
@@ -1169,13 +1261,13 @@ export default function EditorialDeskPage() {
                 </div>
 
                 {/* Preset Chips */}
-                {SPORT_PRESET_IMAGES[editingArticle.category] && (
+                {SPORT_PRESET_IMAGES[editingArticle.category as Exclude<SportCategory, "All Sports">] && (
                   <div className="mt-2.5">
                     <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">
                       Or select from curated {editingArticle.category} graphics:
                     </p>
                     <div className="flex flex-wrap gap-1.5">
-                      {SPORT_PRESET_IMAGES[editingArticle.category].map((preset) => (
+                      {SPORT_PRESET_IMAGES[editingArticle.category as Exclude<SportCategory, "All Sports">].map((preset) => (
                         <button
                           key={preset.url}
                           type="button"
@@ -1282,6 +1374,13 @@ export default function EditorialDeskPage() {
                         excerpt: editingArticle.excerpt,
                         category: editingArticle.category,
                         image: editingArticle.image,
+                        transferStatus: editingArticle.transferStatus,
+                        transferType: editingArticle.transferType,
+                        playerName: editingArticle.playerName,
+                        fromClub: editingArticle.fromClub,
+                        toClub: editingArticle.toClub,
+                        transferFee: editingArticle.transferFee,
+                        transferWindow: editingArticle.transferWindow,
                       }
                     )
                   }

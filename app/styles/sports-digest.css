@@ -75,6 +75,9 @@ img{max-width:100%;height:auto;display:block}button,input,textarea,select{font-f
 .tlbl {
   background: var(--ink);
   color: #fff;
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
 
   font-size: 9px;
   letter-spacing: 3px;

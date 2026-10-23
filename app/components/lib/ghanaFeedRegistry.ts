@@ -4,7 +4,7 @@ import { SportCategory } from "./ghanaSportsData";
  * Every discipline The Sports Digest covers from day one.
  * The coverage matrix below is the contract: no discipline may be dropped.
  */
-export type SportDiscipline = Exclude<SportCategory, "All Sports">;
+export type SportDiscipline = Exclude<SportCategory, "All Sports" | "Transfers">;
 
 /**
  * Source trust tier.
@@ -177,6 +177,13 @@ export const GHANA_FEED_REGISTRY: FeedSource[] = [
     'Ghana judo OR "table tennis" OR swimming OR tennis OR karate OR "sports festival"',
     ["Combat & Others"],
     "Combat & Others"
+  ),
+  googleNewsFeed(
+    "gnews-transfers",
+    "Google News",
+    'Ghana football transfers OR Ghanaian player signs OR Ghanaian player joins club',
+    ["Football"],
+    "Football"
   ),
 ];
 

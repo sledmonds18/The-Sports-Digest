@@ -7,7 +7,8 @@ export type SportCategory =
   | "Armwrestling"
   | "Hockey"
   | "Volleyball"
-  | "Combat & Others";
+  | "Combat & Others"
+  | "Transfers";
 
 export type EditorialStatus = "draft" | "pending" | "approved" | "rejected";
 
@@ -23,6 +24,13 @@ export interface GhanaSportArticle {
   excerpt: string;
   content: string[];
   category: Exclude<SportCategory, "All Sports">;
+  transferStatus?: "confirmed" | "reported";
+  transferType?: "permanent" | "loan" | "free transfer" | "contract extension";
+  playerName?: string;
+  fromClub?: string;
+  toClub?: string;
+  transferFee?: string;
+  transferWindow?: string;
   image?: string;
   slug: string;
   author: string;
@@ -58,6 +66,7 @@ export const GHANA_SPORTS_CATEGORIES: SportCategory[] = [
   "Hockey",
   "Volleyball",
   "Combat & Others",
+  "Transfers",
 ];
 
 // Curated authentic seed articles covering all Ghanaian sports without repetition
@@ -575,6 +584,10 @@ export const SPORT_PRESET_IMAGES: Record<
     { label: "Black Queens (Local)", url: "/Black-Queens-Graphics/black-queens-hero1.png" },
     { label: "Striker Shot", url: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80" },
     { label: "Black Stars Training", url: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&q=80" },
+  ],
+  Transfers: [
+    { label: "International football transfer", url: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80" },
+    { label: "Club announcement", url: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&q=80" },
   ],
   Boxing: [
     { label: "Bukom Ring Duel", url: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=800&q=80" },

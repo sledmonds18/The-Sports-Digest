@@ -226,9 +226,7 @@ class GhanaNewsStore {
     articleId: string,
     editorName: string = "Shem Bravon Lamptey (Editor-in-Chief)",
     notes: string = "Verified by Sports Digest Editorial Desk before publication.",
-    updates?: Partial<
-      Pick<GhanaSportArticle, "title" | "excerpt" | "category" | "image" | "author" | "content">
-    >
+    updates?: Partial<GhanaSportArticle>
   ): GhanaSportArticle | null {
     const index = this.articles.findIndex((a) => a.id === articleId);
     if (index === -1) return null;

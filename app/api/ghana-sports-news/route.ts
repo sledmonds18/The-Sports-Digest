@@ -13,6 +13,7 @@ import {
   DiscoverySourceType,
 } from "../../components/lib/ghanaSportsData";
 import { getCoverageMatrix } from "../../components/lib/ghanaFeedRegistry";
+import { extractArticleOgImage } from "../../components/lib/automatedIngestionEngine";
 
 const MUTATING_ACTIONS = [
   "approve",
@@ -187,6 +188,11 @@ export async function POST(request: Request) {
 
       const discoveryType = (body.discoveryType ||
         "field_correspondent") as DiscoverySourceType;
+      const image = body.image
+        ? String(body.image).trim()
+        : category === "Transfers" && body.sourceUrl
+          ? await extractArticleOgImage(String(body.sourceUrl).trim())
+          : undefined;
 
       const filed = ghanaNewsStore.addEditorialSubmission({
         id: `gha-desk-${slugify(title)}-${Date.now().toString(36)}`,
@@ -197,7 +203,7 @@ export async function POST(request: Request) {
         author: String(body.author || "Sports Digest News Desk").trim(),
         publishedAt: "Pending Editorial Approval",
         readTime: String(body.readTime || "3 min").trim(),
-        image: body.image ? String(body.image).trim() : undefined,
+        image,
         excerpt,
         content:
           rawContent.length > 0
@@ -224,6 +230,15 @@ export async function POST(request: Request) {
               "Manually filed by the newsroom. Verify against a primary source before publishing."
           ),
         },
+        ...(category === "Transfers" ? {
+          transferStatus: body.transferStatus === "confirmed" ? "confirmed" as const : "reported" as const,
+          transferType: body.transferType || undefined,
+          playerName: String(body.playerName || "").trim() || undefined,
+          fromClub: String(body.fromClub || "").trim() || undefined,
+          toClub: String(body.toClub || "").trim() || undefined,
+          transferFee: String(body.transferFee || "").trim() || undefined,
+          transferWindow: String(body.transferWindow || "").trim() || undefined,
+        } : {}),
       });
 
       if (!filed) {

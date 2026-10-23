@@ -70,8 +70,8 @@ Wait for `Ready in …`. Leave this terminal running.
 
 Click **🔍 Check Feeds**.
 
-The panel lists all 12 monitored sources with a status badge, item counts and
-response time. Expect **12 / 12 `ok`**:
+The panel lists all 13 monitored sources with a status badge, item counts and
+response time. Expect **13 / 13 `ok`**:
 
 | Source | Tier |
 | --- | --- |
@@ -79,7 +79,7 @@ response time. Expect **12 / 12 `ok`**:
 | `ghanasoccernet` | national_media |
 | `ghana-sports-news` | national_media |
 | `myjoy-sports` | national_media |
-| `gnews-*` — 8 Google News queries, one per discipline | wire_aggregator |
+| `gnews-*` — 9 Google News queries, including the Ghana transfer search | wire_aggregator |
 
 Below it, the **coverage matrix** proves every discipline has at least one
 source: Football, Boxing, Athletics, Basketball, Armwrestling, Hockey,
@@ -138,6 +138,25 @@ press release, a match report you wrote yourself.
 3. Click **✓ Verify & Publish Live**.
 
 It enters the same queue and approval pipeline as crawled stories.
+
+### Transfer stories from Ghana and International
+
+Both newsroom desks can file transfer stories. Use the desk buttons at the top
+of the Editorial Desk to choose **Ghana** or **International**.
+
+1. Choose **File Story** and select **Transfers** as the category.
+2. Enter the player, from/to clubs, deal type, fee and transfer window when
+   these details are verified and available.
+3. Leave the status as **Reported / Rumour** unless a club, player or other
+   primary source confirms the move. Add the source name and URL.
+4. File the story. It appears in the pending verification queue only.
+5. Open the pending story, verify its details and source, then choose
+   **Verify & Publish Live**. It then appears in the public Transfers page,
+   marked as Ghana or International according to the desk used to file it.
+
+The scheduled crawler also searches Ghana and international transfer feeds.
+Automatically discovered transfer leads are labelled **Reported** and require
+editor approval before appearing publicly.
 
 ---
 

@@ -2,9 +2,6 @@
 
     import { ARTICLES } from "./lib/data";
     import { Newsletter } from "./Newsletter";
-    import InsightCard from "./InsightCard";
-    import { PollCard } from "./PollCard";
-    import { Ticker } from "./Ticker";
     import { LiveBar } from "./LiveBar";
 
     interface HomeProps {
@@ -19,9 +16,6 @@
 
     return (
         <main id="mc" aria-label="Homepage">
-        {/* LIVE TICKER */}
-        <Ticker />
-
         {/* HERO */}
         <section className="hero" aria-label="Hero">
             <div className="hleft">
@@ -81,11 +75,22 @@
         {/* LIVE MATCHES */}
         <LiveBar />
 
-        {/* AI INSIGHT */}
-        <InsightCard />
-
-        {/* FAN POLL */}
-        <PollCard />
+        {/* LIVE FOOTBALL LINK */}
+        <section className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10" aria-labelledby="live-centre-heading">
+            <div className="relative overflow-hidden rounded-2xl border border-red-500/30 bg-gradient-to-r from-zinc-950 via-black to-red-950 p-6 text-white shadow-xl sm:p-9">
+                <div className="pointer-events-none absolute -right-10 -top-16 h-56 w-56 rounded-full border-[28px] border-white/[0.04]" aria-hidden="true" />
+                <div className="relative flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+                    <div className="max-w-2xl">
+                        <p className="text-xs font-black uppercase tracking-[0.24em] text-red-400">Match Centre · Ghana &amp; Worldwide</p>
+                        <h2 id="live-centre-heading" className="mt-3 text-2xl font-black sm:text-3xl">Follow live football as it happens</h2>
+                        <p className="mt-2 text-sm leading-6 text-gray-300">See live scores, match minutes, team crests and competitions in one place.</p>
+                    </div>
+                    <button type="button" onClick={() => onNavigate("live")} className="shrink-0 rounded-lg bg-red-600 px-6 py-3 text-sm font-black text-white transition hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 focus:ring-offset-black">
+                        Open Live Football <span aria-hidden="true">→</span>
+                    </button>
+                </div>
+            </div>
+        </section>
 
         {/* FEATURED */}
         <section className="sec fbg" aria-labelledby="feat-h">

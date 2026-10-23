@@ -1,5 +1,7 @@
 import { runAutomatedIngestion } from "../../../components/lib/automatedIngestionEngine";
 import { ghanaNewsStore } from "../../../components/lib/ghanaNewsStore";
+import { runInternationalIngestion } from "../../../components/lib/internationalIngestionEngine";
+import { internationalNewsStore } from "../../../components/lib/internationalNewsStore";
 import {
   isEditorialRequestAuthorized,
   unauthorizedResponse,
@@ -35,15 +37,21 @@ export async function GET(request: Request) {
       );
     }
 
-    const report = await runAutomatedIngestion();
+    const [report, internationalReport] = await Promise.all([
+      runAutomatedIngestion(),
+      runInternationalIngestion(),
+    ]);
     const ingestResult = ghanaNewsStore.addIngestedArticles(
       report.discoveredStories
+    );
+    const internationalIngestResult = internationalNewsStore.addMany(
+      internationalReport.discoveredStories
     );
 
     return Response.json(
       {
         success: true,
-        message: `Automated ingestion complete. ${ingestResult.added} new stories placed in editorial queue awaiting approval.`,
+        message: `Automated ingestion complete. ${ingestResult.added} Ghana and ${internationalIngestResult.added} international stories placed in the editorial queue awaiting approval.`,
         newStoriesQueued: ingestResult.added,
         duplicatesSkipped: ingestResult.skippedDuplicates,
         staleSkipped: report.staleSkipped,
@@ -55,6 +63,13 @@ export async function GET(request: Request) {
         timestamp: report.fetchedAt,
         durationMs: report.durationMs,
         currentQueueStatus: ghanaNewsStore.getCounts(),
+        internationalNewStoriesQueued: internationalIngestResult.added,
+        internationalDuplicatesSkipped: internationalIngestResult.skippedDuplicates,
+        internationalStaleSkipped: internationalReport.staleSkipped,
+        internationalQueueFull: internationalIngestResult.queueFull,
+        internationalSourcesMonitored: internationalReport.sourcesChecked,
+        internationalSourceHealth: internationalReport.sourceHealth,
+        internationalQueueStatus: internationalNewsStore.getCounts(),
       },
       { status: 200 }
     );

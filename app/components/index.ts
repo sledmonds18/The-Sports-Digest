@@ -21,6 +21,7 @@ export { default as BlackQueens } from "./BlackQueens";
 export { default as GhanaFACup } from "./GhanaFACup";
 export { default as DivisionOneLeague } from "./DivisionOneLeague";
 export { default as GhanaSportsNews } from "./GhanaSportsNews";
+export { default as InternationalSportsNewsPage } from "./InternationalSportsNewsPage";
 
 
 

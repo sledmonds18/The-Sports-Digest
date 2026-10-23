@@ -222,13 +222,6 @@
 
             <button
                 className="menu-parent"
-                onClick={() => handleNavigate("international-football")}
-            >
-                <span>🌍 International Football</span>
-            </button>
-
-            <button
-                className="menu-parent"
                 onClick={() => handleNavigate("fifa")}
             >
                 <span>🏆 FIFA</span>
@@ -240,6 +233,14 @@
             >
                 <span>🏆 UEFA</span>
             </button>
+
+            <button
+                className="menu-parent"
+                onClick={() => handleNavigate("international-sports-news")}
+            >
+                <span>📰 International Sports News</span>
+            </button>
+
             </div>
         )}
 

@@ -723,11 +723,10 @@ export async function runAutomatedIngestion(
       }
       seenNormalized.add(normalized);
 
-      const category = classifySportCategory(
-        item.title,
-        item.description,
-        source.defaultSport
-      );
+      const category =
+        source.id === "gnews-transfers"
+          ? "Transfers"
+          : classifySportCategory(item.title, item.description, source.defaultSport);
       const slug = slugify(item.title);
       const discoveredAt = new Date().toISOString();
       const publisher = item.publisher || source.publisher;
@@ -738,6 +737,7 @@ export async function runAutomatedIngestion(
         title: cleanTitle,
         slug: `${slug}-${Date.now().toString(36)}`,
         category,
+        ...(category === "Transfers" ? { transferStatus: "reported" as const } : {}),
         status: "pending",
         author: `Wire Desk · ${publisher}`,
         publishedAt: "Pending Editorial Approval",

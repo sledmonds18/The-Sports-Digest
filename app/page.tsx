@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSEO } from "./components/lib/hooks";
 import { SEO } from "./components/lib/data";
 
@@ -22,10 +22,18 @@ import {
   GhanaFACup,
   DivisionOneLeague,
   GhanaSportsNews,
+  InternationalSportsNewsPage,
   type MenuScreen,
 } from "./components";
 
 export default function SportsDigest() {
+  useEffect(() => {
+    // This app keeps its view in client state, so a refresh restores Home.
+    // Disable the browser's saved scroll position so Home starts at the hero.
+    window.history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+  }, []);
+
   /* =========================
     MAIN PAGE
   ========================== */
@@ -41,6 +49,7 @@ export default function SportsDigest() {
     | "division-one"
     | "ghana-football"
     | "ghana-sports"
+    | "international-sports-news"
     | "premier-league"
     | "champions-league"
     | "la-liga"
@@ -96,6 +105,7 @@ export default function SportsDigest() {
         | "division-one"
         | "ghana-football"
         | "ghana-sports"
+        | "international-sports-news"
         | "premier-league"
         | "champions-league"
         | "la-liga"
@@ -178,7 +188,7 @@ export default function SportsDigest() {
       {/* =========================
           LIVE TICKER
       ========================== */}
-      <Ticker />
+      <Ticker onNavigate={navigate} />
 
       {/* =========================
           DESKTOP SPORTS CATEGORIES
@@ -267,6 +277,10 @@ export default function SportsDigest() {
       onToast={showToast}
     />
   )}
+
+        {page === "international-sports-news" && (
+          <InternationalSportsNewsPage onNavigate={navigate} />
+        )}
         
 
         {![
@@ -280,6 +294,7 @@ export default function SportsDigest() {
           "ghana-fa-cup",
           "division-one",
           "ghana-sports",
+          "international-sports-news",
         ].includes(page) && (
           <SportsPage
             section={page}

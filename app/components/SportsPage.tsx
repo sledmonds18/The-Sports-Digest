@@ -1,5 +1,14 @@
     "use client";
 
+import InternationalFootballPage, {
+  INTERNATIONAL_FOOTBALL_SECTIONS,
+} from "./InternationalFootballPage";
+import InternationalTransfersPage from "./InternationalTransfersPage";
+import LiveFootballPage from "./LiveFootballPage";
+import FixturesPage from "./FixturesPage";
+import ResultsPage from "./ResultsPage";
+import StandingsPage from "./StandingsPage";
+
     interface SportsPageProps {
     section: string;
     onNavigate: (page: string) => void;
@@ -11,14 +20,6 @@
     title: string;
     excerpt: string;
     image: string;
-    }
-
-    interface Fixture {
-    competition: string;
-    home: string;
-    away: string;
-    date: string;
-    time: string;
     }
 
     const titles: Record<string, string> = {
@@ -90,30 +91,6 @@
     },
     ];
 
-    const fixtures: Fixture[] = [
-    {
-        competition: "Ghana Premier League",
-        home: "Dreams FC",
-        away: "Hearts of Oak",
-        date: "Sun, Oct 4",
-        time: "TBC",
-    },
-    {
-        competition: "Ghana Premier League",
-        home: "Samartex",
-        away: "Young Apostles",
-        date: "Sun, Oct 4",
-        time: "TBC",
-    },
-    {
-        competition: "Ghana Premier League",
-        home: "Medeama",
-        away: "Debibi United",
-        date: "Sun, Oct 4",
-        time: "TBC",
-    },
-    ];
-
     export default function SportsPage({
     section,
     onNavigate,
@@ -126,16 +103,36 @@
         section === "black-queens";
 
     const isInternational =
-        section === "premier-league" ||
-        section === "champions-league" ||
-        section === "la-liga" ||
-        section === "bundesliga" ||
-        section === "serie-a" ||
-        section === "ligue-1" ||
-        section === "mls" ||
-        section === "international-football" ||
-        section === "fifa" ||
-        section === "uefa";
+        INTERNATIONAL_FOOTBALL_SECTIONS.includes(section);
+
+    if (isInternational) {
+        return (
+            <InternationalFootballPage
+                section={section}
+                onNavigate={onNavigate}
+            />
+        );
+    }
+
+    if (section === "transfers") {
+        return <InternationalTransfersPage onNavigate={onNavigate} />;
+    }
+
+    if (section === "live") {
+        return <LiveFootballPage onNavigate={onNavigate} />;
+    }
+
+    if (section === "fixtures") {
+        return <FixturesPage onNavigate={onNavigate} />;
+    }
+
+    if (section === "results") {
+        return <ResultsPage onNavigate={onNavigate} />;
+    }
+
+    if (section === "standings") {
+        return <StandingsPage onNavigate={onNavigate} />;
+    }
 
     const sectionLabel = isGhana
         ? "GHANA FOOTBALL"
@@ -443,36 +440,9 @@
 
                 </div>
 
-                <div className="mt-5 space-y-4">
-
-                    {fixtures.slice(0, 2).map((fixture) => (
-
-                    <div
-                        key={`${fixture.home}-${fixture.away}`}
-                        className="border-b pb-4 last:border-0 last:pb-0"
-                    >
-
-                        <p className="text-[10px] font-bold uppercase tracking-wide text-red-600">
-                        {fixture.competition}
-                        </p>
-
-                        <p className="mt-1 text-sm font-bold">
-                        {fixture.home}
-                        </p>
-
-                        <p className="text-sm text-gray-500">
-                        vs {fixture.away}
-                        </p>
-
-                        <p className="mt-1 text-xs text-gray-400">
-                        {fixture.date}
-                        </p>
-
-                    </div>
-
-                    ))}
-
-                </div>
+                <p className="mt-5 text-sm leading-6 text-gray-500">
+                    See verified upcoming match schedules, kickoff times and competitions in the fixtures centre.
+                </p>
 
                 <button
                     onClick={() => onNavigate("fixtures")}
@@ -497,29 +467,9 @@
 
                 </div>
 
-                <div className="mt-5 rounded-xl bg-gray-50 p-4">
-
-                    <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">
-                    Ghana Premier League
-                    </p>
-
-                    <div className="mt-3 flex items-center justify-between">
-
-                    <span className="text-sm font-bold">
-                        Latest Results
-                    </span>
-
-                    <span className="rounded-md bg-black px-3 py-1 text-xs font-bold text-white">
-                        FT
-                    </span>
-
-                    </div>
-
-                    <p className="mt-3 text-xs text-gray-500">
-                    Check the complete results centre for recent matches.
-                    </p>
-
-                </div>
+                <p className="mt-5 text-sm leading-6 text-gray-500">
+                    Catch up on verified final scores and completed matches in the results centre.
+                </p>
 
                 <button
                     onClick={() => onNavigate("results")}

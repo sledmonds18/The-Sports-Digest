@@ -4,7 +4,7 @@ import { useLiveMatches } from "./lib/useLiveMatches";
 import { MatchCard } from "./MatchCard";
 
 export function LiveBar() {
-  const matches = useLiveMatches();
+  const { matches } = useLiveMatches();
 
   if (!matches || matches.length === 0) {
     return null;
@@ -15,7 +15,7 @@ export function LiveBar() {
       <h2 className="sec-title">Live Matches</h2>
 
       <div className="live-grid">
-        {matches.map((m: any, idx: number) => {
+        {matches.map((m, idx) => {
           const homeName = m?.teams?.home?.name || "Home Team";
           const awayName = m?.teams?.away?.name || "Away Team";
           const homeGoals = m?.goals?.home ?? 0;
