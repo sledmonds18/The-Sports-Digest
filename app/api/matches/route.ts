@@ -26,7 +26,8 @@ function dateInAccra(date: Date) {
 }
 
 export async function GET(request: Request) {
-  const apiKey = process.env.API_SPORTS_KEY || process.env.API_FOOTBALL || process.env.NEXT_PUBLIC_API_KEY;
+  // API_FOOTBALL is the provider URL in the project guide, so never use it as a key.
+  const apiKey = process.env.API_SPORTS_KEY || process.env.NEXT_PUBLIC_API_KEY;
   const { searchParams } = new URL(request.url);
   const wantsFixtures = searchParams.get("view") === "fixtures";
   const wantsResults = searchParams.get("view") === "results";
