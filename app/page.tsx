@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useSEO } from "./components/lib/hooks";
 import { SEO } from "./components/lib/data";
 
@@ -27,11 +27,12 @@ import {
 } from "./components";
 
 export default function SportsDigest() {
-  useEffect(() => {
+  useLayoutEffect(() => {
     // This app keeps its view in client state, so a refresh restores Home.
-    // Disable the browser's saved scroll position so Home starts at the hero.
+    // Disable restoration and jump instantly so smooth-scroll CSS cannot leave
+    // the refreshed Home view visibly down at the previous page position.
     window.history.scrollRestoration = "manual";
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }, []);
 
   /* =========================
