@@ -1,6 +1,7 @@
     "use client";
 
     import Image from "next/image";
+import GhanaNewsDeskCallout from "./GhanaNewsDeskCallout";
 
     interface BlackQueensProps {
     onNavigate?: (page: string) => void;
@@ -826,6 +827,8 @@
         </div>
     </div>
     </section>
+        {onNavigate && <GhanaNewsDeskCallout topic="Black Queens" currentPage="black-queens" onNavigate={onNavigate} />}
+
         {/* =========================================
             BACK HOME
         ========================================= */}

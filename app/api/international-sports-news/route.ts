@@ -3,14 +3,25 @@ import { runInternationalIngestion } from "../../components/lib/internationalIng
 import { INTERNATIONAL_FEED_REGISTRY } from "../../components/lib/internationalFeedRegistry";
 import { INTERNATIONAL_SPORTS_CATEGORIES } from "../../components/lib/internationalSportsData";
 import { isEditorialRequestAuthorized, unauthorizedResponse } from "../../components/lib/editorialAuth";
-import { extractArticleOgImage, slugify } from "../../components/lib/automatedIngestionEngine";
+import { extractArticleOgImage, slugify, stripHtml } from "../../components/lib/automatedIngestionEngine";
 import type { InternationalSportArticle } from "../../components/lib/internationalSportsData";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status") || "approved";
   if (status !== "approved" && !isEditorialRequestAuthorized(request)) return unauthorizedResponse("Editorial authorisation is required for this queue.");
-  return Response.json({ success: true, data: internationalNewsStore.getArticles(status, searchParams.get("category") || "All International"), counts: internationalNewsStore.getCounts(), categories: INTERNATIONAL_SPORTS_CATEGORIES, feeds: INTERNATIONAL_FEED_REGISTRY.map(({ id, name, publisher, category }) => ({ id, name, publisher, category })) });
+  const articles = internationalNewsStore.getArticles(status, searchParams.get("category") || "All International").map((article) => ({
+    ...article,
+    excerpt: stripHtml(article.excerpt) || article.title,
+    content: article.content.map(stripHtml),
+    discoverySource: {
+      ...article.discoverySource,
+      rawSnippet: article.discoverySource.rawSnippet
+        ? stripHtml(article.discoverySource.rawSnippet)
+        : undefined,
+    },
+  }));
+  return Response.json({ success: true, data: articles, counts: internationalNewsStore.getCounts(), categories: INTERNATIONAL_SPORTS_CATEGORIES, feeds: INTERNATIONAL_FEED_REGISTRY.map(({ id, name, publisher, category }) => ({ id, name, publisher, category })) });
 }
 
 export async function POST(request: Request) {

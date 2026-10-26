@@ -61,7 +61,9 @@ export function useLiveMatches() {
 
   useEffect(() => {
     void refresh(true);
-    const interval = window.setInterval(() => void refresh(true), 30_000);
+    // The free football-data plan has a small daily quota; keep this in step
+    // with the API route's 15-minute shared cache to avoid burning calls.
+    const interval = window.setInterval(() => void refresh(true), 15 * 60_000);
     return () => window.clearInterval(interval);
   }, [refresh]);
 

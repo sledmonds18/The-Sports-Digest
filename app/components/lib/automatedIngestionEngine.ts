@@ -290,8 +290,21 @@ function decodeEntities(value: string): string {
     .replace(/&#(\d+);/g, (_m, code) => String.fromCharCode(Number(code)));
 }
 
-function stripHtml(value: string): string {
-  return decodeEntities(value.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+export function stripHtml(value: string): string {
+  let decoded = value;
+  // Some RSS feeds escape their HTML more than once (for example, an anchor
+  // arrives as &amp;lt;a ...&amp;gt;). Decode before stripping tags so the raw
+  // href markup never becomes visible excerpt text.
+  for (let pass = 0; pass < 3; pass++) {
+    const next = decodeEntities(decoded);
+    if (next === decoded) break;
+    decoded = next;
+  }
+  const text = decoded
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, " ")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, " ")
+    .replace(/<[^>]*>/g, " ");
+  return decodeEntities(text).replace(/\s+/g, " ").trim();
 }
 
 export interface ParsedFeedItem {
@@ -344,12 +357,18 @@ export function parseFeedXml(xmlText: string): ParsedFeedItem[] {
       /<dc:date[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/dc:date>/i,
     ]);
 
-    const imageRaw = firstMatch(raw, [
+    let imageMarkup = raw;
+    for (let pass = 0; pass < 3; pass++) {
+      const next = decodeEntities(imageMarkup);
+      if (next === imageMarkup) break;
+      imageMarkup = next;
+    }
+    const imageRaw = firstMatch(imageMarkup, [
       /<media:content[^>]+url=["']([^"']+)["']/i,
       /<media:thumbnail[^>]+url=["']([^"']+)["']/i,
       /<enclosure[^>]+url=["']([^"']+)["']/i,
-      /<image[^>]+src=["']([^"']+)["']/i,
-      /<content:encoded[^>]*>[\s\S]*?<img[^>]+src=["']([^"']+)["']/i,
+      /<img[^>]+(?:src|data-src)=["']([^"']+)["']/i,
+      /<image[^>]+(?:src|url)=["']([^"']+)["']/i,
     ]);
 
     // Google News nests the originating publisher in <source url="...">Name</source>

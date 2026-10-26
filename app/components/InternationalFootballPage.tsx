@@ -1,7 +1,5 @@
 "use client";
 
-import InternationalSportsNews from "./InternationalSportsNews";
-
 interface InternationalFootballPageProps {
   section: string;
   onNavigate: (page: string) => void;
@@ -48,8 +46,6 @@ interface CompetitionProfile {
   landscapeTitle: string;
   landscapeIntro: string;
   landscape: DetailCard[];
-  currentTitle: string;
-  currentUpdate: string;
   officialLinks: { label: string; href: string }[];
   related: { label: string; section: string }[];
 }
@@ -81,8 +77,6 @@ const profiles: Record<string, CompetitionProfile> = {
       { title: "European places", detail: "League position can qualify clubs for UEFA competitions. The number and route of places depend on the applicable season rules." },
       { title: "Promotion and relegation", detail: "The lowest-placed clubs leave the division at season's end, with promoted clubs joining from the EFL Championship." },
     ],
-    currentTitle: "The 2026/27 campaign",
-    currentUpdate: "The 2026/27 fixture list has been released. Broadcast selections and cup scheduling can move match dates and kick-off times, so check the official fixture centre for current information.",
     officialLinks: [
       { label: "Fixtures, results, table and clubs", href: "https://www.premierleague.com/" },
       { label: "All 380 fixtures for 2026/27", href: "https://www.premierleague.com/en/news/4675097/all-380-fixtures-for-202627-premier-league-season" },
@@ -116,8 +110,6 @@ const profiles: Record<string, CompetitionProfile> = {
       { title: "Knockout qualification", detail: "The top eight advance directly to the round of 16. Places 9–24 play two-legged knockouts for the remaining places; the rest are eliminated." },
       { title: "The final", detail: "The final is a single match at a venue selected by UEFA. The 2026/27 final is scheduled for Madrid on 5 June 2027." },
     ],
-    currentTitle: "The 2026/27 league phase",
-    currentUpdate: "The league phase began in September 2026 and runs through Matchday 8 on 27 January 2027. UEFA publishes the live table, results and any date changes.",
     officialLinks: [
       { label: "Live competition centre", href: "https://www.uefa.com/uefachampionsleague/" },
       { label: "2026/27 format, teams and dates", href: "https://www.uefa.com/uefachampionsleague/news/02a6-20d57cfcd03e-407c22a7f465-1000--2026-27-champions-league-teams-dates-draws-format-final/" },
@@ -151,8 +143,6 @@ const profiles: Record<string, CompetitionProfile> = {
       { title: "FC Barcelona", detail: "A historic Catalan club with a long-running rivalry with Real Madrid, known as ElClásico." },
       { title: "Atlético de Madrid", detail: "A major Madrid club whose city rivalry and domestic title challenges are part of LALIGA's story." },
     ],
-    currentTitle: "The 2026/27 campaign",
-    currentUpdate: "The 2026/27 calendar is underway. Fixture times and standings can change during the season; LALIGA's official competition centre carries the latest schedule and table.",
     officialLinks: [
       { label: "Current clubs and competition", href: "https://www.laliga.com/en-US/laliga-easports/clubs" },
       { label: "2026/27 season calendar", href: "https://www.laliga.com/noticias/ya-se-conoce-el-calendario-al-completo-de-laliga-ea-sports-2026-27" },
@@ -186,8 +176,6 @@ const profiles: Record<string, CompetitionProfile> = {
       { title: "Borussia Dortmund", detail: "A major German club known for its passionate support and long-standing domestic rivalry with Bayern." },
       { title: "Home and away", detail: "Every club plays 34 league matches: one at home and one away against each of 17 opponents." },
     ],
-    currentTitle: "The 2026/27 campaign",
-    currentUpdate: "The season's final matchday is scheduled for 22 May 2027. Check the official fixture centre for matchday details, results and updated standings.",
     officialLinks: [
       { label: "Bundesliga fixtures, table and clubs", href: "https://www.bundesliga.com/en/bundesliga" },
       { label: "2026/27 season calendar", href: "https://www.bundesliga.com/en/bundesliga/news/2026-27-season-fixture-schedules-37671" },
@@ -221,8 +209,6 @@ const profiles: Record<string, CompetitionProfile> = {
       { title: "Inter and AC Milan", detail: "The Milan clubs share the San Siro and meet in one of Italian football's defining city derbies." },
       { title: "The title", detail: "Clubs collect points through 38 matchdays, with the highest-ranked team crowned champion under league rules." },
     ],
-    currentTitle: "The 2026/27 campaign",
-    currentUpdate: "The campaign is scheduled to run from 22–23 August 2026 through 29–30 May 2027. Check Lega Serie A for confirmed match information and current results.",
     officialLinks: [
       { label: "Serie A competition centre", href: "https://en.legaseriea.it/serie-a" },
       { label: "Official 2026/27 season guide", href: "https://en.legaseriea.it/serie-a/news/looking-forward-to-the-2026-27-serie-a-fixture-list" },
@@ -256,8 +242,6 @@ const profiles: Record<string, CompetitionProfile> = {
       { title: "Olympique de Marseille", detail: "A historic club with one of French football's most passionate supporter bases and a famous national rivalry." },
       { title: "Promotion and relegation", detail: "The 16th-placed club is scheduled to contest a two-legged play-off against the Ligue 2 play-off winner." },
     ],
-    currentTitle: "The 2026/27 campaign",
-    currentUpdate: "The 2026/27 calendar concludes on 29 May 2027. Ligue 1's official site is the live reference for fixtures, standings and any schedule changes.",
     officialLinks: [
       { label: "Ligue 1 competition centre", href: "https://ligue1.com/en/" },
       { label: "2026/27 official calendar", href: "https://ligue1.com/en/articles/l1_article_5292-the-2026-27-ligue-1-mcdonald-s-calendar-is-released" },
@@ -292,8 +276,6 @@ const profiles: Record<string, CompetitionProfile> = {
       { title: "Western Conference", detail: "Clubs including LA Galaxy and Seattle Sounders FC contest the Western table and playoff bracket." },
       { title: "Playoff route", detail: "The top seven in each conference qualify directly for Round One; places eight and nine play a Wild Card match." },
     ],
-    currentTitle: "The 2026 regular season",
-    currentUpdate: "Each club is scheduled for 34 regular-season matches: 17 at home and 17 away. The official MLS competition guidelines explain the current schedule and playoff rules.",
     officialLinks: [
       { label: "MLS fixtures, standings and clubs", href: "https://www.mlssoccer.com/" },
       { label: "Official 2026 competition guidelines", href: "https://www.mlssoccer.com/league-reports/competition-guidelines/" },
@@ -336,8 +318,6 @@ const profiles: Record<string, CompetitionProfile> = {
       { title: "National-team managers", detail: "Head coaches manage their national teams and are appointed by their own member associations. FIFA sets competition rules and organises tournaments, but does not appoint every national-team manager." },
       { title: "Six continental confederations", detail: "AFC, CAF, Concacaf, CONMEBOL, OFC and UEFA organise football across Asia, Africa, North and Central America and the Caribbean, South America, Oceania and Europe." },
     ],
-    currentTitle: "International football calendar",
-    currentUpdate: "FIFA President Gianni Infantino leads the organisation, with Secretary General Mattias Grafström overseeing its day-to-day administration. FIFA's official tournament directory provides current event, team and schedule information.",
     officialLinks: [
       { label: "FIFA member associations", href: "https://legal.fifa.com/associations" },
       { label: "FIFA tournaments and events", href: "https://www.fifa.com/en/tournaments/" },
@@ -373,8 +353,6 @@ const profiles: Record<string, CompetitionProfile> = {
       { title: "National-team competitions", detail: "UEFA organizes events including the European Championship and Nations League, with separate qualification rules." },
       { title: "Club competitions", detail: "The men's club portfolio includes the Champions League, Europa League and Conference League, alongside women's competitions." },
     ],
-    currentTitle: "The 2026/27 European season",
-    currentUpdate: "UEFA competitions have separate calendars, standings and regulations. Open the relevant official competition page for live results and confirmed schedules.",
     officialLinks: [
       { label: "UEFA national associations", href: "https://www.uefa.com/nationalassociations/" },
       { label: "UEFA competitions", href: "https://www.uefa.com/" },
@@ -511,8 +489,8 @@ const imageGalleries: Record<string, ImageGallery> = {
     images: [
       { name: "Teams line up before kick-off", src: "https://editorial.uefa.com/resources/0298-1d7678a2eed4-a9e4274c1ae6-1000/borussia_dortmund_v_fc_barcelona_-_uefa_champions_league_2024_25_league_phase_md6.jpeg", caption: "Barcelona and Borussia Dortmund line up before a UEFA match" },
       { name: "Players prepare together in the dressing room", src: "https://res.cloudinary.com/dfb-de/image/fetch/c_fill%2Cf_auto%2Ch_630%2Cq_auto%2Cw_1200/https%3A/assets.dfb.de/uploads/000/312/599/original_EM-Doku.jpg%3F1731704980", caption: "Germany's squad gathers in the dressing room during EURO 2024" },
-      { name: "Another European club line-up", src: "https://s3.elespanol.com/2025/12/09/actualidad/1003744048645_260394043_1706x1280.jpg", caption: "Barcelona and Eintracht Frankfurt line up before kick-off" },
-      { name: "A packed European stadium under the lights", src: "https://s7g10.scene7.com/is/image/BORUSSIADORTMGBHANDOCKGAA/CL-Stadion", caption: "Supporters fill Borussia Dortmund's stadium for a Champions League night" },
+      { name: "Another European club line-up", src: "https://media.eintracht.de/image/upload/ar_16%3A9%2Cc_fill%2Cdpr_3.0%2Cf_auto%2Cg_xy_center%2Cq_60%2Cw_400%2Cx_w_mul_0.56%2Cy_h_mul_0.44/v1765313773/uefa-champions-league-fc-barcelona-eintracht-frankfurt-mannschaft-team-startelf-ecba", caption: "Eintracht Frankfurt line up before kick-off against Barcelona" },
+      { name: "A packed European stadium under the lights", src: "https://s7g10.scene7.com/is/image/BORUSSIADORTMUNDGMBHANDCOKGAA/CL-Stadion", caption: "Supporters fill Borussia Dortmund's stadium for a Champions League night" },
       { name: "Two European teams battle in attack", src: "https://img.vavel.com/fazfgozx0agghck-format-jpg-name-large-1661224658007.jpg", caption: "Benfica attack as Dynamo Kyiv defend in the Champions League" },
       { name: "Players celebrate a European goal", src: "https://editorial.uefa.com/resources/025a-0ea7faaf5d41-525abc165e0a-1000/2083188.jpeg", caption: "Real Madrid players celebrate against Borussia Dortmund" },
     ],
@@ -563,8 +541,6 @@ export default function InternationalFootballPage({
           </div>
         </div>
       </section>
-
-      <InternationalSportsNews category={{ "premier-league": "Premier League", "champions-league": "Champions League", "la-liga": "La Liga", bundesliga: "Bundesliga", "serie-a": "Serie A", "ligue-1": "Ligue 1", mls: "MLS", fifa: "FIFA", uefa: "UEFA" }[section] || "Premier League"} />
 
       <section className="border-y border-white/10 bg-[#080808]">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
@@ -631,14 +607,14 @@ export default function InternationalFootballPage({
         </section>
       )}
 
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
-        <div className="rounded-[2rem] border border-red-500/30 bg-gradient-to-br from-red-950/40 via-[#101010] to-black p-7 sm:p-10 lg:p-14">
-          <p className="text-xs font-black uppercase tracking-[0.24em] text-red-500">Current update</p>
-          <h2 className="mt-3 text-4xl font-black sm:text-5xl">{profile.currentTitle}</h2>
-          <p className="mt-5 max-w-3xl text-sm leading-7 text-gray-300 sm:text-base">{profile.currentUpdate}</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            {profile.officialLinks.slice(0, 2).map((link) => <a key={link.href} href={link.href} target="_blank" rel="noreferrer" className="rounded-xl bg-red-600 px-5 py-3 text-sm font-black transition hover:bg-red-700">{link.label}<span aria-hidden="true" className="ml-2">↗</span></a>)}
+      <section className="border-y border-white/10 bg-[#080808]">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-10 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-red-500">The International Sports News desk</p>
+            <h2 className="mt-2 text-2xl font-black sm:text-3xl">Latest {profile.title} stories</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-400">News and match updates are published in the dedicated international news desk.</p>
           </div>
+          <button type="button" onClick={() => onNavigate("international-sports-news")} className="shrink-0 rounded-xl bg-red-600 px-5 py-3 text-sm font-black transition hover:bg-red-700">Go to International News<span aria-hidden="true" className="ml-2">→</span></button>
         </div>
       </section>
 

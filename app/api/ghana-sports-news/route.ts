@@ -3,6 +3,7 @@ import {
   runAutomatedIngestion,
   checkAllFeeds,
   slugify,
+  stripHtml,
 } from "../../components/lib/automatedIngestionEngine";
 import {
   isEditorialRequestAuthorized,
@@ -40,7 +41,17 @@ export async function GET(request: Request) {
       );
     }
 
-    const filtered = ghanaNewsStore.getArticles(statusParam, categoryParam);
+    const filtered = ghanaNewsStore.getArticles(statusParam, categoryParam).map((article) => ({
+      ...article,
+      excerpt: stripHtml(article.excerpt) || article.title,
+      content: article.content.map(stripHtml),
+      discoverySource: {
+        ...article.discoverySource,
+        rawSnippet: article.discoverySource.rawSnippet
+          ? stripHtml(article.discoverySource.rawSnippet)
+          : undefined,
+      },
+    }));
     const counts = ghanaNewsStore.getCounts();
 
     return Response.json(

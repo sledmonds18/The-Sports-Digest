@@ -1,6 +1,7 @@
     "use client";
 
     import Image from "next/image";
+import GhanaNewsDeskCallout from "./GhanaNewsDeskCallout";
 
     interface DivisionOneLeagueProps {
     onNavigate?: (page: string) => void;
@@ -947,8 +948,10 @@
             Division One and earn their place among the country&apos;s elite.
             </p>
 
+            {onNavigate && <GhanaNewsDeskCallout topic="Division One League" currentPage="division-one" onNavigate={onNavigate} />}
+
             {/* BACK HOME */}
-            <section className="mt-20 border-t border-white/10 bg-[#080808] text-left">
+            <section className="border-t border-white/10 bg-[#080808]">
             <div className="mx-auto flex max-w-7xl flex-col justify-between gap-5 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:px-8">
                 <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-red-500">

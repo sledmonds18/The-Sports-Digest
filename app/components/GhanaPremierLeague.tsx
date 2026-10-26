@@ -2,6 +2,7 @@
     "use client";
 
     import Image from "next/image";
+import GhanaNewsDeskCallout from "./GhanaNewsDeskCallout";
     import type { CSSProperties } from "react";
 
     interface GhanaPremierLeagueProps {
@@ -602,6 +603,8 @@
             </div>
             </div>
         </section>
+
+        {onNavigate && <GhanaNewsDeskCallout topic="Ghana Premier League" currentPage="ghana-premier-league" onNavigate={onNavigate} />}
 
         {/* BACK HOME */}
         <section className="border-t border-white/10 bg-[#080808]">

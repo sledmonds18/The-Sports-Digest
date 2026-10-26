@@ -48,7 +48,17 @@ export async function runInternationalIngestion() {
 
   const sourceHealth = results.map((result) => result.health);
   const discoveredStories = results.flatMap((result) => result.discoveredStories);
-  const missingImages = discoveredStories.filter((article) => !article.image && article.discoverySource.sourceUrl).slice(0, 8);
+  // Google News RSS links lead to a generic JavaScript redirect page, not the
+  // publisher's article. Scraping its og:image can assign the same unrelated
+  // thumbnail to many stories, so only fetch metadata from direct article URLs.
+  const missingImages = discoveredStories.filter((article) => {
+    if (article.image || !article.discoverySource.sourceUrl) return false;
+    try {
+      return new URL(article.discoverySource.sourceUrl).hostname !== "news.google.com";
+    } catch {
+      return false;
+    }
+  }).slice(0, 8);
   await Promise.all(missingImages.map(async (article) => {
     article.image = await extractArticleOgImage(article.discoverySource.sourceUrl || "");
   }));

@@ -1,6 +1,7 @@
     "use client";
 
     import Image from "next/image";
+import GhanaNewsDeskCallout from "./GhanaNewsDeskCallout";
 
     interface GhanaFACupProps {
     onNavigate?: (page: string) => void;
@@ -509,6 +510,8 @@
             
             
             
+            {onNavigate && <GhanaNewsDeskCallout topic="Ghana FA Cup" currentPage="ghana-fa-cup" onNavigate={onNavigate} />}
+
             {/* =========================================
             BACK HOME
         ========================================= */}

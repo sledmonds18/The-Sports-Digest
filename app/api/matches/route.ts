@@ -9,11 +9,31 @@ let resultsCache: MatchListCache | null = null;
 const standingsCache = new Map<string, StandingsCache>();
 const leagueSeasonsCache = new Map<string, StandingsCache>();
 
-function assertProviderResponse(data: { errors?: unknown }) {
+function providerErrorMessage(data: { errors?: unknown }) {
   const errors = data.errors;
-  if (Array.isArray(errors) ? errors.length > 0 : errors && typeof errors === "object" ? Object.keys(errors).length > 0 : Boolean(errors)) {
-    throw new Error("Football data provider rejected the request.");
-  }
+  const hasErrors = Array.isArray(errors)
+    ? errors.length > 0
+    : errors && typeof errors === "object"
+      ? Object.keys(errors).length > 0
+      : Boolean(errors);
+  if (!hasErrors) return null;
+
+  const details = Array.isArray(errors)
+    ? errors
+    : errors && typeof errors === "object"
+      ? Object.values(errors as Record<string, unknown>)
+      : [errors];
+  const message = details
+    .map((detail) => typeof detail === "string" ? detail : JSON.stringify(detail))
+    .filter(Boolean)
+    .join("; ")
+    .slice(0, 240);
+  return message || "The football data provider rejected the request.";
+}
+
+function assertProviderResponse(data: { errors?: unknown }) {
+  const message = providerErrorMessage(data);
+  if (message) throw new Error(message);
 }
 
 function dateInAccra(date: Date) {
@@ -41,7 +61,7 @@ export async function GET(request: Request) {
   }
   const headers = wantsFixtures || wantsResults
     ? { "Cache-Control": wantsResults ? "public, s-maxage=1800, stale-while-revalidate=3600" : "public, s-maxage=3600, stale-while-revalidate=21600" }
-    : { "Cache-Control": "no-store, max-age=0" };
+    : { "Cache-Control": "public, s-maxage=900, stale-while-revalidate=1800" };
 
   if (!apiKey?.trim() || apiKey === "your_api_sports_key") {
     return Response.json({ response: [], status: "unconfigured", updatedAt: null }, { headers: wantsStandings ? standingsHeaders : headers });
@@ -126,10 +146,16 @@ export async function GET(request: Request) {
       updatedAt: new Date().toISOString(),
     }, { headers });
   } catch (error) {
-    console.warn("External live sports API unavailable:", error);
+    const responseData = axios.isAxiosError(error) ? error.response?.data : null;
+    const message = (responseData && typeof responseData === "object"
+      ? providerErrorMessage(responseData as { errors?: unknown })
+      : null)
+      || (error instanceof Error ? error.message : "The football data provider rejected the request.");
+    console.warn("External live sports API unavailable:", message);
     return Response.json({
       response: [],
       status: "error",
+      message,
       updatedAt: null,
     }, { status: 502, headers });
   }

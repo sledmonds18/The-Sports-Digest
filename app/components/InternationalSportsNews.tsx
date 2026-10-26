@@ -3,18 +3,6 @@
 import { useEffect, useState } from "react";
 import type { InternationalSportArticle } from "./lib/internationalSportsData";
 
-const CATEGORY_IMAGES: Record<string, string> = {
-  "Premier League": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&q=80",
-  "Champions League": "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200&q=80",
-  "La Liga": "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200&q=80",
-  Bundesliga: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&q=80",
-  "Serie A": "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1200&q=80",
-  "Ligue 1": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&q=80",
-  MLS: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&q=80",
-  FIFA: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200&q=80",
-  UEFA: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200&q=80",
-};
-
 export default function InternationalSportsNews({ category }: { category: string }) {
   const [articles, setArticles] = useState<InternationalSportArticle[]>([]);
   useEffect(() => {
@@ -37,7 +25,7 @@ export default function InternationalSportsNews({ category }: { category: string
           <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {articles.map((article) => (
               <article key={article.id} className="overflow-hidden rounded-2xl border border-white/10 bg-black">
-                <img src={article.image || CATEGORY_IMAGES[article.category] || CATEGORY_IMAGES["Premier League"]} onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = CATEGORY_IMAGES[article.category] || CATEGORY_IMAGES["Premier League"]; }} alt={article.image ? article.title : `Illustrative football image for ${article.category}`} loading="lazy" className="aspect-[16/9] w-full object-cover" />
+                {article.image && <img src={article.image} onError={(event) => event.currentTarget.remove()} alt={article.title} loading="lazy" className="aspect-[16/9] w-full object-cover" />}
                 <div className="p-5">
                   <p className="text-[10px] font-black uppercase tracking-widest text-red-500">{article.category} · {article.publishedAt}</p>
                   <h3 className="mt-3 text-xl font-black leading-snug">{article.title}</h3>
