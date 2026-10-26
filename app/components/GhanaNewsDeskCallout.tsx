@@ -16,7 +16,7 @@ export default function GhanaNewsDeskCallout({
     { page: "ghana-fa-cup", label: "Ghana FA Cup" },
     { page: "division-one", label: "Division One League" },
   ].filter((section) => section.page !== currentPage);
-  const officialSources: Record<string, { label: string; href: string }[]> = {
+  const officialSources: { label: string; href: string }[] = {
     "ghana-premier-league": [
       { label: "Ghana Premier League profile", href: "https://www.ghanafa.org/premier-league-profile" },
       { label: "Premier League news, fixtures and table", href: "https://www.ghanafa.org/category/premier-league" },
