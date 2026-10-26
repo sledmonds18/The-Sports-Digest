@@ -64,7 +64,10 @@ export async function GET(request: Request) {
     : { "Cache-Control": "public, s-maxage=900, stale-while-revalidate=1800" };
 
   if (!apiKey?.trim() || apiKey === "your_api_sports_key") {
-    return Response.json({ response: [], status: "unconfigured", updatedAt: null }, { headers: wantsStandings ? standingsHeaders : headers });
+    return Response.json(
+      { response: [], status: "unconfigured", updatedAt: null },
+      { headers: { "Cache-Control": "no-store, max-age=0" } },
+    );
   }
 
   if (wantsStandings) {
