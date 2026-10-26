@@ -267,40 +267,6 @@
                 <span>🌍 International</span>
             </button>
 
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("nba")}
-            >
-                <span>🏀 NBA</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("wnba")}
-            >
-                <span>🏀 WNBA</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("ncaa")}
-            >
-                <span>🎓 NCAA</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("euroleague")}
-            >
-                <span>🏆 EuroLeague</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("fiba")}
-            >
-                <span>🌍 FIBA</span>
-            </button>
             </div>
         )}
 
@@ -327,26 +293,6 @@
                 <span>🌍 International</span>
             </button>
 
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("atp")}
-            >
-                <span>🎾 ATP</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("wta")}
-            >
-                <span>🎾 WTA</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("grand-slams")}
-            >
-                <span>🏆 Grand Slams</span>
-            </button>
             </div>
         )}
 

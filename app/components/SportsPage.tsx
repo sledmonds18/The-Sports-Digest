@@ -8,6 +8,7 @@ import LiveFootballPage from "./LiveFootballPage";
 import FixturesPage from "./FixturesPage";
 import ResultsPage from "./ResultsPage";
 import StandingsPage from "./StandingsPage";
+import OtherSportsProfilePage, { isOtherSportSection } from "./OtherSportsProfilePage";
 
     interface SportsPageProps {
     section: string;
@@ -95,6 +96,10 @@ import StandingsPage from "./StandingsPage";
     section,
     onNavigate,
     }: SportsPageProps) {
+    if (isOtherSportSection(section)) {
+        return <OtherSportsProfilePage section={section} onNavigate={onNavigate} />;
+    }
+
     const title = titles[section] || "Football";
 
     const isGhana =
