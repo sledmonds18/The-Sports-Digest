@@ -351,6 +351,12 @@ footer{background:#070707;color:#555;padding:clamp(36px,5vw,64px) 0 clamp(20px,3
 /* RESPONSIVE */
 @media(max-width:900px){
 
+  .hero{grid-template-columns:1fr;min-height:auto}
+  .hleft{position:relative;z-index:1;width:100%;min-height:calc(100svh - var(--nh) - 34px)}
+  .hright{position:absolute;inset:0;z-index:0}
+  .hright img{opacity:.24}
+  .hbadges{position:static;margin-top:20px;left:auto;bottom:auto}
+
   .sports-category-bar{
     display:none;
   }
@@ -383,6 +389,12 @@ footer{background:#070707;color:#555;padding:clamp(36px,5vw,64px) 0 clamp(20px,3
 @media(max-width:560px){
   :root{--nh:56px}
   .hh1{font-size:clamp(38px,12vw,58px)}
+  .hleft{padding:38px 20px 24px}
+  .hacts{display:grid;grid-template-columns:1fr;width:100%;gap:10px}
+  .hacts button{width:100%;min-height:48px}
+  .hbadges{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:8px}
+  .hbadge{min-width:0;padding:8px 6px;text-align:center;white-space:normal;font-size:8px;letter-spacing:1px}
+  .hbadge:last-child{grid-column:1/-1;justify-self:center;width:fit-content;max-width:100%}
   .fstack{grid-template-columns:1fr}
   .srow{grid-template-columns:1fr 1fr}
   .fgr{grid-template-columns:1fr}
