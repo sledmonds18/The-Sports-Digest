@@ -42,6 +42,27 @@ type SourceHealth = {
   message?: string;
 };
 
+type SubscriberStats = {
+  total: number;
+  active: number;
+  unsubscribed: number;
+  latestSignupAt: string | null;
+  lastDispatch: {
+    at: string;
+    delivered: number;
+    subscriberCount: number;
+    headline: string;
+  } | null;
+  persistentStorage: {
+    active: boolean;
+    path: string;
+    isLoadedFromDisk: boolean;
+    writable: boolean;
+    ephemeral: boolean;
+    lastError: string | null;
+  };
+};
+
 const EMPTY_FILING = {
   title: "",
   category: "Football",
@@ -79,6 +100,10 @@ export default function EditorialDeskPage() {
   const [editorName, setEditorName] = useState("Shem Bravon Lamptey (Editor-in-Chief)");
   const [verificationNotes, setVerificationNotes] = useState("");
   const [sendBreakingAlert, setSendBreakingAlert] = useState(false);
+  // Optional monetization slot: a paying sponsor attached to this dispatch.
+  const [sponsorName, setSponsorName] = useState("");
+  const [sponsorLine, setSponsorLine] = useState("");
+  const [sponsorUrl, setSponsorUrl] = useState("");
   const [isCrawling, setIsCrawling] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
@@ -89,6 +114,7 @@ export default function EditorialDeskPage() {
 
   const [sourceHealth, setSourceHealth] = useState<SourceHealth[]>([]);
   const [isCheckingFeeds, setIsCheckingFeeds] = useState(false);
+  const [subscriberStats, setSubscriberStats] = useState<SubscriberStats | null>(null);
 
   const coverageMatrix = useMemo(() => getCoverageMatrix(), []);
 
@@ -105,6 +131,22 @@ export default function EditorialDeskPage() {
     }),
     [newsroomToken]
   );
+
+  const loadSubscriberStats = async () => {
+    try {
+      const res = await fetch("/api/newsletter/subscribe", {
+        headers: { [EDITORIAL_TOKEN_HEADER]: newsroomToken },
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.counts) {
+          setSubscriberStats(json.counts);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load subscriber stats:", err);
+    }
+  };
 
   const loadAllArticles = async () => {
     try {
@@ -128,6 +170,7 @@ export default function EditorialDeskPage() {
   useEffect(() => {
     if (isAuthenticated) {
       loadAllArticles();
+      loadSubscriberStats();
       const refreshInterval = window.setInterval(loadAllArticles, 60_000);
       return () => window.clearInterval(refreshInterval);
     }
@@ -152,6 +195,7 @@ export default function EditorialDeskPage() {
     setPasskeyInput("");
     setArticles([]);
     setSourceHealth([]);
+    setSubscriberStats(null);
   };
 
   // Filtered views
@@ -243,7 +287,7 @@ export default function EditorialDeskPage() {
       if (res.ok) {
         if (sendBreakingAlert && editingArticle) {
           try {
-            await fetch("/api/newsletter/breaking-alert", {
+            const alertRes = await fetch("/api/newsletter/breaking-alert", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -255,11 +299,29 @@ export default function EditorialDeskPage() {
                 category: editingArticle.category,
                 author: editorName,
                 slug: editingArticle.slug,
+                sponsor: sponsorName.trim()
+                  ? {
+                      name: sponsorName.trim(),
+                      line: sponsorLine.trim(),
+                      url: sponsorUrl.trim(),
+                    }
+                  : undefined,
               }),
             });
-            showToast("✓ Published live and Breaking Alert dispatched via Resend!");
+            const alertData = await alertRes.json().catch(() => null);
+
+            if (alertRes.ok && alertData?.success) {
+              showToast(
+                `✓ Published live! Breaking bulletin reached ${alertData.subscribersReached} subscriber${alertData.subscribersReached === 1 ? "" : "s"}.`
+              );
+              await loadSubscriberStats();
+            } else {
+              showToast(
+                `⚠ Published live, but the bulletin dispatch failed: ${alertData?.error || res.statusText}`
+              );
+            }
           } catch {
-            showToast("✓ Article approved and published live!");
+            showToast("✓ Published live, but the bulletin dispatch could not be sent.");
           }
         } else {
           showToast("✓ Article approved and published live to The Sports Digest!");
@@ -268,6 +330,9 @@ export default function EditorialDeskPage() {
         setEditingArticle(null);
         setVerificationNotes("");
         setSendBreakingAlert(false);
+        setSponsorName("");
+        setSponsorLine("");
+        setSponsorUrl("");
         await loadAllArticles();
       }
     } catch {
@@ -606,10 +671,52 @@ export default function EditorialDeskPage() {
           {(["ghana", "international"] as const).map((desk) => <button key={desk} type="button" onClick={() => { setActiveDesk(desk); setSelectedSport(desk === "ghana" ? "All Sports" : "All International"); setFiling({ ...EMPTY_FILING, category: desk === "ghana" ? "Football" : "Premier League" }); setSourceHealth([]); }} className={`rounded-lg px-4 py-2 text-xs font-black uppercase tracking-wider ${activeDesk === desk ? "bg-red-600 text-white" : "border border-zinc-700 text-zinc-400"}`}>{desk} desk</button>)}
           <button
             type="button"
+            onClick={() => { setActiveDesk("international"); setSelectedSport("Baseball"); setActiveTab("pending"); setSourceHealth([]); }}
+            className={`rounded-lg border px-4 py-2 text-xs font-black uppercase tracking-wider transition ${activeDesk === "international" && selectedSport === "Baseball" ? "border-red-500/50 bg-red-500/15 text-red-300" : "border-zinc-700 text-zinc-300 hover:border-red-500/50 hover:text-red-300"}`}
+          >
+            ⚾ Baseball Desk
+          </button>
+          <button
+            type="button"
+            onClick={() => { setActiveDesk("international"); setSelectedSport("Baseball"); setFiling({ ...EMPTY_FILING, category: "Baseball" }); setIsFilingOpen(true); setSourceHealth([]); }}
+            className="rounded-lg border border-zinc-700 px-4 py-2 text-xs font-black uppercase tracking-wider text-zinc-300 transition hover:border-red-500 hover:text-white"
+          >
+            ✍️ File Baseball Story
+          </button>
+          <button
+            type="button"
             onClick={() => { setSelectedSport("Transfers"); setActiveTab("pending"); }}
             className={`rounded-lg border px-4 py-2 text-xs font-black uppercase tracking-wider transition ${selectedSport === "Transfers" ? "border-amber-500/50 bg-amber-500/15 text-amber-300" : "border-zinc-700 text-zinc-300 hover:border-amber-500/50 hover:text-amber-300"}`}
           >
             Transfer Desk · {articles.filter((article) => article.category === "Transfers" && article.status === "pending").length} pending
+          </button>
+          <button
+            type="button"
+            onClick={() => { setSelectedSport("Boxing"); setActiveTab("pending"); }}
+            className={`rounded-lg border px-4 py-2 text-xs font-black uppercase tracking-wider transition ${selectedSport === "Boxing" ? "border-red-500/50 bg-red-500/15 text-red-300" : "border-zinc-700 text-zinc-300 hover:border-red-500/50 hover:text-red-300"}`}
+          >
+            Boxing Desk · {articles.filter((article) => article.category === "Boxing" && article.status === "pending").length} pending
+          </button>
+          <button
+            type="button"
+            onClick={() => { setActiveDesk("international"); setSelectedSport("Formula 1"); setActiveTab("pending"); }}
+            className={`rounded-lg border px-4 py-2 text-xs font-black uppercase tracking-wider transition ${activeDesk === "international" && selectedSport === "Formula 1" ? "border-red-500/50 bg-red-500/15 text-red-300" : "border-zinc-700 text-zinc-300 hover:border-red-500/50 hover:text-red-300"}`}
+          >
+            Formula 1 Desk · {articles.filter((article) => article.category === "Formula 1" && article.status === "pending").length} pending
+          </button>
+          <button
+            type="button"
+            onClick={() => { setActiveDesk("ghana"); setSelectedSport("Volleyball"); setActiveTab("pending"); }}
+            className={`rounded-lg border px-4 py-2 text-xs font-black uppercase tracking-wider transition ${activeDesk === "ghana" && selectedSport === "Volleyball" ? "border-red-500/50 bg-red-500/15 text-red-300" : "border-zinc-700 text-zinc-300 hover:border-red-500/50 hover:text-red-300"}`}
+          >
+            Ghana Volleyball Desk
+          </button>
+          <button
+            type="button"
+            onClick={() => { setActiveDesk("international"); setSelectedSport("Volleyball"); setActiveTab("pending"); }}
+            className={`rounded-lg border px-4 py-2 text-xs font-black uppercase tracking-wider transition ${activeDesk === "international" && selectedSport === "Volleyball" ? "border-red-500/50 bg-red-500/15 text-red-300" : "border-zinc-700 text-zinc-300 hover:border-red-500/50 hover:text-red-300"}`}
+          >
+            International Volleyball Desk
           </button>
           <button
             type="button"
@@ -618,12 +725,40 @@ export default function EditorialDeskPage() {
           >
             File Transfer
           </button>
+          <button
+            type="button"
+            onClick={() => { setFiling({ ...EMPTY_FILING, category: "Boxing" }); setIsFilingOpen(true); }}
+            className="rounded-lg border border-zinc-700 px-4 py-2 text-xs font-black uppercase tracking-wider text-zinc-300 transition hover:border-red-500 hover:text-white"
+          >
+            File Boxing Story
+          </button>
+          <button
+            type="button"
+            onClick={() => { setActiveDesk("international"); setSelectedSport("Formula 1"); setFiling({ ...EMPTY_FILING, category: "Formula 1" }); setIsFilingOpen(true); }}
+            className="rounded-lg border border-zinc-700 px-4 py-2 text-xs font-black uppercase tracking-wider text-zinc-300 transition hover:border-red-500 hover:text-white"
+          >
+            File F1 News
+          </button>
+          <button
+            type="button"
+            onClick={() => { setActiveDesk("ghana"); setSelectedSport("Volleyball"); setFiling({ ...EMPTY_FILING, category: "Volleyball" }); setIsFilingOpen(true); }}
+            className="rounded-lg border border-zinc-700 px-4 py-2 text-xs font-black uppercase tracking-wider text-zinc-300 transition hover:border-red-500 hover:text-white"
+          >
+            File Volleyball News
+          </button>
+          <button
+            type="button"
+            onClick={() => { setActiveDesk("international"); setSelectedSport("Volleyball"); setFiling({ ...EMPTY_FILING, category: "Volleyball" }); setIsFilingOpen(true); }}
+            className="rounded-lg border border-zinc-700 px-4 py-2 text-xs font-black uppercase tracking-wider text-zinc-300 transition hover:border-red-500 hover:text-white"
+          >
+            File International Volleyball News
+          </button>
         </div>
       </header>
 
       {/* STATS & AUTOMATION HEALTH */}
       <section className="border-b border-zinc-900 bg-zinc-950/50 px-6 py-5">
-        <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mx-auto grid max-w-7xl gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
             <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
               Pending Verification
@@ -664,8 +799,48 @@ export default function EditorialDeskPage() {
               <span>Daily Scheduled · Manual Scan Available</span>
             </p>
             <p className="text-[11px] text-zinc-500">
-              {activeDesk === "ghana" ? GHANA_FEED_REGISTRY.length : INTERNATIONAL_FEED_REGISTRY.length} Monitored Sources · {activeDesk === "ghana" ? `${coverageMatrix.filter((entry) => entry.covered).length}/${coverageMatrix.length} Sports Covered` : `${INTERNATIONAL_SPORTS_CATEGORIES.length - 1} Competitions Covered`}
+              {activeDesk === "ghana" ? GHANA_FEED_REGISTRY.length : INTERNATIONAL_FEED_REGISTRY.length} Monitored Sources · {activeDesk === "ghana" ? `${coverageMatrix.filter((entry) => entry.covered).length}/${coverageMatrix.length} Sports Covered` : `${INTERNATIONAL_SPORTS_CATEGORIES.length - 1} Categories Covered`}
             </p>
+          </div>
+
+          {/* SUBSCRIBER BULLETIN BOARD — digest list size and the last dispatch's reach */}
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+              📧 Breaking Bulletin Reach
+            </p>
+            <p className="mt-1 text-2xl font-black text-red-400">
+              {subscriberStats ? subscriberStats.active : "—"}{" "}
+              <span className="text-xs font-normal text-zinc-500">
+                active subscribers
+              </span>
+            </p>
+            {subscriberStats?.lastDispatch ? (
+              <p className="mt-1 text-[11px] text-zinc-500">
+                Last bulletin reached{" "}
+                <strong className="text-zinc-300">
+                  {subscriberStats.lastDispatch.delivered}
+                </strong>{" "}
+                reader{subscriberStats.lastDispatch.delivered === 1 ? "" : "s"} on{" "}
+                {new Date(subscriberStats.lastDispatch.at).toLocaleString("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+            ) : (
+              <p className="mt-1 text-[11px] text-zinc-500">
+                No bulletin dispatched yet — tick 🚨 when approving a story.
+              </p>
+            )}
+            {subscriberStats && subscriberStats.unsubscribed > 0 && (
+              <p className="text-[11px] text-zinc-600">
+                {subscriberStats.unsubscribed} opted out ·{" "}
+                {subscriberStats.persistentStorage.writable
+                  ? "list saved to subscribers.json"
+                  : "⚠ storage read-only, list is in-memory"}
+              </p>
+            )}
           </div>
         </div>
       </section>
@@ -1340,8 +1515,41 @@ export default function EditorialDeskPage() {
                   </span>
                 </label>
                 <p className="mt-1 pl-6 text-[10px] text-zinc-500">
-                  Sends formatted breaking sports notification to the email configured in .env.local.
+                  Emails every active subscriber from the digest list (falls back to
+                  the newsroom inbox if the list is still empty).
                 </p>
+                {sendBreakingAlert && (
+                  <div className="mt-3 ml-6 rounded-lg border border-zinc-800 bg-zinc-900/60 p-3 grid gap-2">
+                    <p className="text-[10px] font-bold uppercase tracking-wide text-amber-400/90">
+                      ✦ Sponsor slot (optional monetization)
+                    </p>
+                    <input
+                      type="text"
+                      value={sponsorName}
+                      onChange={(e) => setSponsorName(e.target.value)}
+                      placeholder="Sponsor name, e.g. BetPawa Ghana"
+                      className="rounded-md border border-zinc-700 bg-zinc-950 px-3 py-1.5 text-xs text-zinc-200 placeholder:text-zinc-600 focus:border-amber-500/60 focus:outline-none"
+                    />
+                    <input
+                      type="text"
+                      value={sponsorLine}
+                      onChange={(e) => setSponsorLine(e.target.value)}
+                      placeholder="Tagline, e.g. Odds that celebrate every goal"
+                      className="rounded-md border border-zinc-700 bg-zinc-950 px-3 py-1.5 text-xs text-zinc-200 placeholder:text-zinc-600 focus:border-amber-500/60 focus:outline-none"
+                    />
+                    <input
+                      type="text"
+                      value={sponsorUrl}
+                      onChange={(e) => setSponsorUrl(e.target.value)}
+                      placeholder="Link, e.g. https://example.com/offer"
+                      className="rounded-md border border-zinc-700 bg-zinc-950 px-3 py-1.5 text-xs text-zinc-200 placeholder:text-zinc-600 focus:border-amber-500/60 focus:outline-none"
+                    />
+                    <p className="text-[10px] text-zinc-500">
+                      Leave blank for an unsponsored bulletin. When filled, the email
+                      carries a clearly-labelled “SPONSORED” block.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 

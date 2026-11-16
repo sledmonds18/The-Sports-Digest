@@ -22,9 +22,11 @@ export { default as GhanaFACup } from "./GhanaFACup";
 export { default as DivisionOneLeague } from "./DivisionOneLeague";
 export { default as GhanaSportsNews } from "./GhanaSportsNews";
 export { default as InternationalSportsNewsPage } from "./InternationalSportsNewsPage";
-
-
-
+export { default as BoxingNews } from "./BoxingNews";
+export { default as CricketNews } from "./CricketNews";
+export { default as LiveSportsPage } from "./LiveSportsPage";
+export { default as LiveEventDetail } from "./LiveEventDetail";
+export { default as TeamCrest } from "./TeamCrest";
 
 
 

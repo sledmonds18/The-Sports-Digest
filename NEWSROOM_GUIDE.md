@@ -116,6 +116,13 @@ Rejected stories are deleted from the store.
 Tip: use **✏️ Edit** first if the crawled copy needs correcting — you can adjust
 the headline, category, image and body before it goes out.
 
+### Baseball news
+
+Baseball wire leads are collected under the **Baseball** category on the
+International desk. They enter the same pending queue as other international
+stories and appear on the public Baseball News page only after an editor
+verifies and approves them.
+
 ---
 
 ## Step 8 — File a story manually

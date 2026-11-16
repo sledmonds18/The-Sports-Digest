@@ -123,7 +123,7 @@ const profiles: Record<string, CompetitionProfile> = {
     title: "LALIGA EA SPORTS",
     season: "2026/27 season",
     summary: "Spain's top division brings 20 clubs together in a season-long race shaped by historic rivalries, title contenders and the battle to stay up.",
-    heroImage: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1600&q=85",
+    heroImage: "https://images.unsplash.com/photo-1551958219-acbc608c6377?w=1600&q=85",
     stats: [
       { value: "20", label: "Clubs" },
       { value: "38", label: "Matchdays" },
@@ -156,7 +156,7 @@ const profiles: Record<string, CompetitionProfile> = {
     title: "Bundesliga",
     season: "2026/27 season",
     summary: "Germany's top division features 18 clubs, packed matchdays and a direct connection to Bundesliga 2 through promotion and relegation.",
-    heroImage: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1600&q=85",
+    heroImage: "https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=1600&q=85",
     stats: [
       { value: "18", label: "Clubs" },
       { value: "34", label: "Matches per club" },
@@ -222,7 +222,7 @@ const profiles: Record<string, CompetitionProfile> = {
     title: "Ligue 1 McDonald's",
     season: "2026/27 season",
     summary: "France's top division brings 18 clubs into a 34-matchday campaign for the title, European places and the fight to avoid relegation.",
-    heroImage: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1600&q=85",
+    heroImage: "https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?w=1600&q=85",
     stats: [
       { value: "18", label: "Clubs" },
       { value: "34", label: "Matchdays" },
@@ -289,7 +289,7 @@ const profiles: Record<string, CompetitionProfile> = {
     title: "FIFA",
     season: "Global football calendar",
     summary: "FIFA is the global governing body for association football, working with national member associations and six continental confederations.",
-    heroImage: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=1600&q=85",
+    heroImage: "https://images.unsplash.com/photo-1556056504-5c7696c4c28d?w=1600&q=85",
     stats: [
       { value: "211", label: "Member associations" },
       { value: "6", label: "Continental confederations" },
@@ -333,7 +333,7 @@ const profiles: Record<string, CompetitionProfile> = {
     title: "UEFA",
     season: "2026/27 competitions",
     summary: "UEFA governs football in Europe and organizes national-team and club competitions across its 55 member associations.",
-    heroImage: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1600&q=85",
+    heroImage: "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=1600&q=85",
     stats: [
       { value: "55", label: "National associations" },
       { value: "3", label: "Men's club competitions" },

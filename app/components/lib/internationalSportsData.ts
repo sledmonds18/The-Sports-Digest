@@ -11,6 +11,11 @@ export const INTERNATIONAL_SPORTS_CATEGORIES = [
   "MLS",
   "FIFA",
   "UEFA",
+  "Baseball",
+  "Boxing",
+  "Formula 1",
+  "Volleyball",
+  "Cricket",
   "Transfers",
 ] as const;
 

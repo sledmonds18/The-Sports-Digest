@@ -1,3 +1,4 @@
+
     "use client";
 
     import { FormEvent, useState } from "react";
@@ -22,20 +23,45 @@
         message: "",
     });
 
-    const contactInfo = [
-        { i: "📍", l: "Address", v: "Millennium City, Central Region, Ghana" },
-        { i: "✉️", l: "Editorial", v: "sylvesteredmonds18@gmail.com" },
-        { i: "📞", l: "Newsroom", v: "+233 20 130 9212" },
-        { i: "🕐", l: "Hours", v: "Monday – Friday, 8:00am – 6:00pm GMT" },
-    ];
-const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+    // Track the form submission status
+    const [isSending, setIsSending] = useState(false);
 
-    try {
+    const contactInfo = [
+        {
+        i: "📍",
+        l: "Address",
+        v: "Accra, Ghana ",
+        },
+        {
+        i: "✉️",
+        l: "Editorial",
+        v: "sportsdigesthub@gmail.com",
+        },
+        {
+        i: "📞",
+        l: "Newsroom",
+        v: "+233 20 130 9212",
+        },
+        {
+        i: "🕐",
+        l: "Working Hours",
+        v: "24/7 - Available Around the Clock",
+        },
+    ];
+
+    // Handle contact form submission
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (isSending) return;
+
+        setIsSending(true);
+
+        try {
         const response = await fetch("/api/contact", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+            "Content-Type": "application/json",
             },
             body: JSON.stringify(form),
         });
@@ -43,10 +69,14 @@ const handleSubmit = async (e: FormEvent) => {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error || "Failed to send message.");
+            throw new Error(
+            data.error || "Failed to send message."
+            );
         }
 
-        onToast("✓ Message sent — we'll reply within 24 hours.");
+        onToast(
+            "✓ Message sent — we'll reply within 24 hours."
+        );
 
         setForm({
             name: "",
@@ -54,47 +84,73 @@ const handleSubmit = async (e: FormEvent) => {
             subject: "",
             message: "",
         });
-    } catch (error) {
+        } catch (error) {
         console.error("Contact form error:", error);
-        onToast("✕ Message could not be sent. Please try again.");
-    }
-};
 
-    const handleNewsletterSubmit = () => {
-        onToast("✓ Subscribed! Your first digest arrives tomorrow.");
+        onToast(
+            "✕ Message could not be sent. Please try again."
+        );
+        } finally {
+        setIsSending(false);
+        }
     };
 
+    // Handle newsletter submission
+    const handleNewsletterSubmit = () => {
+        onToast(
+        "✓ Subscribed! Your first digest arrives tomorrow."
+        );
+    };
+
+    // Handle form field changes
     const handleFormChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+        e: React.ChangeEvent<
+        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >
     ) => {
         const { id, value } = e.target;
-        const keyMap: { [key: string]: keyof ContactForm } = {
+
+        const keyMap: {
+        [key: string]: keyof ContactForm;
+        } = {
         fn: "name",
         fe: "email",
         fs: "subject",
         fm: "message",
         };
+
         const key = keyMap[id];
+
         if (key) {
-        setForm((prev) => ({ ...prev, [key]: value }));
+        setForm((prev) => ({
+            ...prev,
+            [key]: value,
+        }));
         }
     };
 
     return (
         <main id="mc">
-        <section className="sec cbg" aria-labelledby="ct-h">
+        <section
+            className="sec cbg"
+            aria-labelledby="ct-h"
+        >
             <div className="wrap">
             <div className="cgrid">
                 <div className="cinfo fu">
                 <p className="slbl">Get In Touch</p>
+
                 <h1 id="ct-h" className="sh2 lt">
                     Contact Us
                 </h1>
+
                 <div className="rule" />
+
                 <p>
-                    Story tip, editorial pitch, press accreditation, or advertising
-                    enquiry — we want to hear from you.
+                    Story tip, editorial pitch, press accreditation,
+                    or advertising enquiry — we want to hear from you.
                 </p>
+
                 {contactInfo.map((d) => (
                     <address
                     key={d.l}
@@ -104,6 +160,7 @@ const handleSubmit = async (e: FormEvent) => {
                     <div className="cicon" aria-hidden="true">
                         {d.i}
                     </div>
+
                     <div className="ctxt">
                         <strong>{d.l}</strong>
                         {d.v}
@@ -111,15 +168,16 @@ const handleSubmit = async (e: FormEvent) => {
                     </address>
                 ))}
                 </div>
+
                 <form
                 className="cform fu d2"
                 onSubmit={handleSubmit}
                 aria-label="Contact form"
-                noValidate
                 >
                 <div className="crow2">
                     <div className="fg">
                     <label htmlFor="fn">Full Name</label>
+
                     <input
                         id="fn"
                         type="text"
@@ -130,8 +188,10 @@ const handleSubmit = async (e: FormEvent) => {
                         autoComplete="name"
                     />
                     </div>
+
                     <div className="fg">
                     <label htmlFor="fe">Email Address</label>
+
                     <input
                         id="fe"
                         type="email"
@@ -143,24 +203,32 @@ const handleSubmit = async (e: FormEvent) => {
                     />
                     </div>
                 </div>
+
                 <div className="fg">
                     <label htmlFor="fs">Subject</label>
+
                     <select
                     id="fs"
                     value={form.subject}
                     onChange={handleFormChange}
                     required
                     >
-                    <option value="">Select a subject…</option>
+                    <option value="">
+                        Select a subject…
+                    </option>
                     <option>Editorial Pitch</option>
                     <option>Press Accreditation</option>
-                    <option>Advertising & Partnerships</option>
+                    <option>
+                        Advertising & Partnerships
+                    </option>
                     <option>Story Tip</option>
                     <option>General Enquiry</option>
                     </select>
                 </div>
+
                 <div className="fg">
                     <label htmlFor="fm">Message</label>
+
                     <textarea
                     id="fm"
                     placeholder="Write your message…"
@@ -170,18 +238,26 @@ const handleSubmit = async (e: FormEvent) => {
                     rows={6}
                     />
                 </div>
+
                 <button
                     type="submit"
                     className="bred"
-                    style={{ alignSelf: "flex-start", padding: "14px 36px" }}
+                    disabled={isSending}
+                    style={{
+                    alignSelf: "flex-start",
+                    padding: "14px 36px",
+                    opacity: isSending ? 0.7 : 1,
+                    cursor: isSending ? "not-allowed" : "pointer",
+                    }}
                 >
-                    Send Message
+                    {isSending ? "Sending..." : "Send Message"}
                 </button>
                 </form>
             </div>
             </div>
         </section>
+
         <Newsletter onSubmit={handleNewsletterSubmit} />
         </main>
     );
-}
+    }

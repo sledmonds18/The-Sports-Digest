@@ -7,6 +7,7 @@ export type SportCategory =
   | "Armwrestling"
   | "Hockey"
   | "Volleyball"
+  | "Cricket"
   | "Combat & Others"
   | "Transfers";
 
@@ -65,6 +66,7 @@ export const GHANA_SPORTS_CATEGORIES: SportCategory[] = [
   "Armwrestling",
   "Hockey",
   "Volleyball",
+  "Cricket",
   "Combat & Others",
   "Transfers",
 ];
@@ -610,6 +612,9 @@ export const SPORT_PRESET_IMAGES: Record<
   ],
   Volleyball: [
     { label: "Beach Spike at Laboma", url: "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=800&q=80" },
+  ],
+  Cricket: [
+    { label: "African Games Cricket in Accra", url: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/2023_African_Games_01_cricket_166.jpg/960px-2023_African_Games_01_cricket_166.jpg" },
   ],
   "Combat & Others": [
     { label: "Trust Emporium Table Tennis", url: "https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?w=800&q=80" },

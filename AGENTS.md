@@ -47,7 +47,7 @@ The site is a **client-rendered single page** with in-memory view state, not URL
     `GHANA_SPORTS_CATEGORIES`, `SPORT_PRESET_IMAGES`.
   - `ghanaFeedRegistry.ts` — **the source registry.** Every monitored feed, its
     trust tier (`federation` / `national_media` / `wire_aggregator`) and the
-    disciplines it covers. `getCoverageMatrix()` proves all 8 disciplines are
+    disciplines it covers. `getCoverageMatrix()` proves all 9 disciplines are
     covered. Add or retire feeds here, never inline in the engine.
   - `ghanaNewsStore.ts` — singleton `GhanaNewsStore`; persists to
     `data/ghana-sports-news.json` on disk via temp-file + rename. Dedupes by id,
@@ -71,7 +71,8 @@ The site is a **client-rendered single page** with in-memory view state, not URL
 | `GET /api/ghana-sports-news` | List articles by `?status=` and `?category=`. Public callers only ever get `approved`; any other status requires the editorial token. |
 | `POST /api/ghana-sports-news` | Actions: `approve`, `update`, `reject`, `reset`, `ingest_wire`, `submit_story`, `check_feeds`. All require the editorial token. |
 | `GET|POST /api/cron/ingest` | Runs the wire crawler. Vercel cron calls this every 30 min with `CRON_SECRET`. |
-| `GET /api/matches` | Live fixtures via football-data.org. |
+| `GET /api/matches` | Football live scores, fixtures, results and standings. Provider chain: Sportmonks (when `SPORTMONKS_API_TOKEN` is set) → API-Sports → keyless ESPN (`lib/espnFootball.ts`, plain HTTP) + Livescore (`lib/livescoreFootball.ts`, live view). List views fall back whenever the primary comes back empty. Serious competitions rank first via `competitionRank`. |
+| `GET /api/live-sports` | Live events from subscribed API-Sports products and Cricket; basketball/NBA/NFL/MLB fall back to keyless ESPN (`lib/espnLive.ts`) when the API-Sports account is suspended or unconfigured. |
 | `GET /api/insights` | Editorial insight feed. |
 | `POST /api/contact` | Contact form. |
 | `POST /api/upload` | Editorial image upload → `public/uploads/`. Requires the editorial token. |
@@ -121,7 +122,7 @@ excluded rather than left in place to fail silently on every cron run.
 | `ghanasoccernet` | GhanaSoccernet | national_media |
 | `ghana-sports-news` | GHSportsNews | national_media |
 | `myjoy-sports` | MyJoyOnline Sports | national_media |
-| `gnews-*` (8) | Google News wire, one query per discipline | wire_aggregator |
+| `gnews-*` (9+) | Google News wire, including a query per discipline | wire_aggregator |
 
 ## Conventions
 
@@ -130,6 +131,9 @@ excluded rather than left in place to fail silently on every cron run.
 - Images live in `public/` under topic folders (`Ghana-Premier-League-Clubs/`,
   `Black-Stars-Graphics/`, `Ghana-Division-One-Teams/`, etc.).
 - Never commit `.env*` — it is gitignored. Keys in use: `API_FOOTBALL`,
+  `API_SPORTS_KEY`, `API_BASKETBALL_KEY`, `API_BASEBALL_KEY`, `API_NBA_KEY`,
+  `API_NFL_KEY`, `API_VOLLEYBALL_KEY`, `API_HANDBALL_KEY`,
+  `SPORTMONKS_API_TOKEN`, `THESPORTSDB_API_KEY`,
   `OPENAI_API_KEY`, `NEXT_PUBLIC_API_KEY`, `RESEND_API_KEY`, `CONTACT_EMAIL`,
   `EDITORIAL_PASSKEY`, `CRON_SECRET`, `INGEST_MAX_AGE_HOURS`. See `.env.example`.
 - `data/ghana-sports-news.json` is the live newsroom database and is tracked in git.

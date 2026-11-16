@@ -98,7 +98,7 @@ export const GHANA_FEED_REGISTRY: FeedSource[] = [
     homepage: "https://www.ghsportsnews.com",
     url: "https://www.ghsportsnews.com/feed/",
     tier: "national_media",
-    coverage: ["Football", "Athletics", "Basketball", "Combat & Others"],
+    coverage: ["Football", "Athletics", "Basketball", "Cricket", "Combat & Others"],
     enabled: true,
   },
   {
@@ -116,6 +116,7 @@ export const GHANA_FEED_REGISTRY: FeedSource[] = [
       "Armwrestling",
       "Hockey",
       "Volleyball",
+      "Cricket",
       "Combat & Others",
     ],
     enabled: true,
@@ -172,6 +173,13 @@ export const GHANA_FEED_REGISTRY: FeedSource[] = [
     "Volleyball"
   ),
   googleNewsFeed(
+    "gnews-cricket",
+    "Google News",
+    'Ghana cricket OR "Ghana Cricket Association" OR "Ghana national cricket team"',
+    ["Cricket"],
+    "Cricket"
+  ),
+  googleNewsFeed(
     "gnews-combat",
     "Google News",
     'Ghana judo OR "table tennis" OR swimming OR tennis OR karate OR "sports festival"',
@@ -195,6 +203,7 @@ export const ALL_SPORT_DISCIPLINES: SportDiscipline[] = [
   "Armwrestling",
   "Hockey",
   "Volleyball",
+  "Cricket",
   "Combat & Others",
 ];
 

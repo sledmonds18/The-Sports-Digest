@@ -1,0 +1,37 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-11-13T14:10:22.425Z",
+  "subscribers": [
+    {
+      "email": "sylvesteredmonds18@gmail.com",
+      "subscribedAt": "2026-11-13T13:51:04.700Z",
+      "status": "active"
+    },
+    {
+      "email": "sportsdigesthub@gmail.com",
+      "subscribedAt": "2026-11-13T13:41:47.420Z",
+      "status": "active"
+    },
+    {
+      "email": "digest-sync-test@outlook.com",
+      "subscribedAt": "2026-11-13T12:41:31.991Z",
+      "status": "unsubscribed"
+    },
+    {
+      "email": "emmanuelafari464@gmail.com",
+      "subscribedAt": "2026-11-10T11:42:38.972Z",
+      "status": "active"
+    },
+    {
+      "email": "info.sylvesteredmonds@gmail.com",
+      "subscribedAt": "2026-11-10T11:35:34.244Z",
+      "status": "active"
+    }
+  ],
+  "lastDispatch": {
+    "at": "2026-11-13T14:10:22.425Z",
+    "delivered": 1,
+    "subscriberCount": 4,
+    "headline": "KIVO U-17 Colts Regional Champions Cup 2026 fixtures announced"
+  }
+}

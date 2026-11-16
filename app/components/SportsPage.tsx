@@ -4,7 +4,13 @@ import InternationalFootballPage, {
   INTERNATIONAL_FOOTBALL_SECTIONS,
 } from "./InternationalFootballPage";
 import InternationalTransfersPage from "./InternationalTransfersPage";
-import LiveFootballPage from "./LiveFootballPage";
+import LiveVolleyballPage from "./LiveVolleyballPage";
+import VolleyballResultsPage from "./VolleyballResultsPage";
+import LiveSportsPage from "./LiveSportsPage";
+import InternationalHandballPage from "./InternationalHandballPage";
+import SportsDeskFooter from "./SportsDeskFooter";
+import { AmericanFootballMatchCenter, AmericanFootballProfile } from "./AmericanFootballPages";
+import BaseballMatchCenter from "./BaseballMatchCenter";
 import FixturesPage from "./FixturesPage";
 import ResultsPage from "./ResultsPage";
 import StandingsPage from "./StandingsPage";
@@ -96,6 +102,35 @@ import OtherSportsProfilePage, { isOtherSportSection } from "./OtherSportsProfil
     section,
     onNavigate,
     }: SportsPageProps) {
+    if (section === "volleyball-results") {
+        return <VolleyballResultsPage onNavigate={onNavigate} />;
+    }
+
+    if (section === "international-handball") {
+        return (
+            <>
+                <InternationalHandballPage />
+                <SportsDeskFooter
+                    desk="Handball Desk"
+                    description="International handball coverage, national teams and competitions."
+                    onNavigate={onNavigate}
+                />
+            </>
+        );
+    }
+
+    if (section === "nfl" || section === "super-bowl") {
+        return <AmericanFootballProfile section={section} onNavigate={onNavigate} />;
+    }
+
+    if (section === "nfl-fixtures" || section === "nfl-results" || section === "nfl-standings") {
+        return <AmericanFootballMatchCenter section={section} onNavigate={onNavigate} />;
+    }
+
+    if (section === "baseball-fixtures" || section === "baseball-results" || section === "baseball-standings") {
+        return <BaseballMatchCenter section={section} onNavigate={onNavigate} />;
+    }
+
     if (isOtherSportSection(section)) {
         return <OtherSportsProfilePage section={section} onNavigate={onNavigate} />;
     }
@@ -123,8 +158,25 @@ import OtherSportsProfilePage, { isOtherSportSection } from "./OtherSportsProfil
         return <InternationalTransfersPage onNavigate={onNavigate} />;
     }
 
-    if (section === "live") {
-        return <LiveFootballPage onNavigate={onNavigate} />;
+    const liveSportsPages: Record<string, Parameters<typeof LiveSportsPage>[0]["initialSport"]> = {
+        live: "football",
+        "live-basketball": "basketball",
+        "live-baseball": "baseball",
+        "live-nba": "nba",
+        "live-nfl": "nfl",
+        "live-handball": "handball",
+    };
+
+    if (section === "live-sports") {
+        return <LiveSportsPage onNavigate={onNavigate} />;
+    }
+
+    if (section === "live-volleyball") {
+        return <LiveVolleyballPage onNavigate={onNavigate} />;
+    }
+
+    if (section in liveSportsPages) {
+        return <LiveSportsPage onNavigate={onNavigate} initialSport={liveSportsPages[section]} />;
     }
 
     if (section === "fixtures") {

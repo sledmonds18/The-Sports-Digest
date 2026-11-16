@@ -1,10 +1,8 @@
-    import { Resend } from "resend";
-
-    const resend = new Resend(process.env.RESEND_API_KEY);
 
     export async function POST(request) {
     try {
-        const { name, email, subject, message } = await request.json();
+        const { name, email, subject, message } =
+        await request.json();
 
         if (!name || !email || !subject || !message) {
         return Response.json(
@@ -13,23 +11,34 @@
         );
         }
 
-        const { data, error } = await resend.emails.send({
-        from: "Sports Digest <onboarding@resend.dev>",
-        to: [process.env.CONTACT_EMAIL],
-        replyTo: email,
-        subject: subject || `New Contact Message from ${name}`,
-        text: `
-    Name: ${name}
-    Email: ${email}
-    Subject: ${subject}
+        const formspreeEndpoint = process.env.FORMSPREE_ENDPOINT
+            ? process.env.FORMSPREE_ENDPOINT
+            : "https://formspree.io/f/xbgolwga";
 
-    Message:
-    ${message}
-        `,
-        });
+        const response = await fetch(
+        formspreeEndpoint,
+        {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            },
+            body: JSON.stringify({
+            name,
+            email,
+            subject,
+            message,
+            // Formspree uses this to set the Reply-To so answering the
+            // forwarded email reaches the visitor, not the form owner.
+            _replyto: email,
+            }),
+        }
+        );
 
-        if (error) {
-        console.error("Resend error:", error);
+        const data = await response.json();
+
+        if (!response.ok) {
+        console.error("Formspree error:", data);
 
         return Response.json(
             { error: "Failed to send message." },
@@ -38,11 +47,12 @@
         }
 
         return Response.json(
-        { message: "Message sent successfully!", data },
+        { message: "Message sent successfully!" },
         { status: 200 }
         );
+
     } catch (error) {
-        console.error("Contact form error:", error);
+        console.error("Contact API error:", error);
 
         return Response.json(
         { error: "Something went wrong." },

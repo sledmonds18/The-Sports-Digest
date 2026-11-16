@@ -776,8 +776,8 @@ import GhanaNewsDeskCallout from "./GhanaNewsDeskCallout";
 
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-zinc-950">
                 <Image
-                    src="/Ghana-Division-One-Graphics/division-one-modern-era.png"
-                    alt="Ghana Division One League - Modern Era"
+                    src="/Ghana-Division-One-Graphics/division-one-future-stars.jpg"
+                    alt="Young African footballers training on a community dirt pitch at sunset - where future stars begin"
                     fill
                     priority
                     className="object-cover"

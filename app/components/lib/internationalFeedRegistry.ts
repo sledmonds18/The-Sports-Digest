@@ -20,9 +20,14 @@ const queries: Array<[InternationalArticleCategory, string]> = [
   ["MLS", 'Major League Soccer MLS'],
   ["FIFA", 'FIFA international football'],
   ["UEFA", 'UEFA European football'],
+  ["Baseball", 'MLB Major League Baseball official news games teams World Series'],
+  ["Boxing", 'international boxing world title fight boxing news'],
+  ["Formula 1", 'Formula 1 Grand Prix F1 drivers teams'],
   ["Transfers", 'football transfers confirmed deals official announcements'],
   ["Transfers", 'football transfer reports rumours clubs players'],
   ["Transfers", 'Ghanaian footballers transfer moves abroad'],
+  ["Volleyball", 'international volleyball FIVB OR "Volleyball World" OR CEV OR "Nations League"'],
+  ["Cricket", 'international cricket ICC OR "Cricket World Cup" OR "Test cricket" OR T20'],
 ];
 
 export const INTERNATIONAL_FEED_REGISTRY: InternationalFeed[] = queries.map(

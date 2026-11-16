@@ -17,7 +17,7 @@ export default function InternationalSportsNews({ category }: { category: string
   return (
     <section className="border-y border-white/10 bg-[#080808]">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <p className="text-xs font-black uppercase tracking-[0.24em] text-red-500">International Sports News</p>
+        <p className="text-xs font-black uppercase tracking-[0.24em] text-red-500">{category === "Formula 1" ? "Formula 1 News" : "International Sports News"}</p>
         <h2 className="mt-3 text-3xl font-black sm:text-4xl">{category === "All International" ? "Latest international stories" : `Latest ${category} stories`}</h2>
         {articles.length === 0 ? (
           <p className="mt-5 max-w-2xl text-sm leading-7 text-gray-400">No approved stories yet. Our newsroom reviews every international news lead before publication.</p>

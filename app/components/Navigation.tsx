@@ -218,6 +218,15 @@
                     🏏 Cricket
                 </button>
 
+                {/* Handball */}
+                <button
+                    className="sports-menu-item"
+                    onClick={() => onMenuScreenChange("handball")}
+                    tabIndex={menu ? 0 : -1}
+                >
+                    🤾 Handball
+                </button>
+
                 {/* American Football */}
                 <button
                     className="sports-menu-item"
@@ -244,40 +253,6 @@
                 {/* =========================
                     OTHER SECTIONS
                 ========================== */}
-
-                {/* News */}
-                <button
-                className="menu-link"
-                onClick={() =>
-                    onMenuScreenChange("news")
-                }
-                tabIndex={menu ? 0 : -1}
-                >
-                📰 NEWS
-                </button>
-
-                {/* Scores & Results */}
-                <button
-                className="menu-link"
-                onClick={() =>
-                    handleNavigate("results")
-                }
-                tabIndex={menu ? 0 : -1}
-                >
-                📊 SCORES & RESULTS
-                </button>
-
-                {/* Trending */}
-                <button
-                className="menu-link"
-                onClick={() =>
-                    handleNavigate("trending")
-                }
-                tabIndex={menu ? 0 : -1}
-                >
-                🔥 TRENDING
-                </button>
-
 
                 {/* About */}
                 <button

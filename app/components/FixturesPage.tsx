@@ -2,9 +2,35 @@
 
 import { useEffect, useMemo, useState } from "react";
 import SportsDeskFooter from "./SportsDeskFooter";
+import LiveEventDetail from "./LiveEventDetail";
 import type { LiveMatch } from "./lib/useLiveMatches";
+import { competitionRank, type LiveSportEvent } from "./lib/liveSportsData";
 
 type FixturesStatus = "loading" | "ready" | "unconfigured" | "error";
+
+// Major competitions first (Premier League, GPL, Champions League…); ties keep
+// the soonest kick-off so the week still reads chronologically within a tier.
+function compareFixturesByPriority(first: LiveMatch, second: LiveMatch): number {
+  const label = (match: LiveMatch) =>
+    [match.league.name, match.league.country].filter(Boolean).join(" · ");
+  const rankDiff = competitionRank(label(first)) - competitionRank(label(second));
+  if (rankDiff !== 0) return rankDiff;
+  return new Date(first.fixture.date).getTime() - new Date(second.fixture.date).getTime();
+}
+
+function fixtureToEvent(match: LiveMatch): LiveSportEvent {
+  const hasScore = match.goals.home != null || match.goals.away != null;
+  return {
+    id: String(match.fixture.id),
+    sport: "football",
+    competition: [match.league.name, match.league.country].filter(Boolean).join(" · ") || "Football",
+    participants: [match.teams.home.name, match.teams.away.name],
+    logos: [match.teams.home.logo, match.teams.away.logo],
+    score: hasScore ? `${match.goals.home} - ${match.goals.away}` : "vs",
+    status: match.fixture.status.short,
+    date: match.fixture.date,
+  };
+}
 
 function TeamBadge({ name, logo }: { name: string; logo?: string }) {
   const [failed, setFailed] = useState(false);
@@ -13,7 +39,7 @@ function TeamBadge({ name, logo }: { name: string; logo?: string }) {
     : <span aria-hidden="true" className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-[10px] font-black text-gray-300">{name.split(/\s+/).map((word) => word[0]).slice(0, 2).join("").toUpperCase()}</span>;
 }
 
-function FixtureCard({ match }: { match: LiveMatch }) {
+function FixtureCard({ match, onOpen }: { match: LiveMatch; onOpen: (event: LiveSportEvent) => void }) {
   const kickoff = new Date(match.fixture.date);
   const time = kickoff.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   const matchDate = kickoff.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" });
@@ -21,7 +47,12 @@ function FixtureCard({ match }: { match: LiveMatch }) {
   const statusLabel = status === "PST" ? "Postponed" : status === "CANC" ? "Cancelled" : time;
 
   return (
-    <article className="rounded-2xl border border-white/10 bg-zinc-950 p-5 sm:p-6">
+    <button
+      type="button"
+      onClick={() => onOpen(fixtureToEvent(match))}
+      className="block w-full cursor-pointer rounded-2xl border border-white/10 bg-zinc-950 p-5 text-left transition hover:border-red-500/50 sm:p-6"
+      title="Open match details"
+    >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
         <div className="flex items-center gap-2 text-xs font-bold text-gray-300">
           {match.league.logo && <img src={match.league.logo} alt="" className="h-5 w-5 object-contain" />}
@@ -42,7 +73,10 @@ function FixtureCard({ match }: { match: LiveMatch }) {
         </div>
       </div>
       {match.fixture.venue?.name && <p className="border-t border-white/10 pt-3 text-center text-xs text-gray-500">{match.fixture.venue.name}{match.fixture.venue.city ? ` · ${match.fixture.venue.city}` : ""}</p>}
-    </article>
+      <p className="mt-3 text-center text-[10px] font-bold uppercase tracking-wider text-gray-500">
+        Match details <span aria-hidden="true">→</span>
+      </p>
+    </button>
   );
 }
 
@@ -50,6 +84,7 @@ export default function FixturesPage({ onNavigate }: { onNavigate: (page: string
   const [matches, setMatches] = useState<LiveMatch[]>([]);
   const [status, setStatus] = useState<FixturesStatus>("loading");
   const [competition, setCompetition] = useState("All competitions");
+  const [selectedEvent, setSelectedEvent] = useState<LiveSportEvent | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -69,7 +104,7 @@ export default function FixturesPage({ onNavigate }: { onNavigate: (page: string
 
   const upcoming = useMemo(() => matches
     .filter((match) => new Date(match.fixture.date).getTime() >= Date.now() && ["NS", "TBD", "PST", "CANC"].includes(match.fixture.status.short))
-    .sort((first, second) => new Date(first.fixture.date).getTime() - new Date(second.fixture.date).getTime()), [matches]);
+    .sort(compareFixturesByPriority), [matches]);
   const competitions = useMemo(() => ["All competitions", ...Array.from(new Set(upcoming.map((match) => match.league.name))).sort(),], [upcoming]);
   const visibleFixtures = competition === "All competitions" ? upcoming : upcoming.filter((match) => match.league.name === competition);
 
@@ -99,9 +134,11 @@ export default function FixturesPage({ onNavigate }: { onNavigate: (page: string
         ) : visibleFixtures.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-white/15 bg-zinc-950 p-10 text-center"><h3 className="text-lg font-bold">No upcoming fixtures found</h3><p className="mt-2 text-sm text-gray-400">There are no scheduled matches in the provider feed for the next seven days.</p></div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">{visibleFixtures.map((match) => <FixtureCard key={match.fixture.id} match={match} />)}</div>
+          <div className="grid gap-4 md:grid-cols-2">{visibleFixtures.map((match) => <FixtureCard key={match.fixture.id} match={match} onOpen={setSelectedEvent} />)}</div>
         )}
       </section>
+
+      <LiveEventDetail event={selectedEvent} onClose={() => setSelectedEvent(null)} />
 
       <SportsDeskFooter desk="Football Fixtures Desk" description="Upcoming football match schedules from Ghana and around the world." onNavigate={onNavigate} />
     </main>

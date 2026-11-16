@@ -1,29 +1,21 @@
 "use client";
 
-import { useLiveMatches } from "./lib/useLiveMatches";
+import { LIVE_SPORT_ICONS, LIVE_SPORT_LABELS, interleaveBySport } from "./lib/liveSportsData";
+import { useLiveSports } from "./lib/useLiveSports";
 
 export function Ticker({ onNavigate }: { onNavigate?: (page: string) => void }) {
-  const { matches, status } = useLiveMatches();
-  const items = matches.slice(0, 6).map((match) => {
-    const time = match.fixture.status.elapsed != null
-      ? `${match.fixture.status.elapsed}′`
-      : match.fixture.status.short;
-    return `⚽ ${match.league.name}: ${match.teams.home.name} ${match.goals.home ?? 0}–${match.goals.away ?? 0} ${match.teams.away.name} · ${time}`;
-  });
+  const { events, status } = useLiveSports();
+  const items = interleaveBySport(events, 8).map((event) =>
+    `${LIVE_SPORT_ICONS[event.sport]} ${LIVE_SPORT_LABELS[event.sport]} · ${event.competition}: ${event.participants.join(" ")} ${event.score} · ${event.status}`
+  );
 
   const tickerItems = items.length > 0
     ? items
-    : [status === "loading"
-      ? "Loading live football scores…"
-      : status === "unconfigured"
-        ? "Live football scores are not connected yet"
-        : status === "error"
-          ? "Live football scores are temporarily unavailable"
-          : "No football matches are live right now"];
+    : [status === "loading" ? "Checking live sports scores…" : "No live sports events are available right now"];
 
   return (
-    <div className="ticker" aria-label="Live football scores" aria-live="polite">
-      <button type="button" className="tlbl" onClick={() => onNavigate?.("live")} aria-label="Open Live Football">
+    <div className="ticker" aria-label="Live sports scores" aria-live="polite">
+      <button type="button" className="tlbl" onClick={() => onNavigate?.("live-sports")} aria-label="Open Live Sports">
         Live
       </button>
       <div className="ttrack">

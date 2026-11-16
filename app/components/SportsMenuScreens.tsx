@@ -11,10 +11,10 @@
     | "athletics"
     | "f1"
     | "volleyball"
+    | "handball"
     | "cricket"
     | "american-football"
     | "baseball"
-    | "news"
     | "features";
 
     interface SportsMenuScreensProps {
@@ -267,6 +267,13 @@
                 <span>🌍 International</span>
             </button>
 
+            <button className="menu-parent" onClick={() => handleNavigate("live-basketball")}>
+                <span>🔴 Live Basketball</span>
+            </button>
+            <button className="menu-parent" onClick={() => handleNavigate("live-nba")}>
+                <span>🔴 Live NBA</span>
+            </button>
+
             </div>
         )}
 
@@ -364,27 +371,6 @@
             >
                 <span>🌍 International</span>
             </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("track-field")}
-            >
-                <span>🏃 Track & Field</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("world-athletics")}
-            >
-                <span>🌍 World Athletics</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("athletics-results")}
-            >
-                <span>🥇 Results</span>
-            </button>
             </div>
         )}
 
@@ -399,16 +385,9 @@
 
             <button
                 className="menu-parent"
-                onClick={() => handleNavigate("f1-calendar")}
+                onClick={() => handleNavigate("f1-general")}
             >
-                <span>🏁 Race Calendar</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("f1-results")}
-            >
-                <span>✅ Race Results</span>
+                <span>🏁 General</span>
             </button>
 
             <button
@@ -423,13 +402,6 @@
                 onClick={() => handleNavigate("f1-teams")}
             >
                 <span>🏢 Teams</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("f1-standings")}
-            >
-                <span>📊 Standings</span>
             </button>
 
             <button
@@ -469,6 +441,10 @@
                 onClick={() => handleNavigate("volleyball-news")}
             >
                 <span>🏐 Volleyball News</span>
+            </button>
+
+            <button className="menu-parent" onClick={() => handleNavigate("live-volleyball")}>
+                <span>🔴 Live Volleyball</span>
             </button>
 
             <button
@@ -517,12 +493,6 @@
                 <span>🏆 ICC</span>
             </button>
 
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("cricket-results")}
-            >
-                <span>✅ Results</span>
-            </button>
             </div>
         )}
 
@@ -540,6 +510,10 @@
                 onClick={() => handleNavigate("nfl")}
             >
                 <span>🏈 NFL</span>
+            </button>
+
+            <button className="menu-parent" onClick={() => handleNavigate("live-nfl")}>
+                <span>🔴 Live NFL</span>
             </button>
 
             <button
@@ -572,6 +546,18 @@
             </div>
         )}
 
+        {menuScreen === "handball" && (
+            <div className="menu-screen">
+            <button className="menu-back" onClick={goBack}>← Handball</button>
+            <button className="menu-parent" onClick={() => handleNavigate("international-handball")}>
+                <span>🌍 International</span>
+            </button>
+            <button className="menu-parent" onClick={() => handleNavigate("live-handball")}>
+                <span>🔴 Live Handball</span>
+            </button>
+            </div>
+        )}
+
         {/* =========================
             BASEBALL
         ========================== */}
@@ -586,6 +572,10 @@
                 onClick={() => handleNavigate("mlb")}
             >
                 <span>⚾ MLB</span>
+            </button>
+
+            <button className="menu-parent" onClick={() => handleNavigate("live-baseball")}>
+                <span>🔴 Live Baseball</span>
             </button>
 
             <button
@@ -614,66 +604,6 @@
                 onClick={() => handleNavigate("baseball-news")}
             >
                 <span>📰 Baseball News</span>
-            </button>
-            </div>
-        )}
-
-        {/* =========================
-            NEWS
-        ========================== */}
-        {menuScreen === "news" && (
-            <div className="menu-screen">
-            <button className="menu-back" onClick={goBack}>
-                ← News
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("ghana-news")}
-            >
-                <span>🇬🇭 Ghana</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("africa-news")}
-            >
-                <span>🌍 Africa</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("international-news")}
-            >
-                <span>🌎 International</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("breaking-news")}
-            >
-                <span>🔥 Breaking News</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("transfers")}
-            >
-                <span>🔄 Transfers</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("sports-business")}
-            >
-                <span>💰 Sports Business</span>
-            </button>
-
-            <button
-                className="menu-parent"
-                onClick={() => handleNavigate("highlights")}
-            >
-                <span>🎥 Sports Highlights</span>
             </button>
             </div>
         )}

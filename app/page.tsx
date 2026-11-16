@@ -23,6 +23,7 @@ import {
   DivisionOneLeague,
   GhanaSportsNews,
   InternationalSportsNewsPage,
+  BoxingNews,
   type MenuScreen,
 } from "./components";
 
@@ -50,7 +51,21 @@ export default function SportsDigest() {
     | "division-one"
     | "ghana-football"
     | "ghana-sports"
+    | "boxing-news"
     | "international-sports-news"
+    | "live-sports"
+    | "live-basketball"
+    | "live-baseball"
+    | "live-nba"
+    | "live-nfl"
+    | "live-volleyball"
+    | "live-handball"
+    | "international-handball"
+    | "nfl"
+    | "super-bowl"
+    | "nfl-fixtures"
+    | "nfl-results"
+    | "nfl-standings"
     | "premier-league"
     | "champions-league"
     | "la-liga"
@@ -106,6 +121,19 @@ export default function SportsDigest() {
         | "division-one"
         | "ghana-football"
         | "ghana-sports"
+        | "live-sports"
+        | "live-basketball"
+        | "live-baseball"
+        | "live-nba"
+        | "live-nfl"
+        | "live-volleyball"
+        | "live-handball"
+        | "international-handball"
+        | "nfl"
+        | "super-bowl"
+        | "nfl-fixtures"
+        | "nfl-results"
+        | "nfl-standings"
         | "international-sports-news"
         | "premier-league"
         | "champions-league"
@@ -282,6 +310,8 @@ export default function SportsDigest() {
         {page === "international-sports-news" && (
           <InternationalSportsNewsPage onNavigate={navigate} />
         )}
+
+        {page === "boxing-news" && <BoxingNews />}
         
 
         {![
@@ -295,6 +325,7 @@ export default function SportsDigest() {
           "ghana-fa-cup",
           "division-one",
           "ghana-sports",
+          "boxing-news",
           "international-sports-news",
         ].includes(page) && (
           <SportsPage
