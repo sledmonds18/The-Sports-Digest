@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type { LiveDetailSource } from "./liveSportsData";
 
 export interface LiveMatch {
   fixture: {
@@ -15,6 +16,10 @@ export interface LiveMatch {
     away: { name: string; logo?: string; winner?: boolean | null };
   };
   goals: { home: number | null; away: number | null };
+  /** Provider that issued `fixture.id` (live slate only). */
+  provider?: LiveDetailSource;
+  /** Detail lookup override when scores and details come from different providers. */
+  detail?: { source: LiveDetailSource; id: string };
 }
 
 type LiveMatchesStatus = "loading" | "ready" | "unconfigured" | "error";

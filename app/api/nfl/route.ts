@@ -1,3 +1,6 @@
+import { apiSportsKey } from "../../components/lib/apiSportsKey";
+import { getPlanSeasonLimit } from "../../components/lib/apiSportsPlan";
+
 export const dynamic = "force-dynamic";
 
 type NflView = "fixtures" | "results" | "standings";
@@ -14,12 +17,6 @@ const NFL_LEAGUE_ID = 1;
 
 function getCurrentSeason(now = new Date()): number {
   return now.getUTCMonth() >= 7 ? now.getUTCFullYear() : now.getUTCFullYear() - 1;
-}
-
-function getApiKey(): string | undefined {
-  return process.env.API_NFL_KEY?.trim() ||
-    process.env.API_SPORTS_KEY?.trim() ||
-    process.env.NEXT_PUBLIC_API_KEY?.trim();
 }
 
 function getErrorMessage(errors: unknown, apiKey: string): string | undefined {
@@ -40,14 +37,6 @@ function getErrorMessage(errors: unknown, apiKey: string): string | undefined {
     "The American football provider rejected this request.";
 }
 
-function getSeasonAccessLimit(message: string): { firstSeason: number; lastSeason: number } | null {
-  const match = message.match(/free plans do not have access to this season,\s*try from\s+(\d{4})\s+to\s+(\d{4})/i);
-  if (!match) return null;
-  const firstSeason = Number(match[1]);
-  const lastSeason = Number(match[2]);
-  return firstSeason <= lastSeason ? { firstSeason, lastSeason } : null;
-}
-
 function validView(value: string | null): value is NflView {
   return value === "fixtures" || value === "results" || value === "standings";
 }
@@ -65,8 +54,8 @@ export async function GET(request: Request) {
     return Response.json({ status: "error", message: "Choose a valid NFL season." }, { status: 400 });
   }
 
-  const apiKey = getApiKey();
-  if (!apiKey || apiKey === "your_api_sports_key") {
+  const apiKey = apiSportsKey("API_NFL_KEY");
+  if (!apiKey) {
     return Response.json(
       { response: [], status: "unconfigured", message: "Add API_NFL_KEY to the server environment.", updatedAt: null },
       { status: 503 }
@@ -100,7 +89,7 @@ export async function GET(request: Request) {
     const message = getErrorMessage(data.errors, apiKey);
 
     if (!upstream.ok || message) {
-      const seasonAccessLimit = message ? getSeasonAccessLimit(message) : null;
+      const seasonAccessLimit = message ? getPlanSeasonLimit(message) : null;
       if (seasonAccessLimit) {
         return Response.json({
           response: [],

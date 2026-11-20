@@ -16,7 +16,7 @@ type StandingRow = {
   description?: string | null;
 };
 type StandingsGroup = { league?: { name?: string; country?: string; logo?: string; season?: number; standings?: StandingRow[][] } };
-type PageStatus = "loading" | "ready" | "unconfigured" | "error";
+type PageStatus = "loading" | "ready" | "unconfigured" | "error" | "season_unavailable";
 
 // API-Football league IDs are stable between seasons. Season values are the
 // starting year used by the provider, including calendar-year MLS seasons.
@@ -45,6 +45,7 @@ export default function StandingsPage({ onNavigate }: { onNavigate: (page: strin
   const [seasonsStatus, setSeasonsStatus] = useState<PageStatus>("loading");
   const [groups, setGroups] = useState<StandingsGroup[]>([]);
   const [status, setStatus] = useState<PageStatus>("loading");
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const league = LEAGUES.find((item) => item.id === leagueId) ?? LEAGUES[0];
 
@@ -76,16 +77,19 @@ export default function StandingsPage({ onNavigate }: { onNavigate: (page: strin
   useEffect(() => {
     const controller = new AbortController();
     setStatus("loading");
+    setStatusMessage(null);
     fetch(`/api/matches?view=standings&league=${leagueId}&season=${season}`, { signal: controller.signal, cache: "no-store" })
       .then(async (response) => {
         const data = await response.json();
         if (!response.ok || data.status === "error") throw new Error("Standings unavailable");
         setGroups(Array.isArray(data.response) ? data.response : []);
         setUpdatedAt(data.updatedAt ?? null);
-        setStatus(data.status === "unconfigured" ? "unconfigured" : "ready");
+        setStatusMessage(typeof data.message === "string" ? data.message : null);
+        setStatus(data.status === "season_unavailable" ? "season_unavailable" : data.status === "unconfigured" ? "unconfigured" : "ready");
       })
       .catch((error) => {
         if (error instanceof DOMException && error.name === "AbortError") return;
+        setStatusMessage(null);
         setStatus("error");
       });
     return () => controller.abort();
@@ -135,6 +139,7 @@ export default function StandingsPage({ onNavigate }: { onNavigate: (page: strin
 
         {status === "loading" ? <div className="rounded-2xl border border-white/10 bg-zinc-950 p-10 text-center text-sm text-gray-400">Loading the table…</div>
           : status === "unconfigured" ? <div className="rounded-2xl border border-dashed border-white/15 bg-zinc-950 p-10 text-center"><h3 className="text-lg font-bold">Standings aren’t connected yet</h3><p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-gray-400">Add the server environment variable <code className="text-gray-200">API_SPORTS_KEY</code> locally and in Vercel to load standings.</p></div>
+          : status === "season_unavailable" ? <div className="rounded-2xl border border-dashed border-amber-500/30 bg-amber-500/[0.04] p-10 text-center"><h3 className="text-lg font-bold text-amber-200">Current season isn’t in the API plan</h3><p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-gray-300">{statusMessage ?? `The API-Sports plan configured for this site does not include ${league.name} ${season}. Try an earlier season or upgrade the API-Sports plan.`}</p></div>
           : status === "error" ? <div className="rounded-2xl border border-dashed border-white/15 bg-zinc-950 p-10 text-center"><h3 className="text-lg font-bold">Standings are temporarily unavailable</h3><p className="mt-2 text-sm text-gray-400">Please try again later.</p></div>
           : tables.length === 0 || tables.every((table) => table.rows.length === 0) ? <div className="rounded-2xl border border-dashed border-white/15 bg-zinc-950 p-10 text-center"><h3 className="text-lg font-bold">No table available for this season</h3><p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-gray-400">The provider has no standings published for {league.name} in {season}. Try another season or competition.</p></div>
           : <div className="space-y-8">{tables.map((table, tableIndex) => (

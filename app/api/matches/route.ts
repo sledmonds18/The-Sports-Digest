@@ -1,11 +1,15 @@
 import axios from "axios";
+import { apiSportsKey } from "../../components/lib/apiSportsKey";
+import { getPlanSeasonLimit } from "../../components/lib/apiSportsPlan";
 import { competitionRank } from "../../components/lib/liveSportsData";
 import { isSportmonksEnabled, sportmonksMatches } from "../../components/lib/sportmonksFootball";
 import {
+  espnEventIdForTeams,
   espnFixtureDetail,
   espnFixturesInRange,
   espnLiveMatches,
   espnResultsInRange,
+  espnWarmTeamIndex,
 } from "../../components/lib/espnFootball";
 import { lsLiveMatches } from "../../components/lib/livescoreFootball";
 export const dynamic = "force-dynamic";
@@ -19,6 +23,18 @@ let resultsCache: MatchListCache | null = null;
 const detailCache = new Map<string, DetailCache>();
 const standingsCache = new Map<string, StandingsCache>();
 const leagueSeasonsCache = new Map<string, StandingsCache>();
+
+// Every fixture declares which provider issued its id. The live slate is a
+// merge of Sportmonks/API-Sports/ESPN/Livescore, and a detail lookup sent to
+// the wrong provider always comes back "not found".
+type ProviderName = "sportmonks" | "api-sports" | "espn" | "livescore" | "thesportsdb";
+type FixtureEnvelope = { provider?: ProviderName; detail?: { source: ProviderName; id: string } };
+
+function stamped(item: unknown, provider: ProviderName): unknown {
+  return item !== null && typeof item === "object" && !Array.isArray(item)
+    ? { ...(item as Record<string, unknown>), provider }
+    : item;
+}
 
 function providerErrorMessage(data: { errors?: unknown }) {
   const errors = data.errors;
@@ -77,7 +93,10 @@ function dateInAccra(date: Date) {
 }
 
 export async function GET(request: Request) {
-  const view = new URL(request.url).searchParams.get("view") || "";
+  const { searchParams } = new URL(request.url);
+  const view = searchParams.get("view") || "";
+  const detailId = searchParams.get("id") || "";
+  const detailSource = (searchParams.get("source") || "") as ProviderName | "";
 
   // Standings and seasons have no ESPN equivalent; keep the primary provider's
   // behaviour, including its "plan coverage" error messages.
@@ -85,11 +104,29 @@ export async function GET(request: Request) {
     return isSportmonksEnabled() ? sportmonksMatches(request) : apiSportsMatches(request);
   }
 
-  const primary = isSportmonksEnabled()
+  // ESPN event ids do not exist on the paid providers, so a detail lookup
+  // tagged with the ESPN source goes straight to ESPN.
+  if (view === "detail" && detailSource === "espn") {
+    return espnDetailResponse(detailId);
+  }
+  if (view === "detail" && detailSource === "livescore") {
+    return Response.json({
+      response: null,
+      status: "unavailable",
+      message: "The live provider for this match publishes scores only, not events, line-ups or statistics.",
+      updatedAt: null,
+    }, { status: 404, headers: { "Cache-Control": "no-store" } });
+  }
+
+  const sportmonks = isSportmonksEnabled();
+  const primaryProvider: ProviderName = sportmonks ? "sportmonks" : "api-sports";
+  const primary = sportmonks
     ? await sportmonksMatches(request)
     : await apiSportsMatches(request);
   const primaryPayload = await primary.json();
-  const primaryItems = Array.isArray(primaryPayload.response) ? primaryPayload.response : [];
+  const primaryItems = Array.isArray(primaryPayload.response)
+    ? primaryPayload.response.map((item: unknown) => stamped(item, primaryProvider))
+    : [];
 
   // A detail lookup only falls back when the primary provider could not find
   // the fixture at all; list views fall back whenever the primary came back
@@ -97,29 +134,30 @@ export async function GET(request: Request) {
   // subscription lacks league coverage — which is indistinguishable from a
   // genuinely quiet day until ESPN also reports nothing.
   if (view === "detail") {
-    if (primaryPayload.status !== "not_found" && primaryPayload.status !== "error") {
+    if (primaryPayload.status === "ok") {
       return replay(primary, primaryPayload);
     }
-    const espnDetail = await espnFixtureDetail(new URL(request.url).searchParams.get("id") || "");
-    if (espnDetail) {
-      return Response.json({ response: espnDetail, status: "ok", updatedAt: new Date().toISOString() }, { headers: { "Cache-Control": "no-store" } });
-    }
-    return replay(primary, primaryPayload);
+    return espnDetailResponse(detailId, primary, primaryPayload);
   }
 
+  const teamIndex = view === "" ? espnWarmTeamIndex() : Promise.resolve();
   const [espnItems, livescoreItems] = view === "fixtures"
     ? [await espnFixturesInRange(7), [] as unknown[]]
     : view === "results"
       ? [await espnResultsInRange(7), [] as unknown[]]
       : view === "" ? await Promise.all([espnLiveMatches(), lsLiveMatches()]) : [[], []] as [unknown[], unknown[]];
+  await teamIndex;
 
-  // Livescore leads the live sweep (it flags in-play games immediately);
-  // ESPN entries are kept for duplicates because their ids support the
-  // match-centre detail view.
+  // Livescore leads the live sweep (it flags in-play games earlier than ESPN),
+  // but its ids cannot be looked up anywhere. When ESPN carries the same
+  // fixture, keep Livescore's fresher score and borrow ESPN's id for the
+  // match-detail view (and its key events).
   const espnPairs = new Set(espnItems.map(teamPairKey));
   const fallbackItems = [
-    ...espnItems,
-    ...livescoreItems.filter((item) => !espnPairs.has(teamPairKey(item))),
+    ...espnItems.map((item) => stamped(item, "espn")),
+    ...livescoreItems
+      .filter((item) => !espnPairs.has(teamPairKey(item)))
+      .map((item) => withEspnTwin(stamped(item, "livescore"))),
   ];
 
   if (primaryItems.length === 0 && fallbackItems.length === 0) {
@@ -172,11 +210,48 @@ function replay(response: Response, payload: unknown): Response {
   });
 }
 
-// API_SPORTS_KEY is the fallback provider for the football views. The project
-// guide lists API_FOOTBALL as the provider URL, so never use it as a key.
+// Livescore flags in-play matches before ESPN does, so its scores are kept,
+// but its ids cannot be resolved by any detail provider. When ESPN carries the
+// same team pair, hand the detail pane ESPN's id instead.
+function withEspnTwin(item: unknown): unknown {
+  const value = item as { teams?: { home?: { name?: string }; away?: { name?: string } } } | null;
+  const home = value?.teams?.home?.name;
+  const away = value?.teams?.away?.name;
+  if (!home || !away) return item;
+  const espnId = espnEventIdForTeams(home, away);
+  if (!espnId) return item;
+  return {
+    ...(item as FixtureEnvelope as Record<string, unknown>),
+    detail: { source: "espn", id: espnId },
+  };
+}
+
+// Detail lookups ask ESPN last (or directly, when the id came from ESPN), and
+// answer with an honest "no detail feed" instead of replaying a provider error
+// for a fixture ESPN has never heard of.
+async function espnDetailResponse(
+  id: string,
+  fallback?: Response,
+  fallbackPayload?: unknown,
+): Promise<Response> {
+  const headers = { "Cache-Control": "no-store" };
+  const espnDetail = await espnFixtureDetail(id);
+  if (espnDetail) {
+    return Response.json({ response: espnDetail, status: "ok", updatedAt: new Date().toISOString() }, { headers });
+  }
+  if (fallback && fallbackPayload !== undefined) return replay(fallback, fallbackPayload);
+  return Response.json({
+    response: null,
+    status: "not_found",
+    message: "No detailed feed is available for this match.",
+    updatedAt: null,
+  }, { status: 404, headers });
+}
+
+// API-Sports is the football fallback whenever Sportmonks is not configured.
+// The credential comes from the shared API-Sports account.
 async function apiSportsMatches(request: Request) {
-  // API_FOOTBALL is the provider URL in the project guide, so never use it as a key.
-  const apiKey = process.env.API_SPORTS_KEY || process.env.NEXT_PUBLIC_API_KEY;
+  const apiKey = apiSportsKey();
   const { searchParams } = new URL(request.url);
   const wantsFixtures = searchParams.get("view") === "fixtures";
   const wantsResults = searchParams.get("view") === "results";
@@ -197,7 +272,7 @@ async function apiSportsMatches(request: Request) {
     ? { "Cache-Control": wantsResults ? "public, s-maxage=1800, stale-while-revalidate=3600" : "public, s-maxage=3600, stale-while-revalidate=21600" }
     : { "Cache-Control": "public, s-maxage=900, stale-while-revalidate=1800" };
 
-  if (!apiKey?.trim() || apiKey === "your_api_sports_key") {
+  if (!apiKey) {
     return Response.json(
       { response: [], status: "unconfigured", updatedAt: null },
       { headers: { "Cache-Control": "no-store, max-age=0" } },
@@ -221,6 +296,17 @@ async function apiSportsMatches(request: Request) {
       standingsCache.set(cacheKey, { response: data, expiresAt: Date.now() + 6 * 60 * 60 * 1000 });
       return Response.json({ response: data, status: "ok", updatedAt: new Date().toISOString() }, { headers: standingsHeaders });
     } catch (error) {
+      const message = error instanceof Error ? error.message : "";
+      const planLimit = getPlanSeasonLimit(message);
+      if (planLimit) {
+        return Response.json({
+          response: [],
+          status: "season_unavailable",
+          message: `The API-Sports plan configured for this site only provides standings for seasons ${planLimit.firstSeason}–${planLimit.lastSeason}. The ${season} season is not included.`,
+          ...planLimit,
+          updatedAt: null,
+        }, { headers: standingsHeaders });
+      }
       console.warn("External football standings API unavailable:", error);
       return Response.json({ response: [], status: "error", updatedAt: null }, { status: 502, headers: standingsHeaders });
     }
@@ -248,8 +334,10 @@ async function apiSportsMatches(request: Request) {
   }
 
   // Single-fixture detail: goals with scorers, cards, substitutions, VAR and
-  // team statistics (fouls, possession, shots…). Short cache so an open detail
-  // panel can auto-refresh without hammering the provider.
+  // team statistics (fouls, possession, shots…). Player statistics are fetched
+  // from the companion endpoint so the panel can show who scored, who was
+  // booked and who committed the fouls. Short cache so an open detail panel can
+  // auto-refresh without hammering the provider.
   if (wantsDetail) {
     const detailHeaders = { "Cache-Control": "no-store" };
     const cachedDetail = detailCache.get(detailId);
@@ -257,18 +345,45 @@ async function apiSportsMatches(request: Request) {
       return Response.json({ response: cachedDetail.response, status: "ok", updatedAt: new Date().toISOString() }, { headers: detailHeaders });
     }
     try {
-      const response = await axios.get("https://v3.football.api-sports.io/fixtures", {
-        headers: { "x-apisports-key": apiKey },
-        params: { id: detailId },
-        timeout: 8000,
-      });
+      const [response, playersResponse] = await Promise.all([
+        axios.get("https://v3.football.api-sports.io/fixtures", {
+          headers: { "x-apisports-key": apiKey },
+          params: { id: detailId },
+          timeout: 8000,
+        }),
+        axios.get("https://v3.football.api-sports.io/fixtures/players", {
+          headers: { "x-apisports-key": apiKey },
+          params: { fixture: detailId },
+          timeout: 8000,
+        }).catch((error) => {
+          // Player stats are a bonus: a league without coverage, a plan limit or
+          // a provider hiccup must not take down the whole match detail.
+          console.warn("Football player statistics unavailable:", error instanceof Error ? error.message : error);
+          return null;
+        }),
+      ]);
       assertProviderResponse(response.data);
       const fixture = Array.isArray(response.data?.response) ? response.data.response[0] : null;
       if (!fixture) {
         return Response.json({ response: null, status: "not_found", updatedAt: null }, { status: 404, headers: detailHeaders });
       }
-      detailCache.set(detailId, { response: fixture, expiresAt: Date.now() + 45_000 });
-      return Response.json({ response: fixture, status: "ok", updatedAt: new Date().toISOString() }, { headers: detailHeaders });
+
+      let playerStats: unknown[] = [];
+      if (playersResponse) {
+        const playerPayload = playersResponse.data as { response?: unknown; errors?: unknown };
+        const playerError = providerErrorMessage(playerPayload);
+        if (playerError) {
+          console.warn("Football player statistics unavailable:", playerError);
+        } else if (Array.isArray(playerPayload.response)) {
+          playerStats = playerPayload.response;
+        }
+      }
+
+      const enrichedFixture = playerStats.length > 0 && fixture && typeof fixture === "object"
+        ? { ...(fixture as Record<string, unknown>), playerStats }
+        : fixture;
+      detailCache.set(detailId, { response: enrichedFixture, expiresAt: Date.now() + 45_000 });
+      return Response.json({ response: enrichedFixture, status: "ok", updatedAt: new Date().toISOString() }, { headers: detailHeaders });
     } catch (error) {
       const responseData = axios.isAxiosError(error) ? error.response?.data : null;
       const message = (responseData && typeof responseData === "object"

@@ -130,11 +130,12 @@ excluded rather than left in place to fail silently on every cron run.
   for the larger component stylesheets.
 - Images live in `public/` under topic folders (`Ghana-Premier-League-Clubs/`,
   `Black-Stars-Graphics/`, `Ghana-Division-One-Teams/`, etc.).
-- Never commit `.env*` — it is gitignored. Keys in use: `API_FOOTBALL`,
-  `API_SPORTS_KEY`, `API_BASKETBALL_KEY`, `API_BASEBALL_KEY`, `API_NBA_KEY`,
+- Never commit `.env*` — it is gitignored. Keys in use: `API_SPORTS_KEY` (the
+  shared API-Sports key — it takes precedence over the per-sport variables),
+  `API_BASKETBALL_KEY`, `API_BASEBALL_KEY`, `API_NBA_KEY`,
   `API_NFL_KEY`, `API_VOLLEYBALL_KEY`, `API_HANDBALL_KEY`,
   `SPORTMONKS_API_TOKEN`, `THESPORTSDB_API_KEY`,
-  `OPENAI_API_KEY`, `NEXT_PUBLIC_API_KEY`, `RESEND_API_KEY`, `CONTACT_EMAIL`,
+  `OPENAI_API_KEY`, `RESEND_API_KEY`, `CONTACT_EMAIL`,
   `EDITORIAL_PASSKEY`, `CRON_SECRET`, `INGEST_MAX_AGE_HOURS`. See `.env.example`.
 - `data/ghana-sports-news.json` is the live newsroom database and is tracked in git.
   It changes on every approve/reject/ingest, so expect it in diffs.

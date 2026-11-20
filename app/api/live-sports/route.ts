@@ -7,7 +7,8 @@ import {
   LIVE_SPORTS,
   compareEventsByPriority,
 } from "../../components/lib/liveSportsData";
-import { espnLiveSportEvents, espnSupportedSport } from "../../components/lib/espnLive";
+import { espnLiveSportEvents, espnSportGameDetail, espnSupportedSport } from "../../components/lib/espnLive";
+import { apiSportsKey } from "../../components/lib/apiSportsKey";
 
 export const dynamic = "force-dynamic";
 
@@ -144,6 +145,7 @@ function apiSportsEvent(sport: LiveSport, value: unknown, index: number): LiveSp
   return {
     id: text(valueAt(game, "id"), text(valueAt(game, "event_key"), text(valueAt(game, "race", "id"), `${sport}-${index}`))),
     sport,
+    source: "api-sports",
     competition: country ? `${league} · ${country}` : league,
     participants: away ? [home, away] : [home],
     logos: away ? [homeLogo, awayLogo] : [homeLogo],
@@ -197,22 +199,14 @@ function errorMessage(data: JsonRecord, apiKey: string): string | undefined {
     "The sports data provider rejected this request.";
 }
 
-function getApiKey(keyName: string): string | undefined {
-  const environment = process.env as Record<string, string | undefined>;
-  return environment[keyName]?.trim() ||
-    process.env.API_SPORTS_KEY?.trim() ||
-    process.env.NEXT_PUBLIC_API_KEY?.trim() ||
-    undefined;
-}
-
 async function getApiSportsFeed(
   sport: LiveSport,
   config: NonNullable<typeof API_SPORTS_CONFIG[LiveSport]>,
   requestDate?: Date,
   includeCompleted = false
 ): Promise<LiveSportFeed> {
-  const apiKey = getApiKey(config.keyName);
-  if (!apiKey || apiKey === "your_api_sports_key") {
+  const apiKey = apiSportsKey(config.keyName);
+  if (!apiKey) {
     return { sport, status: "unconfigured", events: [], message: "Add the shared API-Sports key to the server environment." };
   }
 
@@ -270,26 +264,49 @@ async function getApiSportsFeed(
 
 // Single-game detail for the non-football sports: full status, venue and the
 // per-period scores (quarters, sets, innings) each provider game carries.
+// The live lists fall back to ESPN when the API-Sports account is suspended,
+// so the detail lookup follows the same chain — otherwise every ESPN-sourced
+// game id would be sent to a provider that has never heard of it.
 async function getSportGameDetail(searchParams: URLSearchParams): Promise<Response> {
   const noStore = { "Cache-Control": "no-store" };
   const sport = searchParams.get("sport") as LiveSport | null;
   const id = searchParams.get("id") || "";
+  const source = searchParams.get("source") || "";
+  const notFound = (message: string) => Response.json(
+    { response: null, status: "not_found", message, updatedAt: null },
+    { status: 404, headers: noStore }
+  );
   if (!sport || !LIVE_SPORTS.includes(sport) || !/^\d+$/.test(id)) {
     return Response.json({ response: null, status: "invalid_request", updatedAt: null }, { status: 400, headers: noStore });
   }
+
+  if (source === "espn") {
+    const detail = await espnSportGameDetail(sport, id);
+    return detail
+      ? Response.json({ response: detail, status: "ok", updatedAt: new Date().toISOString() }, { headers: noStore })
+      : notFound("This game's provider does not publish a per-game detail feed.");
+  }
+
   const config = API_SPORTS_CONFIG[sport];
   if (!config) {
     return Response.json({ response: null, status: "unsupported", updatedAt: null, message: "No live-data provider is configured for this sport." }, { status: 501, headers: noStore });
   }
-  const apiKey = getApiKey(config.keyName);
-  if (!apiKey || apiKey === "your_api_sports_key") {
-    return Response.json({ response: null, status: "unconfigured", updatedAt: null }, { status: 503, headers: noStore });
-  }
 
-  const cacheKey = `${sport}:${id}`;
+  const cacheKey = `${sport}:${source || "api-sports"}:${id}`;
+  const okDetail = (detail: unknown) => {
+    gameDetailCache.set(cacheKey, { response: detail, expiresAt: Date.now() + 45_000 });
+    return Response.json({ response: detail, status: "ok", updatedAt: new Date().toISOString() }, { headers: noStore });
+  };
   const cached = gameDetailCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) {
     return Response.json({ response: cached.response, status: "ok", updatedAt: new Date().toISOString() }, { headers: noStore });
+  }
+
+  const apiKey = apiSportsKey(config.keyName);
+  if (!apiKey) {
+    const espnDetail = await espnSportGameDetail(sport, id);
+    if (espnDetail) return okDetail(espnDetail);
+    return Response.json({ response: null, status: "unconfigured", updatedAt: null }, { status: 503, headers: noStore });
   }
 
   try {
@@ -303,17 +320,24 @@ async function getSportGameDetail(searchParams: URLSearchParams): Promise<Respon
     const data = record(await response.json());
     const message = errorMessage(data, apiKey);
     if (!response.ok || message) {
+      // A suspended account or exhausted quota should not hide a game ESPN
+      // can describe perfectly well.
+      const espnDetail = await espnSportGameDetail(sport, id);
+      if (espnDetail) return okDetail(espnDetail);
       return Response.json({ response: null, status: "error", message: message || `The ${sport} detail provider returned HTTP ${response.status}.`, updatedAt: null }, { status: 502, headers: noStore });
     }
     const game = Array.isArray(data.response) ? data.response[0] ?? null : null;
     if (!game) {
-      return Response.json({ response: null, status: "not_found", updatedAt: null }, { status: 404, headers: noStore });
+      const espnDetail = await espnSportGameDetail(sport, id);
+      if (espnDetail) return okDetail(espnDetail);
+      return notFound("No detailed feed is available for this game.");
     }
-    gameDetailCache.set(cacheKey, { response: game, expiresAt: Date.now() + 45_000 });
-    return Response.json({ response: game, status: "ok", updatedAt: new Date().toISOString() }, { headers: noStore });
+    return okDetail(game);
   } catch (error) {
     const message = error instanceof Error ? error.message : "The provider request failed.";
     console.warn(`${sport} game detail unavailable:`, message);
+    const espnDetail = await espnSportGameDetail(sport, id);
+    if (espnDetail) return okDetail(espnDetail);
     return Response.json({ response: null, status: "error", message: `${sport} match details are temporarily unavailable.`, updatedAt: null }, { status: 502, headers: noStore });
   }
 }

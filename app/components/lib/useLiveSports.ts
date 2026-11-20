@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   LIVE_SPORTS,
   compareEventsByPriority,
+  type LiveDetailSource,
   type LiveSport,
   type LiveSportEvent,
   type LiveSportFeed,
@@ -47,6 +48,8 @@ function footballEvents(matches: unknown[]): LiveSportEvent[] {
       league?: { name?: string; country?: string };
       teams?: { home?: { name?: string; logo?: string }; away?: { name?: string; logo?: string } };
       goals?: { home?: number | null; away?: number | null };
+      provider?: LiveDetailSource;
+      detail?: { source?: LiveDetailSource; id?: string };
     };
     return {
       id: String(match.fixture?.id ?? `football-${index}`),
@@ -59,6 +62,10 @@ function footballEvents(matches: unknown[]): LiveSportEvent[] {
         ? `${match.fixture.status.elapsed}′`
         : match.fixture?.status?.short || "Live",
       date: match.fixture?.date,
+      source: match.provider,
+      detail: match.detail?.source && match.detail?.id
+        ? { source: match.detail.source, id: match.detail.id }
+        : undefined,
     };
   });
 }

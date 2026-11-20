@@ -23,9 +23,8 @@ loop: crawl → review → publish → verify public site.
 Open `.env.local` from the Explorer. It already contains:
 
 ```dotenv
-API_FOOTBALL = https://v3.football.api-sports.io/
+API_SPORTS_KEY=your_api_sports_key
 OPENAI_API_KEY=your_openai_api_key
-NEXT_PUBLIC_API_KEY=your_api_sports_key
 RESEND_API_KEY=REPLACE_WITH_LOCAL_VALUE
 CONTACT_EMAIL=sylvesteredmonds18@gmail.com
 

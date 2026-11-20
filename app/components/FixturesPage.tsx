@@ -29,6 +29,8 @@ function fixtureToEvent(match: LiveMatch): LiveSportEvent {
     score: hasScore ? `${match.goals.home} - ${match.goals.away}` : "vs",
     status: match.fixture.status.short,
     date: match.fixture.date,
+    source: match.provider,
+    detail: match.detail,
   };
 }
 

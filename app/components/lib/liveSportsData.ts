@@ -11,6 +11,17 @@ export const LIVE_SPORTS = [
 export type LiveSport = (typeof LIVE_SPORTS)[number];
 export type LiveSportStatus = "ready" | "unconfigured" | "error" | "unsupported";
 
+// Which provider an event's data (and therefore its id) belongs to. The live
+// lists are a merge of several sources, so the detail endpoint cannot guess:
+// a Livescore id sent to Sportmonks, or an ESPN id sent to API-Sports, always
+// comes back "not found".
+export type LiveDetailSource =
+  | "espn"
+  | "livescore"
+  | "sportmonks"
+  | "api-sports"
+  | "thesportsdb";
+
 export interface LiveSportEvent {
   id: string;
   sport: LiveSport;
@@ -22,6 +33,11 @@ export interface LiveSportEvent {
   date?: string;
   /** Team crests aligned by index with `participants` (entries may be missing). */
   logos?: (string | undefined)[];
+  /** Provider that issued `id`. */
+  source?: LiveDetailSource;
+  /** Set when the live scores and the match detail come from different
+   * providers (a Livescore fixture that also exists on ESPN). */
+  detail?: { source: LiveDetailSource; id: string };
 }
 
 export interface LiveSportFeed {

@@ -1,3 +1,6 @@
+import { apiSportsKey } from "../../components/lib/apiSportsKey";
+import { getPlanSeasonLimit } from "../../components/lib/apiSportsPlan";
+
 export const dynamic = "force-dynamic";
 
 type BaseballView = "fixtures" | "results" | "standings";
@@ -11,12 +14,6 @@ type CacheEntry = {
 const MLB_LEAGUE_ID = 1;
 const CACHE_DURATION = 5 * 60 * 1000;
 const cache = new Map<string, CacheEntry>();
-
-function getApiKey(): string | undefined {
-  return process.env.API_BASEBALL_KEY?.trim() ||
-    process.env.API_SPORTS_KEY?.trim() ||
-    process.env.NEXT_PUBLIC_API_KEY?.trim();
-}
 
 function validView(value: string | null): value is BaseballView {
   return value === "fixtures" || value === "results" || value === "standings";
@@ -40,14 +37,6 @@ function errorMessage(errors: unknown, apiKey: string): string | undefined {
     "The baseball data provider rejected this request.";
 }
 
-function getSeasonAccessLimit(message: string): { firstSeason: number; lastSeason: number } | null {
-  const match = message.match(/free plans do not have access to this season,\s*try from\s+(\d{4})\s+to\s+(\d{4})/i);
-  if (!match) return null;
-  const firstSeason = Number(match[1]);
-  const lastSeason = Number(match[2]);
-  return firstSeason <= lastSeason ? { firstSeason, lastSeason } : null;
-}
-
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const view = searchParams.get("view");
@@ -61,8 +50,8 @@ export async function GET(request: Request) {
     return Response.json({ status: "error", message: "Choose a valid baseball season." }, { status: 400 });
   }
 
-  const apiKey = getApiKey();
-  if (!apiKey || apiKey === "your_api_sports_key") {
+  const apiKey = apiSportsKey("API_BASEBALL_KEY");
+  if (!apiKey) {
     return Response.json(
       { response: [], status: "unconfigured", message: "Add API_BASEBALL_KEY or API_SPORTS_KEY to the server environment.", updatedAt: null },
       { status: 503 }
@@ -96,7 +85,7 @@ export async function GET(request: Request) {
     const message = errorMessage(data.errors, apiKey);
 
     if (!upstream.ok || message) {
-      const seasonAccessLimit = message ? getSeasonAccessLimit(message) : null;
+      const seasonAccessLimit = message ? getPlanSeasonLimit(message) : null;
       if (seasonAccessLimit) {
         return Response.json({
           response: [],

@@ -96,7 +96,10 @@ function countryForSlug(slug: string): string {
     eng: "England", esp: "Spain", ita: "Italy", ger: "Germany", fra: "France",
     ned: "Netherlands", por: "Portugal", tur: "Türkiye", sco: "Scotland",
     usa: "USA", mex: "Mexico", bra: "Brazil", arg: "Argentina", sau: "Saudi Arabia",
-    rsa: "South Africa", egy: "Egypt", uefa: "Europe", fifa: "World",
+    rsa: "South Africa", egy: "Egypt", ind: "India", col: "Colombia", per: "Peru",
+    bol: "Bolivia", uru: "Uruguay", chi: "Chile", par: "Paraguay", ecu: "Ecuador",
+    ven: "Venezuela", jpn: "Japan", kor: "South Korea", aus: "Australia",
+    uefa: "Europe", fifa: "World",
     caf: "Africa", conmebol: "South America", concacaf: "North America",
   };
   return countries[prefix] ?? "";
@@ -111,6 +114,27 @@ const detailCache = new Map<string, Cache<JsonRecord>>();
 // ESPN event id → league slug, populated from scoreboard responses so the
 // detail view can locate the summary endpoint without extra lookups.
 const eventSlugById = new Map<string, string>();
+// ESPN event id → league label, so a detail lookup still shows the real
+// competition when the summary payload omits its `leagues` block.
+const eventLeagueById = new Map<string, { name: string; country: string }>();
+// Normalised team pair → ESPN event id, recorded from every scoreboard event
+// (live or not). Livescore flags matches in play earlier than ESPN, so the
+// live list keeps Livescore's fresher score but borrows ESPN's id for detail.
+const eventIdByPair = new Map<string, string>();
+
+function pairKey(home: string, away: string): string {
+  const norm = (name: string) => name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+  return `${norm(home)}|${norm(away)}`;
+}
+
+/** ESPN event id for a team pair seen on the current scoreboards, if any. */
+export function espnEventIdForTeams(home: string, away: string): string | null {
+  return eventIdByPair.get(pairKey(home, away)) || null;
+}
 
 // ─── Scoreboard fetching ────────────────────────────────────────────────────
 
@@ -127,6 +151,42 @@ async function scoreboard(slug: string, dates?: string): Promise<{ events: JsonR
     console.warn(`ESPN scoreboard (${slug}) failed:`, error instanceof Error ? error.message : error);
     return null;
   }
+}
+
+// ESPN's "all" scoreboard covers one date across every soccer league it
+// carries. It is the cheapest way to learn the ESPN id of a Livescore fixture
+// from outside the priority slug list, so that fixture can borrow ESPN's
+// detail feed (scorers, cards, line-ups, team stats).
+const allDayCache = new Map<string, Cache<JsonRecord[]>>();
+const ALL_DAY_TTL_MS = 20 * 60 * 1000;
+
+async function allScoreboardDay(compactDate: string): Promise<JsonRecord[]> {
+  const cached = allDayCache.get(compactDate);
+  if (cached && cached.expiresAt > Date.now()) return cached.value;
+  const board = await scoreboard("all", compactDate);
+  const events = board?.events ?? [];
+  for (const event of events) {
+    const id = text(event.id);
+    if (!id) continue;
+    const competition = record(records(event.competitions)[0]);
+    const home = competitorSide(competition, "home");
+    const away = competitorSide(competition, "away");
+    if (home.name && away.name) {
+      eventIdByPair.set(pairKey(text(home.name), text(away.name)), id);
+    }
+  }
+  allDayCache.set(compactDate, { value: events, expiresAt: Date.now() + ALL_DAY_TTL_MS });
+  return events;
+}
+
+/** Index today's and yesterday's ESPN "all" scoreboards by team pair. */
+export async function espnWarmTeamIndex(): Promise<void> {
+  const now = Date.now();
+  const days = [0, -1].map((offset) =>
+    accraDateCompact(new Date(now + offset * 24 * 60 * 60 * 1000)));
+  await Promise.all(days.map((day) => allScoreboardDay(day))).catch((error) => {
+    console.warn("ESPN all-scoreboard index failed:", error instanceof Error ? error.message : error);
+  });
 }
 
 function elapsedMinute(status: JsonRecord): number | null {
@@ -166,7 +226,8 @@ function competitorSide(competition: JsonRecord, side: "home" | "away"): JsonRec
   return {
     id: Number(text(team.id)) || 0,
     name: text(team.displayName, side === "home" ? "Home" : "Away"),
-    logo: text(team.logo) || undefined,
+    // Soccer scoreboards often only carry the crest array, not `logo`.
+    logo: text(team.logo) || text(record(records(team.logos)[0]).href) || undefined,
     winner: text(entry.winner) === "true" ? true : null,
   };
 }
@@ -183,10 +244,18 @@ function toApiFootballFixture(event: JsonRecord, league: JsonRecord, slug: strin
   const status = statusShape(competition.status ? record(competition.status) : record(event.status));
   const country = countryForSlug(text(league.slug) || slug);
   const venue = record(competition.venue);
-  eventSlugById.set(text(event.id), text(league.slug) || slug);
+  const id = text(event.id);
+  const home = competitorSide(competition, "home");
+  const away = competitorSide(competition, "away");
+  eventSlugById.set(id, text(league.slug) || slug);
+  if (id) eventLeagueById.set(id, { name: text(league.name, "Football"), country });
+  if (id && home.name && away.name) {
+    eventIdByPair.set(pairKey(text(home.name), text(away.name)), id);
+  }
   return {
+    provider: "espn",
     fixture: {
-      id: Number(text(event.id)) || 0,
+      id: Number(id) || 0,
       date: text(event.date),
       status,
       venue: text(venue.fullName)
@@ -199,10 +268,7 @@ function toApiFootballFixture(event: JsonRecord, league: JsonRecord, slug: strin
       country,
       logo: text(record(records(league.logos)[0]).href) || undefined,
     },
-    teams: {
-      home: competitorSide(competition, "home"),
-      away: competitorSide(competition, "away"),
-    },
+    teams: { home, away },
     goals: {
       home: competitorScore(competition, "home"),
       away: competitorScore(competition, "away"),
@@ -360,85 +426,175 @@ async function mergeGhana(fixtures: JsonRecord[], from: string, to: string, newe
 
 // ─── Detail ─────────────────────────────────────────────────────────────────
 
-// ESPN summary keyEvent type id → API-Football event type.
-const KEY_EVENT_TYPES: Record<string, string> = {
-  "goal": "Goal",
-  "own-goal": "Goal",
-  "penalty-goal": "Goal",
-  "free-kick-goal": "Goal",
-  "yellow-card": "Card",
-  "red-card": "Card",
-  "yellowred-card": "Card",
-  "substitution": "Subst",
-  "var": "Var",
-  "penalty-shootout": "Penalty",
-  "penalty-missed": "Var",
-};
+// ESPN soccer summary type slugs → the event vocabulary the UI renders.
+function keyEventType(type: JsonRecord): string {
+  const slug = text(type.type).toLowerCase();
+  const label = text(type.text).toLowerCase();
+  if (slug === "substitution" || label.includes("substitution")) return "subst";
+  if (slug === "var" || label.includes("var")) return "Var";
+  if (slug.includes("yellowred") || (label.includes("yellow") && label.includes("red"))) return "Card";
+  if (slug.includes("yellow") || slug.includes("red") || label.includes("card")) return "Card";
+  if (slug === "penalty-missed" || slug.includes("missed")) return "Goal";
+  if (slug.includes("goal") || label.includes("goal")) return "Goal";
+  return text(type.text, "Event");
+}
+
+// ESPN camelCase statistic names → the labels shown in the stats table.
+function statLabel(name: string): string {
+  const known: Record<string, string> = {
+    foulsCommitted: "Fouls",
+    yellowCards: "Yellow cards",
+    redCards: "Red cards",
+    offsides: "Offsides",
+    wonCorners: "Corners",
+    saves: "Saves",
+    possessionPct: "Possession %",
+    totalShots: "Shots",
+    shotsOnTarget: "Shots on target",
+    accuratePasses: "Accurate passes",
+    totalPasses: "Passes",
+    passPct: "Pass %",
+    totalTackles: "Tackles",
+    interceptions: "Interceptions",
+    effectiveClearance: "Clearances",
+    blockedShots: "Blocked shots",
+    accurateCrosses: "Accurate crosses",
+    crossPct: "Cross %",
+  };
+  if (known[name]) return known[name];
+  return name
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/[-_]/g, " ")
+    .replace(/^./, (letter) => letter.toUpperCase());
+}
+
+async function fetchSummary(slug: string, eventId: string): Promise<JsonRecord | null> {
+  try {
+    const response = await fetch(`${SITE_API}/${slug}/summary?event=${eventId}`, {
+      signal: AbortSignal.timeout(TIMEOUT_MS), cache: "no-store",
+    });
+    if (!response.ok) return null;
+    const body = record(await response.json().catch(() => null));
+    return Object.keys(body).length > 0 ? body : null;
+  } catch (error) {
+    console.warn(`ESPN summary (${slug}/event ${eventId}) failed:`, error instanceof Error ? error.message : error);
+    return null;
+  }
+}
 
 /** Best-effort fixture detail for an ESPN event id, or null when unknown. */
 export async function espnFixtureDetail(detailId: string): Promise<JsonRecord | null> {
   if (!/^\d+$/.test(detailId)) return null;
   const cached = detailCache.get(detailId);
   if (cached && cached.expiresAt > Date.now()) return cached.value;
-  const slug = eventSlugById.get(detailId);
-  if (!slug) return null;
-  try {
-    const response = await fetch(`${SITE_API}/${slug}/summary?event=${detailId}`, {
-      signal: AbortSignal.timeout(TIMEOUT_MS), cache: "no-store",
-    });
-    if (!response.ok) return null;
-    const body = record(await response.json().catch(() => null));
-    const header = record(body.header);
-    const competition = record(records(header.competitions)[0]);
-    if (records(competition.competitors).length === 0) return null;
-    const status = statusShape(competition.status ? record(competition.status) : record(header.status));
-    const gameInfo = record(body.gameInfo);
-    const venue = record(gameInfo.venue);
-    const boardLeague = record(records(body.leagues)[0]);
-    const events = records(body.keyEvents).map((event) => {
-      const type = record(event.type);
-      const clock = record(event.clock);
-      const involved = records(event.athletesInvolved);
-      return {
-        time: { elapsed: parseInt(text(clock.displayValue), 10) || null, extra: null },
-        type: KEY_EVENT_TYPES[text(type.id)] || text(type.text, "Event"),
-        detail: text(type.text) || text(event.text),
-        player: { name: text(record(involved[0]).displayName) || undefined },
-        assist: { name: text(record(involved[1]).displayName) || undefined },
-        team: { name: text(record(event.team).displayName) || undefined, logo: undefined },
-      };
-    });
-    const fixture: JsonRecord = {
-      fixture: {
-        id: Number(detailId),
-        date: text(competition.date) || text(header.date),
-        status,
-        venue: text(venue.fullName)
-          ? { name: text(venue.fullName), city: text(record(venue.address).city) || null }
-          : undefined,
-      },
-      league: {
-        id: Number(text(boardLeague.id)) || 0,
-        name: text(boardLeague.name, "Football"),
-        country: countryForSlug(slug),
-        logo: text(record(records(boardLeague.logos)[0]).href) || undefined,
-      },
-      teams: {
-        home: competitorSide(competition, "home"),
-        away: competitorSide(competition, "away"),
-      },
-      goals: {
-        home: competitorScore(competition, "home"),
-        away: competitorScore(competition, "away"),
-      },
-      score: { halftime: { home: null, away: null }, fulltime: { home: null, away: null } },
-      events,
-      statistics: [],
+
+  // The "all" summary resolves every competition ESPN carries, so a detail
+  // request no longer depends on the league slug (or on state left behind by
+  // the list request on the same serverless instance).
+  const knownSlug = eventSlugById.get(detailId);
+  const body = await fetchSummary("all", detailId)
+    ?? (knownSlug ? await fetchSummary(knownSlug, detailId) : null);
+  if (!body) return null;
+
+  const header = record(body.header);
+  const competition = record(records(header.competitions)[0]);
+  if (records(competition.competitors).length === 0) return null;
+  const status = statusShape(competition.status ? record(competition.status) : record(header.status));
+  const gameInfo = record(body.gameInfo);
+  const venue = record(gameInfo.venue);
+  const boardLeague = record(records(body.leagues)[0]);
+  const headerLeague = record(header.league);
+  const knownLeague = eventLeagueById.get(detailId);
+  const leagueSlug = text(headerLeague.slug) || knownSlug || "";
+  const leagueName = text(headerLeague.name) || text(boardLeague.name) || knownLeague?.name || "Football";
+  const leagueCountry = countryForSlug(leagueSlug) || knownLeague?.country || "";
+
+  const events = records(body.keyEvents).map((event) => {
+    const type = record(event.type);
+    const clock = record(event.clock);
+    const kind = keyEventType(type);
+    // Soccer summaries name the people in `participants` (scorer + assist,
+    // player booked, on + off for a substitution); `athletesInvolved` is the
+    // shape used by a few other summaries.
+    const people = records(event.participants)
+      .map((participant) => text(record(record(participant).athlete).displayName))
+      .filter(Boolean);
+    const involved = records(event.athletesInvolved)
+      .map((athlete) => text(record(athlete).displayName))
+      .filter(Boolean);
+    const names = people.length > 0 ? people : involved;
+    return {
+      time: { elapsed: parseInt(text(clock.displayValue), 10) || null, extra: null },
+      type: kind,
+      detail: kind === "subst" ? "" : text(type.text) || text(event.text),
+      player: { name: names[0] || undefined },
+      assist: { name: names[1] || undefined },
+      team: { name: text(record(event.team).displayName) || undefined, logo: undefined },
     };
-    detailCache.set(detailId, { value: fixture, expiresAt: Date.now() + 45_000 });
-    return fixture;
-  } catch (error) {
-    console.warn("ESPN fixture detail failed:", error instanceof Error ? error.message : error);
-    return null;
-  }
+  });
+
+  // Line-ups: shirt numbers, positions, starters and substitution flags. ESPN
+  // carries these even for leagues where it has no per-player statistics.
+  const lineups = records(body.rosters).map((entry) => {
+    const players = records(entry.roster).map((player, index) => ({
+      name: text(record(player.athlete).displayName, "Unknown"),
+      jersey: text(player.jersey) || undefined,
+      position: text(record(player.position).abbreviation) || undefined,
+      starter: Boolean(player.starter),
+      subbedIn: Boolean(player.subbedIn),
+      subbedOut: Boolean(player.subbedOut),
+      order: Number(text(player.formationPlace)) || index + 1,
+    })).sort((first, second) =>
+      Number(second.starter) - Number(first.starter) || first.order - second.order);
+    return {
+      team: text(record(entry.team).displayName),
+      homeAway: text(entry.homeAway),
+      formation: text(entry.formation) || undefined,
+      players,
+    };
+  }).filter((lineup) => lineup.players.length > 0);
+
+  // Team statistics: fouls, cards, possession, shots, corners… (coverage
+  // varies by competition; the big leagues carry the full set).
+  const statistics = records(record(body.boxscore).teams).map((entry) => ({
+    team: { name: text(record(entry.team).displayName) },
+    statistics: records(entry.statistics).map((stat) => ({
+      type: statLabel(text(stat.name)),
+      value: text(stat.displayValue) || text(stat.value),
+    })),
+  })).filter((group) => group.statistics.length > 0);
+
+  const fixture: JsonRecord = {
+    provider: "espn",
+    fixture: {
+      id: Number(detailId),
+      date: text(competition.date) || text(header.date),
+      status,
+      venue: text(venue.fullName)
+        ? { name: text(venue.fullName), city: text(record(venue.address).city) || null }
+        : undefined,
+    },
+    league: {
+      id: Number(text(headerLeague.id)) || Number(text(boardLeague.id)) || 0,
+      name: leagueName,
+      country: leagueCountry,
+      logo: text(record(records(headerLeague.logos)[0]).href)
+        || text(record(records(boardLeague.logos)[0]).href)
+        || undefined,
+    },
+    teams: {
+      home: competitorSide(competition, "home"),
+      away: competitorSide(competition, "away"),
+    },
+    goals: {
+      home: competitorScore(competition, "home"),
+      away: competitorScore(competition, "away"),
+    },
+    score: { halftime: { home: null, away: null }, fulltime: { home: null, away: null } },
+    events,
+    statistics,
+    lineups,
+  };
+  detailCache.set(detailId, { value: fixture, expiresAt: Date.now() + 45_000 });
+  return fixture;
 }
