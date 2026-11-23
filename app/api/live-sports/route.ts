@@ -103,18 +103,22 @@ function dateInAccra(date: Date = new Date()): string {
 
 function apiSportsEvent(sport: LiveSport, value: unknown, index: number): LiveSportEvent {
   const game = record(value);
-  const status = text(
-    valueAt(game, "status", "short") ?? valueAt(game, "status", "long") ??
-      valueAt(game, "event_status") ?? valueAt(game, "status"),
-    "Live"
-  );
+  // API-NBA calls the away side `visitors` and reports numeric status codes,
+  // so prefer the human-readable `long` value there.
+  const status = sport === "nba"
+    ? text(valueAt(game, "status", "long"), text(valueAt(game, "status", "short"), "Live"))
+    : text(
+        valueAt(game, "status", "short") ?? valueAt(game, "status", "long") ??
+          valueAt(game, "event_status") ?? valueAt(game, "status"),
+        "Live"
+      );
   const eventTitle = text(valueAt(game, "competition", "name"), "Live event");
   const home = text(
     valueAt(game, "teams", "home", "name"),
     text(valueAt(game, "event_home_team"), text(valueAt(game, "drivers", "first", "name"), eventTitle))
   );
   const away = text(
-    valueAt(game, "teams", "away", "name"),
+    valueAt(game, "teams", "away", "name") ?? valueAt(game, "teams", "visitors", "name"),
     text(valueAt(game, "event_away_team"), text(valueAt(game, "drivers", "second", "name"), ""))
   );
   const homeScore =
@@ -124,7 +128,10 @@ function apiSportsEvent(sport: LiveSport, value: unknown, index: number): LiveSp
   const awayScore =
     valueAt(game, "scores", "away", "total") ??
     valueAt(game, "scores", "away", "points") ??
-    valueAt(game, "scores", "away");
+    valueAt(game, "scores", "visitors", "total") ??
+    valueAt(game, "scores", "visitors", "points") ??
+    valueAt(game, "scores", "away") ??
+    valueAt(game, "scores", "visitors");
   const league = text(
     valueAt(game, "league", "name"),
     text(valueAt(game, "league_name"), text(valueAt(game, "competition", "name"), "Live event"))
@@ -140,7 +147,10 @@ function apiSportsEvent(sport: LiveSport, value: unknown, index: number): LiveSp
     : displayScore(homeScore, awayScore);
 
   const homeLogo = text(valueAt(game, "teams", "home", "logo")) || undefined;
-  const awayLogo = text(valueAt(game, "teams", "away", "logo")) || undefined;
+  const awayLogo =
+    text(valueAt(game, "teams", "away", "logo")) ||
+    text(valueAt(game, "teams", "visitors", "logo")) ||
+    undefined;
 
   return {
     id: text(valueAt(game, "id"), text(valueAt(game, "event_key"), text(valueAt(game, "race", "id"), `${sport}-${index}`))),
@@ -157,6 +167,12 @@ function apiSportsEvent(sport: LiveSport, value: unknown, index: number): LiveSp
 }
 
 function isLiveGame(sport: LiveSport, value: unknown): boolean {
+  if (sport === "nba") {
+    // API-NBA statuses are numeric: 2 means in play.
+    const short = text(valueAt(value, "status", "short"));
+    const long = text(valueAt(value, "status", "long")).trim().toLowerCase();
+    return short === "2" || long === "in play" || long === "halftime" || long === "live";
+  }
   const eventLive = text(valueAt(value, "event_live"));
   if (eventLive) return eventLive === "1";
   const status = text(
@@ -197,6 +213,263 @@ function errorMessage(data: JsonRecord, apiKey: string): string | undefined {
   const message = details.map((detail) => text(detail)).filter(Boolean).join("; ");
   return message.replaceAll(apiKey, "[redacted]").slice(0, 200) ||
     "The sports data provider rejected this request.";
+}
+
+type PlayerStatRow = { name: string; starter: boolean; stats: string[] };
+type PlayerStatGroup = { title: string; labels: string[]; players: PlayerStatRow[] };
+type PlayerStatTeam = { team: string; groups: PlayerStatGroup[] };
+
+// Per-game player statistics, normalised to the box-score shape the detail
+// modal already renders for ESPN games. API-Basketball and API-NBA expose a
+// companion endpoint; API-NFL uses the same `/games/statistics/players` route.
+// Baseball, volleyball and handball do not publish player-level box scores, so
+// they simply return no section instead of failing the whole detail request.
+const PLAYER_STATS_ENDPOINT: Partial<Record<LiveSport, { path: string; param: string }>> = {
+  basketball: { path: "/games/statistics/players", param: "id" },
+  nba: { path: "/players/statistics", param: "game" },
+  nfl: { path: "/games/statistics/players", param: "id" },
+};
+
+function recordArray(value: unknown): JsonRecord[] {
+  return Array.isArray(value) ? value.map(record) : [];
+}
+
+function teamNamesById(game: JsonRecord): Map<string, string> {
+  const teams = record(game.teams);
+  const names = new Map<string, string>();
+  for (const side of ["home", "away", "visitors"]) {
+    const team = record(teams[side]);
+    const id = text(team.id);
+    const name = text(team.name);
+    if (id && name && !names.has(id)) names.set(id, name);
+  }
+  return names;
+}
+
+function basketballPlayerBoxScores(rows: JsonRecord[], game: JsonRecord): PlayerStatTeam[] {
+  const names = teamNamesById(game);
+  const labels = ["MIN", "PTS", "REB", "AST", "FG", "3PT", "FT"];
+  const order: string[] = [];
+  const buckets = new Map<string, { starters: PlayerStatRow[]; bench: PlayerStatRow[] }>();
+  const shotLine = (row: JsonRecord, group: string) =>
+    `${text(valueAt(row, group, "total"), "0")}/${text(valueAt(row, group, "attempts"), "0")}`;
+
+  for (const row of rows) {
+    const name = text(valueAt(row, "player", "name"));
+    if (!name) continue;
+    const team = text(valueAt(row, "team", "name")) || names.get(text(valueAt(row, "team", "id"))) || "Team";
+    if (!buckets.has(team)) {
+      buckets.set(team, { starters: [], bench: [] });
+      order.push(team);
+    }
+    const starter = text(row.type) === "starters";
+    const bucket = buckets.get(team)!;
+    (starter ? bucket.starters : bucket.bench).push({
+      name,
+      starter,
+      stats: [
+        text(row.minutes, "-"),
+        text(row.points, "0"),
+        text(valueAt(row, "rebounds", "total"), "0"),
+        text(row.assists, "0"),
+        shotLine(row, "field_goals"),
+        shotLine(row, "threepoint_goals"),
+        shotLine(row, "freethrows_goals"),
+      ],
+    });
+  }
+
+  const minutesOf = (player: PlayerStatRow) => {
+    const [minutes, seconds] = (player.stats[0] || "0").split(":").map(Number);
+    return (minutes || 0) * 60 + (seconds || 0);
+  };
+
+  return order.map((team) => {
+    const bucket = buckets.get(team)!;
+    const groups: PlayerStatGroup[] = [];
+    for (const [title, players] of [["Starters", bucket.starters], ["Bench", bucket.bench]] as const) {
+      if (players.length === 0) continue;
+      groups.push({
+        title,
+        labels,
+        players: [...players].sort((first, second) => minutesOf(second) - minutesOf(first)),
+      });
+    }
+    return { team, groups };
+  }).filter((entry) => entry.groups.length > 0);
+}
+
+function nbaPlayerBoxScores(rows: JsonRecord[]): PlayerStatTeam[] {
+  const labels = ["MIN", "PTS", "REB", "AST", "STL", "BLK", "TO", "PF", "+/-"];
+  const order: string[] = [];
+  const buckets = new Map<string, PlayerStatRow[]>();
+
+  for (const row of rows) {
+    const player = record(row.player);
+    const name = text(player.name) || [text(player.firstname), text(player.lastname)].filter(Boolean).join(" ");
+    if (!name) continue;
+    const team = text(valueAt(row, "team", "name")) || "Team";
+    if (!buckets.has(team)) {
+      buckets.set(team, []);
+      order.push(team);
+    }
+    buckets.get(team)!.push({
+      // The NBA feed does not flag starters; the position column already says
+      // who plays where, so leave the badge off rather than guess.
+      name,
+      starter: false,
+      stats: [
+        text(row.min, "-"),
+        text(row.points, "0"),
+        text(row.totReb, "0"),
+        text(row.assists, "0"),
+        text(row.steals, "0"),
+        text(row.blocks, "0"),
+        text(row.turnovers, "0"),
+        text(row.pFouls, "0"),
+        text(row.plusMinus, "-"),
+      ],
+    });
+  }
+
+  return order.map((team) => ({
+    team,
+    groups: [{
+      title: "Box score",
+      labels,
+      players: [...buckets.get(team)!].sort(
+        (first, second) => (Number(second.stats[0]) || 0) - (Number(first.stats[0]) || 0)
+      ),
+    }],
+  }));
+}
+
+const NFL_STAT_LABELS: Record<string, string> = {
+  "passing.yards": "PASS YDS",
+  "passing.touchdowns": "PASS TD",
+  "passing.interceptions": "INT",
+  "passing.completions": "CMP",
+  "passing.attempts": "ATT",
+  "rushing.yards": "RUSH YDS",
+  "rushing.touchdowns": "RUSH TD",
+  "receiving.receptions": "REC",
+  "receiving.yards": "REC YDS",
+  "receiving.touchdowns": "REC TD",
+  "defense.tackles": "TKL",
+  "defense.sacks": "SACK",
+  "defense.interceptions": "INT",
+  "kicking.field_goals": "FG",
+  "kicking.extra_points": "XP",
+  tackles: "TKL",
+  sacks: "SACK",
+  interceptions: "INT",
+};
+
+function statLabel(key: string): string {
+  return NFL_STAT_LABELS[key] || key
+    .split(".")
+    .pop()!
+    .replace(/[_-]+/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .toUpperCase()
+    .slice(0, 12);
+}
+
+function flattenPlayerStats(value: unknown, prefix = "", out = new Map<string, string>()): Map<string, string> {
+  for (const [key, entry] of Object.entries(record(value))) {
+    const path = prefix ? `${prefix}.${key}` : key;
+    if (entry !== null && typeof entry === "object" && !Array.isArray(entry)) {
+      flattenPlayerStats(entry, path, out);
+    } else if (typeof entry === "string" || typeof entry === "number") {
+      out.set(path, text(entry));
+    }
+  }
+  return out;
+}
+
+// API-NFL's player-stat payload has changed shape between releases, so accept
+// both a flat stat object and a `statistics: [{ name, value }]` list.
+function nflPlayerBoxScores(rows: JsonRecord[], game: JsonRecord): PlayerStatTeam[] {
+  const names = teamNamesById(game);
+  const order: string[] = [];
+  const buckets = new Map<string, Map<string, { name: string; values: Map<string, string> }>>();
+
+  for (const row of rows) {
+    const name = text(valueAt(row, "player", "name"));
+    if (!name) continue;
+    const team = text(valueAt(row, "team", "name")) || names.get(text(valueAt(row, "team", "id"))) || "Team";
+    const namedStats = recordArray(row.statistics)
+      .map((entry) => ({
+        key: text(entry.name),
+        value: text(entry.value),
+      }))
+      .filter((entry) => entry.key && entry.value);
+    const values = namedStats.length > 0
+      ? new Map(namedStats.map((entry) => [entry.key.toLowerCase(), entry.value]))
+      : flattenPlayerStats(row);
+    for (const key of [...values.keys()]) {
+      if (/^(player|team|game|group|position|pos|statistics)\b/.test(key)) values.delete(key);
+    }
+
+    if (values.size === 0) continue;
+    if (!buckets.has(team)) {
+      buckets.set(team, new Map());
+      order.push(team);
+    }
+    buckets.get(team)!.set(name, { name, values });
+  }
+
+  return order.map((team) => {
+    const players = [...buckets.get(team)!.values()];
+    const keys: string[] = [];
+    for (const player of players) {
+      for (const key of player.values.keys()) if (!keys.includes(key)) keys.push(key);
+    }
+    return {
+      team,
+      groups: [{
+        title: "Box score",
+        labels: keys.map(statLabel),
+        players: players.map((player) => ({
+          name: player.name,
+          starter: false,
+          stats: keys.map((key) => player.values.get(key) ?? "-"),
+        })),
+      }],
+    };
+  }).filter((entry) => entry.groups[0].players.length > 0);
+}
+
+function playerBoxScores(sport: LiveSport, rows: JsonRecord[], game: JsonRecord): PlayerStatTeam[] {
+  if (sport === "basketball") return basketballPlayerBoxScores(rows, game);
+  if (sport === "nba") return nbaPlayerBoxScores(rows);
+  if (sport === "nfl") return nflPlayerBoxScores(rows, game);
+  return [];
+}
+
+async function fetchPlayerStats(sport: LiveSport, apiKey: string, id: string): Promise<JsonRecord[]> {
+  const endpoint = PLAYER_STATS_ENDPOINT[sport];
+  const config = API_SPORTS_CONFIG[sport];
+  if (!endpoint || !config) return [];
+  try {
+    const url = new URL(`${config.host}${endpoint.path}`);
+    url.searchParams.set(endpoint.param, id);
+    const response = await fetch(url, {
+      headers: { "x-apisports-key": apiKey },
+      signal: AbortSignal.timeout(8000),
+      cache: "no-store",
+    });
+    const data = record(await response.json());
+    const message = errorMessage(data, apiKey);
+    if (!response.ok || message) {
+      console.warn(`${sport} player statistics unavailable:`, message || `HTTP ${response.status}`);
+      return [];
+    }
+    return recordArray(data.response);
+  } catch (error) {
+    console.warn(`${sport} player statistics unavailable:`, error instanceof Error ? error.message : error);
+    return [];
+  }
 }
 
 async function getApiSportsFeed(
@@ -312,11 +585,16 @@ async function getSportGameDetail(searchParams: URLSearchParams): Promise<Respon
   try {
     const url = new URL(`${config.host}/games`);
     url.searchParams.set("id", id);
-    const response = await fetch(url, {
-      headers: { "x-apisports-key": apiKey },
-      signal: AbortSignal.timeout(8000),
-      cache: "no-store",
-    });
+    // Fetch the box score alongside the game so opening a match costs one
+    // round-trip rather than two. Player stats are optional on every provider.
+    const [response, statRows] = await Promise.all([
+      fetch(url, {
+        headers: { "x-apisports-key": apiKey },
+        signal: AbortSignal.timeout(8000),
+        cache: "no-store",
+      }),
+      fetchPlayerStats(sport, apiKey, id),
+    ]);
     const data = record(await response.json());
     const message = errorMessage(data, apiKey);
     if (!response.ok || message) {
@@ -332,7 +610,11 @@ async function getSportGameDetail(searchParams: URLSearchParams): Promise<Respon
       if (espnDetail) return okDetail(espnDetail);
       return notFound("No detailed feed is available for this game.");
     }
-    return okDetail(game);
+    const playerTeams = playerBoxScores(sport, statRows, record(game));
+    const detail = playerTeams.length > 0
+      ? { ...record(game), playerStats: playerTeams }
+      : game;
+    return okDetail(detail);
   } catch (error) {
     const message = error instanceof Error ? error.message : "The provider request failed.";
     console.warn(`${sport} game detail unavailable:`, message);

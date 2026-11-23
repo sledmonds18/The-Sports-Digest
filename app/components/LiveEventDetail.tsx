@@ -249,7 +249,7 @@ function PlayerStatsSection({ playerStats }: { playerStats: unknown }) {
                         <tr key={`${player.name}-${playerIndex}`} className="border-b border-white/5 last:border-0">
                           <td className="sticky left-0 bg-zinc-950 px-4 py-2 text-xs font-bold text-white">
                             <span className="whitespace-nowrap">{player.name}</span>
-                            {!player.starter && (
+                            {group.players.some((entry) => entry.starter) && !player.starter && (
                               <span className="ml-1.5 text-[9px] font-black uppercase tracking-wide text-gray-600">sub</span>
                             )}
                           </td>
@@ -456,22 +456,34 @@ function FootballDetail({ detail }: { detail: JsonRecord }) {
 function OtherSportDetail({ event, detail }: { event: LiveSportEvent; detail: JsonRecord }) {
   const teams = record(detail.teams);
   const home = record(teams.home);
-  const away = record(teams.away);
+  // API-NBA labels the away side `visitors` instead of `away`.
+  const away = { ...record(teams.visitors), ...record(teams.away) };
   const scores = record(detail.scores);
   const homeScores = record(scores.home);
-  const awayScores = record(scores.away);
+  const awayScores = { ...record(scores.visitors), ...record(scores.away) };
   const status = record(detail.status);
   const statusLabel = text(status.long, text(status.short, event.status));
   const clock = text(detail.time);
 
-  const homeTotal = typeof homeScores.total === "number" ? homeScores.total : null;
-  const awayTotal = typeof awayScores.total === "number" ? awayScores.total : null;
+  const homeTotal = typeof homeScores.total === "number"
+    ? homeScores.total
+    : typeof homeScores.points === "number" ? homeScores.points : null;
+  const awayTotal = typeof awayScores.total === "number"
+    ? awayScores.total
+    : typeof awayScores.points === "number" ? awayScores.points : null;
   const score = homeTotal != null && awayTotal != null
     ? `${homeTotal} - ${awayTotal}`
     : event.score;
 
+  const NON_PERIOD_KEYS = new Set(["total", "points", "win", "loss", "series", "linescore", "ties"]);
   const periodKeys = Array.from(new Set([...Object.keys(homeScores), ...Object.keys(awayScores)]))
-    .filter((key) => key !== "total" && (typeof homeScores[key] === "number" || typeof awayScores[key] === "number"));
+    .filter((key) => !NON_PERIOD_KEYS.has(key) &&
+      (typeof homeScores[key] === "number" || typeof awayScores[key] === "number"));
+  // NBA games publish quarter-by-quarter scoring as a `linescore` array rather
+  // than named period keys.
+  const homeLine = Array.isArray(homeScores.linescore) ? homeScores.linescore : [];
+  const awayLine = Array.isArray(awayScores.linescore) ? awayScores.linescore : [];
+  const linePeriods = homeLine.length >= awayLine.length ? homeLine : awayLine;
 
   const statistics = asRecordArray(detail.statistics);
   const statsFor = (teamName: string, index: number) => {
@@ -506,6 +518,30 @@ function OtherSportDetail({ event, detail }: { event: LiveSportEvent; detail: Js
           formatKickoff(text(detail.date), clock || text(detail.time)),
         ].filter(Boolean).join("  ·  ")}
       </p>
+
+      {linePeriods.length > 0 && (
+        <section>
+          <h3 className="text-xs font-black uppercase tracking-widest text-gray-400">Score by period</h3>
+          <div className="mt-2 rounded-xl border border-white/10">
+            {linePeriods.map((_, index) => (
+              <div key={index} className="grid grid-cols-[3rem_1fr_3rem] items-center gap-2 border-b border-white/5 px-4 py-2 text-center last:border-0">
+                <span className="text-sm font-black tabular-nums text-white">{text(homeLine[index], "-")}</span>
+                <span className="text-[11px] font-bold uppercase tracking-wide text-gray-500">
+                  {index < 4 ? `Q${index + 1}` : `OT${index > 4 ? index - 3 : ""}`}
+                </span>
+                <span className="text-sm font-black tabular-nums text-white">{text(awayLine[index], "-")}</span>
+              </div>
+            ))}
+            {homeTotal != null && awayTotal != null && (
+              <div className="grid grid-cols-[3rem_1fr_3rem] items-center gap-2 border-t border-white/10 px-4 py-2 text-center">
+                <span className="text-sm font-black tabular-nums text-red-400">{homeTotal}</span>
+                <span className="text-[11px] font-black uppercase tracking-wide text-red-400">Total</span>
+                <span className="text-sm font-black tabular-nums text-red-400">{awayTotal}</span>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {periodKeys.length > 0 && (
         <section>
