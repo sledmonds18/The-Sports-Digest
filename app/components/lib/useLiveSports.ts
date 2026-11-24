@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   LIVE_SPORTS,
   compareEventsByPriority,
@@ -11,10 +11,18 @@ import {
   type LiveSportStatus,
 } from "./liveSportsData";
 
-type LiveSportsSnapshot = {
+type FootballSnapshot = {
   events: LiveSportEvent[];
+  status: LiveSportStatus;
+  updatedAt: string | null;
+  message?: string;
+  fetchedAt: number;
+};
+
+type SportsSnapshot = {
   feeds: Record<LiveSport, LiveSportFeed>;
   updatedAt: string | null;
+  fetchedAt: number;
 };
 
 function makeInitialFeeds(): Record<LiveSport, LiveSportFeed> {
@@ -31,15 +39,45 @@ function makeInitialFeeds(): Record<LiveSport, LiveSportFeed> {
 
 const initialFeeds = makeInitialFeeds();
 
-const loadingSnapshot: LiveSportsSnapshot = {
-  events: [],
-  feeds: makeInitialFeeds(),
-  updatedAt: null,
-};
+// Football and the other sports are cached separately on purpose. The live bar
+// is the first thing a mobile visitor sees, and it must not wait for the
+// multi-sport sweep (basketball/NFL/volleyball can each spend seconds on a
+// provider timeout). Each request updates the UI the moment it lands.
+let cachedFootball: FootballSnapshot | null = null;
+let cachedSports: SportsSnapshot | null = null;
+let footballInFlight: Promise<FootballSnapshot> | null = null;
+let sportsInFlight: Promise<SportsSnapshot> | null = null;
 
-let cachedSnapshot: LiveSportsSnapshot | null = null;
-let cachedAt = 0;
-let requestInFlight: Promise<LiveSportsSnapshot> | null = null;
+const FOOTBALL_TTL_MS = 25_000;
+const SPORTS_TTL_MS = 60_000;
+const KEEP_PREVIOUS_MS = 10 * 60_000;
+const FOOTBALL_STORAGE_KEY = "tsd:live-football:v1";
+
+// Repeat visits (common on phones) paint the last slate immediately instead of
+// showing an empty bar while the API wakes up. The snapshot is revalidated by
+// the normal fetch right after hydration.
+function readStoredFootball(): FootballSnapshot | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(FOOTBALL_STORAGE_KEY);
+    if (!raw) return null;
+    const stored = JSON.parse(raw) as FootballSnapshot;
+    if (!stored || !Array.isArray(stored.events)) return null;
+    if (Date.now() - Number(stored.fetchedAt) > KEEP_PREVIOUS_MS) return null;
+    return stored;
+  } catch {
+    return null;
+  }
+}
+
+function storeFootball(snapshot: FootballSnapshot): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(FOOTBALL_STORAGE_KEY, JSON.stringify(snapshot));
+  } catch {
+    // Private mode or a full quota: caching is optional.
+  }
+}
 
 function footballEvents(matches: unknown[]): LiveSportEvent[] {
   return matches.map((value, index) => {
@@ -70,100 +108,168 @@ function footballEvents(matches: unknown[]): LiveSportEvent[] {
   });
 }
 
-async function loadSnapshot(force = false): Promise<LiveSportsSnapshot> {
-  if (!force && cachedSnapshot && Date.now() - cachedAt < 60_000) return cachedSnapshot;
-  if (requestInFlight) return requestInFlight;
+async function getFootballSnapshot(force = false): Promise<FootballSnapshot> {
+  if (!force && cachedFootball && Date.now() - cachedFootball.fetchedAt < FOOTBALL_TTL_MS) {
+    return cachedFootball;
+  }
+  if (footballInFlight) return footballInFlight;
 
-  requestInFlight = Promise.all([
-    fetch(force ? `/api/live-sports?refresh=${Date.now()}` : "/api/live-sports", { cache: "no-store" }),
-    fetch("/api/matches", { cache: "no-store" }),
-  ])
-    .then(async ([sportsResponse, footballResponse]) => {
-      const [sportsData, footballData] = await Promise.all([
-        sportsResponse.json(),
-        footballResponse.json(),
-      ]);
-      if (!sportsResponse.ok || !Array.isArray(sportsData.feeds)) {
+  const request = fetch("/api/matches", { cache: "no-store" })
+    .then(async (response) => {
+      const data = await response.json();
+      if (!response.ok || data.status === "error") {
+        throw new Error("Live football data is temporarily unavailable.");
+      }
+      const snapshot: FootballSnapshot = {
+        events: Array.isArray(data.response) ? footballEvents(data.response) : [],
+        status: data.status === "unconfigured" ? "unconfigured" : "ready",
+        updatedAt: data.updatedAt || null,
+        message: data.status === "unconfigured"
+          ? "Add the shared API-Sports key to the server environment."
+          : undefined,
+        fetchedAt: Date.now(),
+      };
+      cachedFootball = snapshot;
+      storeFootball(snapshot);
+      return snapshot;
+    })
+    .catch((error) => {
+      console.warn("Live matches unavailable:", error);
+      // A transient provider hiccup should not blank the football slate — keep
+      // the last known matches for up to ten minutes.
+      const previous = cachedFootball;
+      const keepPrevious =
+        !!previous &&
+        previous.events.length > 0 &&
+        Date.now() - previous.fetchedAt < KEEP_PREVIOUS_MS;
+      const snapshot: FootballSnapshot = {
+        events: keepPrevious && previous ? previous.events : [],
+        status: "error",
+        updatedAt: previous?.updatedAt ?? null,
+        message: "Live football data is temporarily unavailable.",
+        fetchedAt: Date.now(),
+      };
+      return snapshot;
+    })
+    .finally(() => {
+      footballInFlight = null;
+    });
+
+  footballInFlight = request;
+  return request;
+}
+
+async function getSportsSnapshot(force = false): Promise<SportsSnapshot> {
+  if (!force && cachedSports && Date.now() - cachedSports.fetchedAt < SPORTS_TTL_MS) {
+    return cachedSports;
+  }
+  if (sportsInFlight) return sportsInFlight;
+
+  const request = fetch(
+    force ? `/api/live-sports?refresh=${Date.now()}` : "/api/live-sports",
+    { cache: "no-store" },
+  )
+    .then(async (response) => {
+      const data = await response.json();
+      if (!response.ok || !Array.isArray(data.feeds)) {
         throw new Error("Live sports could not be refreshed.");
       }
-
       const feeds = { ...initialFeeds };
-      for (const feed of sportsData.feeds as LiveSportFeed[]) {
+      for (const feed of data.feeds as LiveSportFeed[]) {
         if (LIVE_SPORTS.includes(feed.sport)) feeds[feed.sport] = feed;
       }
-
-      if (!footballResponse.ok || footballData.status === "error") {
-        // A transient provider hiccup (rate limit, timeout) should not blank the
-        // football slate — keep the last known matches for up to ten minutes.
-        const previousFootball = cachedSnapshot?.feeds.football;
-        const keepPrevious =
-          !!previousFootball &&
-          previousFootball.events.length > 0 &&
-          Date.now() - cachedAt < 10 * 60_000;
-        feeds.football = {
-          sport: "football",
-          status: "error",
-          events: keepPrevious ? previousFootball.events : [],
-          message: "Live football data is temporarily unavailable.",
-        };
-      } else {
-        const events = Array.isArray(footballData.response)
-          ? footballEvents(footballData.response)
-          : [];
-        feeds.football = {
-          sport: "football",
-          status: footballData.status === "unconfigured" ? "unconfigured" : "ready",
-          events,
-          message: footballData.status === "unconfigured"
-            ? "Add the shared API-Sports key to the server environment."
-            : undefined,
-        };
-      }
-
-      // Serious competitions first within each sport; sports stay grouped in
-      // LIVE_SPORTS order, so football always leads the merged feed.
-      const snapshot = {
+      const snapshot: SportsSnapshot = {
         feeds,
-        events: LIVE_SPORTS.flatMap((sport) =>
-          [...feeds[sport].events].sort(compareEventsByPriority)
-        ),
-        updatedAt: sportsData.updatedAt || footballData.updatedAt || null,
+        updatedAt: data.updatedAt || null,
+        fetchedAt: Date.now(),
       };
-      cachedSnapshot = snapshot;
-      cachedAt = Date.now();
+      cachedSports = snapshot;
       return snapshot;
     })
     .catch((error) => {
       console.warn("Live sports unavailable:", error);
-      return cachedSnapshot || loadingSnapshot;
+      return cachedSports ?? {
+        feeds: makeInitialFeeds(),
+        updatedAt: null,
+        fetchedAt: Date.now(),
+      };
     })
     .finally(() => {
-      requestInFlight = null;
+      sportsInFlight = null;
     });
 
-  return requestInFlight;
+  sportsInFlight = request;
+  return request;
 }
 
 export function useLiveSports() {
-  const [snapshot, setSnapshot] = useState<LiveSportsSnapshot>(cachedSnapshot || loadingSnapshot);
+  const [football, setFootball] = useState<FootballSnapshot | null>(cachedFootball);
+  const [sports, setSports] = useState<SportsSnapshot | null>(cachedSports);
   const [status, setStatus] = useState<LiveSportStatus | "loading">(
-    cachedSnapshot ? "ready" : "loading"
+    cachedFootball || cachedSports ? "ready" : "loading"
   );
   const [refreshing, setRefreshing] = useState(false);
 
   const refresh = useCallback(async (automatic = false) => {
     if (!automatic) setRefreshing(true);
-    const nextSnapshot = await loadSnapshot(!automatic);
-    setSnapshot(nextSnapshot);
-    setStatus(nextSnapshot === loadingSnapshot ? "error" : "ready");
+    // Both requests start together, but each result is applied as soon as it
+    // arrives. Football therefore renders even when a slower sport times out.
+    const footballPromise = getFootballSnapshot(!automatic).then((snapshot) => {
+      setFootball(snapshot);
+      setStatus(snapshot.status === "error" ? "error" : "ready");
+    });
+    const sportsPromise = getSportsSnapshot(!automatic).then((snapshot) => {
+      setSports(snapshot);
+      setStatus("ready");
+    });
+    await Promise.allSettled([footballPromise, sportsPromise]);
     setRefreshing(false);
   }, []);
 
   useEffect(() => {
+    if (!cachedFootball) {
+      const stored = readStoredFootball();
+      if (stored) {
+        cachedFootball = stored;
+        setFootball(stored);
+        setStatus("ready");
+      }
+    }
     void refresh(true);
+    // The live feeds refresh server-side every 20 minutes; keep the client in
+    // step without polling hard enough to burn a free provider quota.
     const interval = window.setInterval(() => void refresh(true), 20 * 60_000);
     return () => window.clearInterval(interval);
   }, [refresh]);
 
-  return { ...snapshot, status, refreshing, refresh };
+  const feeds = useMemo(() => {
+    const base = sports?.feeds ?? initialFeeds;
+    return {
+      ...base,
+      football: {
+        sport: "football" as const,
+        status: football?.status ?? "ready",
+        events: football?.events ?? [],
+        message: football?.message,
+      },
+    };
+  }, [sports, football]);
+
+  // Serious competitions first within each sport; sports stay grouped in
+  // LIVE_SPORTS order, so football always leads the merged feed.
+  const events = useMemo(
+    () => LIVE_SPORTS.flatMap((sport) =>
+      [...feeds[sport].events].sort(compareEventsByPriority)
+    ),
+    [feeds]
+  );
+
+  return {
+    events,
+    feeds,
+    status,
+    updatedAt: sports?.updatedAt || football?.updatedAt || null,
+    refreshing,
+    refresh,
+  };
 }

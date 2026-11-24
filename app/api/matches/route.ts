@@ -97,6 +97,13 @@ export async function GET(request: Request) {
   const view = searchParams.get("view") || "";
   const detailId = searchParams.get("id") || "";
   const detailSource = (searchParams.get("source") || "") as ProviderName | "";
+  // The client passes the teams so a detail request can still reach ESPN when
+  // the paid provider cannot resolve its own fixture id (outage, suspension,
+  // or a league it has dropped).
+  const detailTeams = {
+    home: searchParams.get("home") || "",
+    away: searchParams.get("away") || "",
+  };
 
   // Standings and seasons have no ESPN equivalent; keep the primary provider's
   // behaviour, including its "plan coverage" error messages.
@@ -110,6 +117,10 @@ export async function GET(request: Request) {
     return espnDetailResponse(detailId);
   }
   if (view === "detail" && detailSource === "livescore") {
+    // Livescore ids mean nothing to ESPN, but its team pair may still resolve
+    // to a real ESPN fixture — borrow that feed for scorers, cards and line-ups.
+    const matched = await espnDetailFromTeams(detailTeams.home, detailTeams.away);
+    if (matched) return espnDetailPayload(matched);
     return Response.json({
       response: null,
       status: "unavailable",
@@ -137,7 +148,7 @@ export async function GET(request: Request) {
     if (primaryPayload.status === "ok") {
       return replay(primary, primaryPayload);
     }
-    return espnDetailResponse(detailId, primary, primaryPayload);
+    return espnDetailResponse(detailId, primary, primaryPayload, detailTeams);
   }
 
   const teamIndex = view === "" ? espnWarmTeamIndex() : Promise.resolve();
@@ -151,13 +162,20 @@ export async function GET(request: Request) {
   // Livescore leads the live sweep (it flags in-play games earlier than ESPN),
   // but its ids cannot be looked up anywhere. When ESPN carries the same
   // fixture, keep Livescore's fresher score and borrow ESPN's id for the
-  // match-detail view (and its key events).
-  const espnPairs = new Set(espnItems.map(teamPairKey));
+  // match-detail view (and its key events). ESPN's duplicate card is dropped so
+  // a fixture both providers spell differently still appears once.
+  const twinnedEspnIds = new Set<number>();
+  const livescoreWithTwins = livescoreItems.map((item) => {
+    const twinned = withEspnTwin(stamped(item, "livescore"));
+    const twinId = Number((twinned as FixtureEnvelope).detail?.id);
+    if (twinId) twinnedEspnIds.add(twinId);
+    return twinned;
+  });
   const fallbackItems = [
-    ...espnItems.map((item) => stamped(item, "espn")),
-    ...livescoreItems
-      .filter((item) => !espnPairs.has(teamPairKey(item)))
-      .map((item) => withEspnTwin(stamped(item, "livescore"))),
+    ...espnItems
+      .filter((item) => !twinnedEspnIds.has(fixtureId(item)))
+      .map((item) => stamped(item, "espn")),
+    ...livescoreWithTwins,
   ];
 
   if (primaryItems.length === 0 && fallbackItems.length === 0) {
@@ -226,19 +244,43 @@ function withEspnTwin(item: unknown): unknown {
   };
 }
 
+function espnDetailPayload(detail: Record<string, unknown>): Response {
+  return Response.json(
+    { response: detail, status: "ok", updatedAt: new Date().toISOString() },
+    { headers: { "Cache-Control": "no-store" } }
+  );
+}
+
+// Resolve an ESPN fixture from a team pair when the provider id cannot be
+// looked up. The scoreboard index covers today and yesterday, so an in-play
+// match is found even though the caller only knows the Livescore/API-Sports id.
+async function espnDetailFromTeams(
+  home: string,
+  away: string,
+): Promise<Record<string, unknown> | null> {
+  if (!home || !away) return null;
+  await espnWarmTeamIndex();
+  const espnId = espnEventIdForTeams(home, away);
+  if (!espnId) return null;
+  return espnFixtureDetail(espnId);
+}
+
 // Detail lookups ask ESPN last (or directly, when the id came from ESPN), and
 // answer with an honest "no detail feed" instead of replaying a provider error
-// for a fixture ESPN has never heard of.
+// for a fixture ESPN has never heard of. When the provider id cannot be looked
+// up at all, the team pair is used to borrow ESPN's id for the same fixture.
 async function espnDetailResponse(
   id: string,
   fallback?: Response,
   fallbackPayload?: unknown,
+  teams?: { home?: string; away?: string },
 ): Promise<Response> {
   const headers = { "Cache-Control": "no-store" };
-  const espnDetail = await espnFixtureDetail(id);
-  if (espnDetail) {
-    return Response.json({ response: espnDetail, status: "ok", updatedAt: new Date().toISOString() }, { headers });
+  let espnDetail = await espnFixtureDetail(id);
+  if (!espnDetail && teams?.home && teams?.away) {
+    espnDetail = await espnDetailFromTeams(teams.home, teams.away);
   }
+  if (espnDetail) return espnDetailPayload(espnDetail);
   if (fallback && fallbackPayload !== undefined) return replay(fallback, fallbackPayload);
   return Response.json({
     response: null,

@@ -121,19 +121,176 @@ const eventLeagueById = new Map<string, { name: string; country: string }>();
 // (live or not). Livescore flags matches in play earlier than ESPN, so the
 // live list keeps Livescore's fresher score but borrows ESPN's id for detail.
 const eventIdByPair = new Map<string, string>();
+// Every indexed event, so a pair whose spelling differs between providers can
+// still be matched. Livescore says "Uniao de Leiria" where ESPN says "Uniao
+// Leiria", and "Daejeon Citizen" where ESPN says "Daejeon Hana Citizen FC".
+const indexedEvents = new Map<string, { id: string; home: string; away: string }>();
 
 function pairKey(home: string, away: string): string {
-  const norm = (name: string) => name
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "");
+  const norm = (name: string) => foldTeamName(name).replace(/[^a-z0-9]/g, "");
   return `${norm(home)}|${norm(away)}`;
+}
+
+function indexEvent(id: string, home: string, away: string): void {
+  eventIdByPair.set(pairKey(home, away), id);
+  indexedEvents.set(id, { id, home, away });
+}
+
+// ─── Fuzzy team matching ────────────────────────────────────────────────────
+//
+// Club names drift between providers ("FC", "AFC", "de", "St" vs "Saint"…), so
+// exact keys miss fixtures ESPN actually carries. Matching is token-based and
+// deliberately conservative: both sides must be fully covered, with at most
+// two extra words on one side. Age/sex markers must agree exactly, otherwise
+// ESPN's senior Bodo/Glimt side would stand in for a Livescore U19 fixture.
+
+const CLUB_STOPWORDS = new Set([
+  "fc", "cf", "afc", "sc", "ac", "as", "ss", "ssc", "cd", "ud", "sv", "fk", "bk",
+  "if", "ff", "sk", "nk", "hk", "cs", "ca", "cp", "sl", "club", "calcio", "the",
+  // Club designators that differ between providers ("Hertha Berlin" vs
+  // "Hertha BSC", "Genk" vs "KRC Genk").
+  "bsc", "vfl", "vfb", "tsg", "fsv", "bvb", "ogc", "osc", "losc", "rsc",
+  "kaa", "krc", "kv", "tsv", "spvgg", "ssv",
+  // Name particles ("Uniao de Leiria" vs "Uniao Leiria").
+  "de", "do", "da", "dos", "das", "del", "la", "le", "les", "el",
+]);
+
+const NAME_ALIASES: Array<[RegExp, string]> = [
+  [/\bgimnasia lp\b/g, "gimnasia la plata"],
+  [/\bpsg\b/g, "paris saint germain"],
+  [/\bqpr\b/g, "queens park rangers"],
+  [/\bwolves\b/g, "wolverhampton wanderers"],
+  [/\bgladbach\b/g, "monchengladbach"],
+  [/\binter\b/g, "internazionale"],
+];
+
+const TOKEN_ALIASES: Record<string, string> = {
+  utd: "united",
+  st: "saint",
+  ath: "athletic",
+  intl: "international",
+  man: "manchester",
+  nottm: "nottingham",
+  sheff: "sheffield",
+  wed: "wednesday",
+  spurs: "tottenham",
+  koln: "cologne",
+  brom: "bromwich",
+};
+
+const LEVEL_MARKERS = /\b(?:u\s?1[5-9]|u\s?2[0-3]|under\s?\d{2}|youth|academy|reserves?|res|b|ii|women|womens|ladies|fem(?:enil)?|primavera)\b/g;
+
+// Letters NFD does not decompose into an ASCII base ("Bodø/Glimt" would
+// otherwise tokenise as "bod glimt" and miss ESPN's "Bodo/Glimt").
+const SPECIAL_LETTERS: Record<string, string> = {
+  "ø": "o", "æ": "ae", "ß": "ss", "ł": "l", "đ": "d", "ð": "d", "þ": "th",
+};
+
+function foldTeamName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[øæßłđðþ]/g, (letter) => SPECIAL_LETTERS[letter] ?? letter)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function levelMarkers(name: string): string {
+  return Array.from(foldTeamName(name).matchAll(LEVEL_MARKERS), (match) => match[0].replace(/\s+/g, ""))
+    .sort()
+    .join(",");
+}
+
+function teamTokens(name: string): string[] {
+  let folded = foldTeamName(name);
+  for (const [pattern, replacement] of NAME_ALIASES) folded = folded.replace(pattern, replacement);
+  return folded
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter((token) => token.length > 1)
+    .map((token) => TOKEN_ALIASES[token] ?? token)
+    .filter((token) => !CLUB_STOPWORDS.has(token));
+}
+
+// Small edit distance absorbs spelling drift ("Epitsentr" / "Epicentr") while
+// staying far away from genuinely different clubs ("United" / "City").
+function editDistance(first: string, second: string): number {
+  if (first === second) return 0;
+  if (Math.abs(first.length - second.length) > 2) return 3;
+  const rows = Array.from({ length: first.length + 1 }, (_, index) => index);
+  for (let column = 1; column <= second.length; column += 1) {
+    let diagonal = rows[0];
+    rows[0] = column;
+    for (let row = 1; row <= first.length; row += 1) {
+      const above = rows[row];
+      rows[row] = Math.min(
+        rows[row] + 1,
+        rows[row - 1] + 1,
+        diagonal + (first[row - 1] === second[column - 1] ? 0 : 1),
+      );
+      diagonal = above;
+    }
+  }
+  return rows[first.length];
+}
+
+function tokensMatch(first: string, second: string): boolean {
+  if (first === second) return true;
+  if (first.length < 5 || second.length < 5) return false;
+  return editDistance(first, second) <= 2;
+}
+
+/** 0 = different clubs, 1 = same club. */
+function teamSimilarity(first: string, second: string): number {
+  if (levelMarkers(first) !== levelMarkers(second)) return 0;
+  const left = teamTokens(first);
+  const right = teamTokens(second);
+  if (!left.length || !right.length) return 0;
+  const leftCovered = left.filter((token) => right.some((other) => tokensMatch(token, other))).length;
+  const rightCovered = right.filter((token) => left.some((other) => tokensMatch(token, other))).length;
+  if (!leftCovered || !rightCovered) return 0;
+  if (leftCovered === left.length && rightCovered === right.length) return 1;
+  // One name is an abbreviated form of the other, e.g. "Daejeon Citizen" vs
+  // "Daejeon Hana Citizen FC". Only accept a couple of extra words.
+  const extra = Math.max(left.length, right.length) - Math.min(left.length, right.length);
+  const covered = leftCovered === left.length || rightCovered === right.length;
+  return covered && extra <= 2 ? 0.85 : 0;
+}
+
+function pairSimilarity(
+  home: string,
+  away: string,
+  candidateHome: string,
+  candidateAway: string,
+): number {
+  const direct = (teamSimilarity(home, candidateHome) + teamSimilarity(away, candidateAway)) / 2;
+  const swapped = (teamSimilarity(home, candidateAway) + teamSimilarity(away, candidateHome)) / 2;
+  return Math.max(direct, swapped);
 }
 
 /** ESPN event id for a team pair seen on the current scoreboards, if any. */
 export function espnEventIdForTeams(home: string, away: string): string | null {
-  return eventIdByPair.get(pairKey(home, away)) || null;
+  if (!home || !away) return null;
+  const exact = eventIdByPair.get(pairKey(home, away))
+    ?? eventIdByPair.get(pairKey(away, home));
+  if (exact) return exact;
+
+  let best: { id: string; score: number } | null = null;
+  let runnerUp = 0;
+  for (const candidate of indexedEvents.values()) {
+    const score = pairSimilarity(home, away, candidate.home, candidate.away);
+    if (!best || score > best.score) {
+      runnerUp = best?.score ?? 0;
+      best = { id: candidate.id, score };
+    } else if (score > runnerUp) {
+      runnerUp = score;
+    }
+  }
+  if (!best || best.score < 0.8) return null;
+  // Two equally plausible fixtures means the pair is not distinctive enough.
+  if (runnerUp >= best.score - 0.05) return null;
+  return best.id;
 }
 
 // ─── Scoreboard fetching ────────────────────────────────────────────────────
@@ -172,7 +329,7 @@ async function allScoreboardDay(compactDate: string): Promise<JsonRecord[]> {
     const home = competitorSide(competition, "home");
     const away = competitorSide(competition, "away");
     if (home.name && away.name) {
-      eventIdByPair.set(pairKey(text(home.name), text(away.name)), id);
+      indexEvent(id, text(home.name), text(away.name));
     }
   }
   allDayCache.set(compactDate, { value: events, expiresAt: Date.now() + ALL_DAY_TTL_MS });
@@ -554,6 +711,51 @@ export async function espnFixtureDetail(detailId: string): Promise<JsonRecord | 
     };
   }).filter((lineup) => lineup.players.length > 0);
 
+  // Player box scores: ESPN carries per-player goals, assists, cards, fouls,
+  // shots and saves for most competitions. Emit them in the same "box score"
+  // shape the client already renders for basketball/NBA/NFL, so football gets
+  // the same per-player table without a second normalisation pass.
+  const PLAYER_STAT_COLUMNS: Array<[string, string]> = [
+    ["totalGoals", "G"],
+    ["goalAssists", "A"],
+    ["yellowCards", "YC"],
+    ["redCards", "RC"],
+    ["foulsCommitted", "Fouls"],
+    ["foulsSuffered", "Fouls won"],
+    ["totalShots", "Shots"],
+    ["shotsOnTarget", "On target"],
+    ["saves", "Saves"],
+    ["offsides", "Offsides"],
+  ];
+  const playerStat = (player: JsonRecord, name: string): string => {
+    const stat = records(player.stats).find((entry) => text(entry.name) === name);
+    return stat ? text(stat.displayValue) || text(stat.value) : "";
+  };
+  const playerStats = records(body.rosters).flatMap((entry) => {
+    const roster = records(entry.roster);
+    if (!roster.some((player) => records(player.stats).length > 0)) return [];
+    const players = roster
+      .filter((player) =>
+        Boolean(player.starter) ||
+        Boolean(player.subbedIn) ||
+        Number(playerStat(player, "appearances")) > 0)
+      .map((player) => ({
+        name: text(record(player.athlete).displayName, "Unknown"),
+        starter: Boolean(player.starter),
+        stats: PLAYER_STAT_COLUMNS.map(([key]) => playerStat(player, key) || "-"),
+      }))
+      .sort((first, second) => Number(second.starter) - Number(first.starter));
+    if (players.length === 0) return [];
+    return [{
+      team: text(record(entry.team).displayName),
+      groups: [{
+        title: "Matchday squad",
+        labels: PLAYER_STAT_COLUMNS.map(([, label]) => label),
+        players,
+      }],
+    }];
+  }).filter((group) => group.team);
+
   // Team statistics: fouls, cards, possession, shots, corners… (coverage
   // varies by competition; the big leagues carry the full set).
   const statistics = records(record(body.boxscore).teams).map((entry) => ({
@@ -594,6 +796,7 @@ export async function espnFixtureDetail(detailId: string): Promise<JsonRecord | 
     events,
     statistics,
     lineups,
+    playerStats,
   };
   detailCache.set(detailId, { value: fixture, expiresAt: Date.now() + 45_000 });
   return fixture;

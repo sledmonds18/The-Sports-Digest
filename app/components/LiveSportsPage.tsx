@@ -24,7 +24,7 @@ function LiveEventCard({
     <button
       type="button"
       onClick={() => onOpen(event)}
-      className="block w-full cursor-pointer rounded-2xl border border-white/10 bg-zinc-950 p-5 text-left transition hover:border-red-500/50 sm:p-6"
+      className="block w-full min-w-0 cursor-pointer rounded-2xl border border-white/10 bg-zinc-950 p-5 text-left transition hover:border-red-500/50 sm:p-6"
       title="Open match details"
     >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
@@ -39,7 +39,7 @@ function LiveEventCard({
           {event.status}
         </span>
       </div>
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 py-6 sm:gap-6">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 py-6 sm:gap-6">
         <div className="flex min-w-0 flex-col items-center gap-3 text-center">
           <TeamCrest name={event.participants[0]} logo={event.logos?.[0]} className="h-11 w-11" />
           <span className="text-sm font-bold text-white sm:text-base">{event.participants[0]}</span>
@@ -149,14 +149,14 @@ export default function LiveSportsPage({
                       Live {LIVE_SPORT_LABELS[sport]}
                       <span className="text-gray-500">· {sportEvents.length}</span>
                     </h2>
-                    <div className="mt-4 grid gap-4 md:grid-cols-2">
+                    <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                       {sportEvents.map((event) => <LiveEventCard key={`${event.sport}-${event.id}`} event={event} onOpen={setSelectedEvent} />)}
                     </div>
                   </div>
                 );
               })
             ) : (
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {visibleEvents.map((event) => <LiveEventCard key={`${event.sport}-${event.id}`} event={event} onOpen={setSelectedEvent} />)}
               </div>
             )

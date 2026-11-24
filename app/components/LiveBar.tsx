@@ -29,22 +29,22 @@ export function LiveBar({ onNavigate }: { onNavigate: (page: string) => void }) 
       </div>
 
       {visibleEvents.length > 0 ? (
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {visibleEvents.map((event) => (
             <button
               key={`${event.sport}-${event.id}`}
               type="button"
               onClick={() => setSelectedEvent(event)}
-              className="block w-full cursor-pointer rounded-xl border border-white/10 bg-zinc-950 p-4 text-left transition hover:border-red-500/50"
+              className="block w-full min-w-0 cursor-pointer rounded-xl border border-white/10 bg-zinc-950 p-4 text-left transition hover:border-red-500/50"
               title="Open match details"
             >
               <div className="flex items-center justify-between gap-3">
-                <p className="truncate text-[10px] font-black uppercase tracking-widest text-red-400">
+                <p className="min-w-0 truncate text-[10px] font-black uppercase tracking-widest text-red-400">
                   {LIVE_SPORT_ICONS[event.sport]} {LIVE_SPORT_LABELS[event.sport]} · {event.competition}
                 </p>
                 <span className="shrink-0 text-xs font-bold text-red-300">{event.status}</span>
               </div>
-              <div className="mt-3 grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-3">
+              <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
                 <div className="flex min-w-0 items-center gap-2">
                   <TeamCrest name={event.participants[0]} logo={event.logos?.[0]} className="h-7 w-7" />
                   <span className="truncate text-sm font-bold text-white">{event.participants[0]}</span>

@@ -42,6 +42,7 @@ function eventIcon(type: string, detail: string): string {
   if (type === "Card") return lower.includes("red") ? "🟥" : "🟨";
   if (type === "subst") return "🔁";
   if (type === "Var") return "📺";
+  if (/kickoff|delay|half ?time|full ?time|end (regular|extra)|start/i.test(type)) return "⏱";
   return "•";
 }
 
@@ -145,6 +146,8 @@ const FOOTBALL_PLAYER_LABELS = [
 // API-Football returns one entry per team, with a player and a statistics
 // object. Convert it to the same box-score shape ESPN uses for the other
 // sports, so the existing player table can render goals, cards and fouls.
+// ESPN's football detail already emits that shape, so it passes straight
+// through when the API-Football conversion finds nothing.
 function footballPlayerBoxScores(value: unknown): TeamBoxScore[] {
   const boxes: TeamBoxScore[] = [];
   for (const teamEntry of asRecordArray(value)) {
@@ -192,7 +195,7 @@ function footballPlayerBoxScores(value: unknown): TeamBoxScore[] {
       });
     }
   }
-  return boxes;
+  return boxes.length > 0 ? boxes : readBoxScores(value);
 }
 
 function readBoxScores(value: unknown): TeamBoxScore[] {
@@ -410,6 +413,8 @@ function FootballDetail({ detail }: { detail: JsonRecord }) {
                 : "";
               const type = text(event.type);
               const detailText = text(event.detail);
+              const playerName = text(valueAt(event, "player", "name"));
+              const teamName = text(valueAt(event, "team", "name"));
               const assist = text(valueAt(event, "assist", "name"));
               const extras = [
                 detailText && detailText.toLowerCase() !== text(event.type).toLowerCase()
@@ -419,16 +424,20 @@ function FootballDetail({ detail }: { detail: JsonRecord }) {
               ].filter(Boolean).join(" · ");
               return (
                 <li key={`${index}-${text(valueAt(event, "player", "name"))}-${minute}`} className="flex items-center gap-3 border-b border-white/5 py-2.5 last:border-0">
-                  <span className="w-10 shrink-0 rounded-md bg-white/5 py-1 text-center text-[10px] font-black tabular-nums text-gray-300">{minute}</span>
+                  <span className="w-10 shrink-0 rounded-md bg-white/5 py-1 text-center text-[10px] font-black tabular-nums text-gray-300">{minute || "–"}</span>
                   <span aria-hidden="true" className="text-base">{eventIcon(type, detailText)}</span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold text-white">{text(valueAt(event, "player", "name")) || "Unknown player"}</p>
+                    <p className="truncate text-sm font-bold text-white">
+                      {playerName || (type === "subst" ? "Substitution" : type) || detailText || "Match event"}
+                    </p>
                     {extras && <p className="truncate text-xs text-gray-500">{extras}</p>}
                   </div>
-                  <div className="flex min-w-0 items-center justify-end gap-2 text-right">
-                    <span className="truncate text-xs font-bold text-gray-400">{text(valueAt(event, "team", "name"))}</span>
-                    <TeamCrest name={text(valueAt(event, "team", "name"))} logo={text(valueAt(event, "team", "logo")) || undefined} className="h-5 w-5" />
-                  </div>
+                  {teamName && (
+                    <div className="flex min-w-0 items-center justify-end gap-2 text-right">
+                      <span className="truncate text-xs font-bold text-gray-400">{teamName}</span>
+                      <TeamCrest name={teamName} logo={text(valueAt(event, "team", "logo")) || undefined} className="h-5 w-5" />
+                    </div>
+                  )}
                 </li>
               );
             })}
@@ -600,19 +609,17 @@ export default function LiveEventDetail({
       setMessage("The provider behind this match does not publish a detailed feed.");
       return;
     }
-    if (source === "livescore") {
-      // Livescore carries scores only. Asking any detail provider for its
-      // synthetic id just returns "not found", so say so plainly.
-      setDetail(null);
-      setStatus("unavailable");
-      setMessage("Live scores for this match come from a provider that does not publish events, line-ups or statistics.");
-      return;
-    }
     if (silent) setRefreshing(true);
     else setStatus("loading");
     try {
       const params = new URLSearchParams({ id: detailId });
       if (source) params.set("source", source);
+      // Let the football route borrow ESPN's detail feed by team pair when the
+      // paid provider cannot resolve its own fixture (outage or lost coverage).
+      if (event.sport === "football") {
+        if (event.participants[0]) params.set("home", event.participants[0]);
+        if (event.participants[1]) params.set("away", event.participants[1]);
+      }
       const url = event.sport === "football"
         ? `/api/matches?view=detail&${params.toString()}`
         : `/api/live-sports?view=detail&sport=${event.sport}&${params.toString()}`;

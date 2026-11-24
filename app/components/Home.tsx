@@ -35,32 +35,6 @@
                 Fearless analysis, investigative features and the voices that
                 define the game — delivered daily from Accra to the world.
             </p>
-
-            <div className="hacts fu d4">
-                <button
-                className="bred"
-                onClick={() => onNavigate("articles")}
-                >
-                Read Features
-                </button>
-
-                <button
-                className="bghost"
-                onClick={() => onNavigate("about")}
-                >
-                Our Story
-                </button>
-            </div>
-
-            <div className="hbadges fu d4" aria-hidden="true">
-                {["12+ Sports", "850K Readers", "SJA Award 2025"].map(
-                (badge) => (
-                    <span key={badge} className="hbadge">
-                    {badge}
-                    </span>
-                )
-                )}
-            </div>
             </div>
 
             <div className="hright" aria-hidden="true">
