@@ -581,6 +581,129 @@ async function mergeGhana(fixtures: JsonRecord[], from: string, to: string, newe
   }
 }
 
+// ─── Standings ──────────────────────────────────────────────────────────────
+
+// API-Football league IDs (used by the standings UI) → ESPN league slugs.
+const API_FOOTBALL_TO_ESPN_SLUG: Record<number, string> = {
+  233: "gha.1",   // Ghana Premier League
+  39: "eng.1",    // Premier League
+  2: "uefa.champions",
+  140: "esp.1",   // La Liga
+  78: "ger.1",    // Bundesliga
+  135: "ita.1",   // Serie A
+  61: "fra.1",    // Ligue 1
+  253: "usa.1",   // MLS
+};
+
+function statNumber(stats: JsonRecord[], name: string): number {
+  const stat = stats.find((s) => text(s.name) === name);
+  const value = stat ? Number(text(stat.value) !== "" ? stat.value : stat.displayValue) : NaN;
+  return Number.isFinite(value) ? value : 0;
+}
+
+function normalizeEspnStandings(body: JsonRecord, slug: string, requestedSeason: number): JsonRecord[] {
+  const seasonYear = Number(text(record(body.season).year)) || requestedSeason;
+  const leagueName = text(body.name, "Football");
+  const leagueLogo = text(record(records(body.logos)[0]).href) || undefined;
+  const groups = records(body.children);
+  const tables: JsonRecord[][] = [];
+
+  for (const group of groups) {
+    const entries = records(record(group.standings).entries);
+    if (entries.length === 0) continue;
+    const groupName = groups.length > 1 ? text(group.name) || text(group.abbreviation) || undefined : undefined;
+    const rows: JsonRecord[] = entries.map((entry, index) => {
+      const team = record(entry.team);
+      const stats = records(entry.stats);
+      const note = record(entry.note);
+      const logo = text(record(records(team.logos)[0]).href) || text(team.logo) || undefined;
+      return {
+        rank: statNumber(stats, "rank") || index + 1,
+        team: {
+          id: Number(text(team.id)) || 0,
+          name: text(team.displayName) || text(team.name, "Team"),
+          logo,
+        },
+        points: statNumber(stats, "points"),
+        goalsDiff: statNumber(stats, "pointDifferential"),
+        group: groupName ?? (text(note.description) || undefined),
+        description: text(note.description) || undefined,
+        form: null,
+        all: {
+          played: statNumber(stats, "gamesPlayed"),
+          win: statNumber(stats, "wins"),
+          draw: statNumber(stats, "ties"),
+          lose: statNumber(stats, "losses"),
+          goals: {
+            for: statNumber(stats, "pointsFor"),
+            against: statNumber(stats, "pointsAgainst"),
+          },
+        },
+      };
+    });
+    tables.push(rows);
+  }
+
+  if (tables.length === 0) return [];
+  return [{
+    league: {
+      id: Number(text(body.id)) || 0,
+      name: leagueName,
+      country: countryForSlug(slug),
+      logo: leagueLogo,
+      season: seasonYear,
+      standings: tables,
+    },
+  }];
+}
+
+export async function espnStandings(apiLeagueId: number, season: number): Promise<JsonRecord[] | null> {
+  const slug = API_FOOTBALL_TO_ESPN_SLUG[apiLeagueId];
+  if (!slug) return null;
+  try {
+    const response = await fetch(`http://site.api.espn.com/apis/v2/sports/soccer/${slug}/standings?season=${season}`, {
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+      cache: "no-store",
+    });
+    if (!response.ok) return null;
+    const body = record(await response.json().catch(() => null));
+    if (Object.keys(body).length === 0) return null;
+    const groups = normalizeEspnStandings(body, slug, season);
+    return groups.length > 0 ? groups : null;
+  } catch (error) {
+    console.warn(`ESPN standings (${slug}, ${season}) failed:`, error instanceof Error ? error.message : error);
+    return null;
+  }
+}
+
+export async function espnSeasons(apiLeagueId: number): Promise<JsonRecord[] | null> {
+  const slug = API_FOOTBALL_TO_ESPN_SLUG[apiLeagueId];
+  if (!slug) return null;
+  try {
+    const response = await fetch(`http://site.api.espn.com/apis/v2/sports/soccer/${slug}/standings`, {
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+      cache: "no-store",
+    });
+    if (!response.ok) return null;
+    const body = record(await response.json().catch(() => null));
+    const seasons = records(body.seasons);
+    if (seasons.length === 0) return null;
+    const currentYear = Number(text(record(body.season).year));
+    return seasons
+      .filter((s) => records(s.types).some((t) => text(t.hasStandings) === "true" || t.hasStandings === true))
+      .map((s) => ({
+        year: Number(text(s.year)),
+        current: Number(text(s.year)) === currentYear,
+        coverage: { standings: true },
+      }))
+      .filter((s) => Number.isFinite(s.year) && s.year > 0)
+      .sort((a, b) => b.year - a.year);
+  } catch (error) {
+    console.warn(`ESPN seasons (${slug}) failed:`, error instanceof Error ? error.message : error);
+    return null;
+  }
+}
+
 // ─── Detail ─────────────────────────────────────────────────────────────────
 
 // ESPN soccer summary type slugs → the event vocabulary the UI renders.

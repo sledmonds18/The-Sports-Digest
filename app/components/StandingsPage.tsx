@@ -47,6 +47,7 @@ export default function StandingsPage({ onNavigate }: { onNavigate: (page: strin
   const [status, setStatus] = useState<PageStatus>("loading");
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
+  const [provider, setProvider] = useState<string | null>(null);
   const league = LEAGUES.find((item) => item.id === leagueId) ?? LEAGUES[0];
 
   useEffect(() => {
@@ -84,6 +85,7 @@ export default function StandingsPage({ onNavigate }: { onNavigate: (page: strin
         if (!response.ok || data.status === "error") throw new Error("Standings unavailable");
         setGroups(Array.isArray(data.response) ? data.response : []);
         setUpdatedAt(data.updatedAt ?? null);
+        setProvider(typeof data.provider === "string" ? data.provider : null);
         setStatusMessage(typeof data.message === "string" ? data.message : null);
         setStatus(data.status === "season_unavailable" ? "season_unavailable" : data.status === "unconfigured" ? "unconfigured" : "ready");
       })
@@ -154,7 +156,7 @@ export default function StandingsPage({ onNavigate }: { onNavigate: (page: strin
               </table></div>
             </section>
           ))}</div>}
-        {status === "ready" && updatedAt && <p className="mt-4 text-right text-xs text-gray-600">Data supplied by API-Football · Updated {new Date(updatedAt).toLocaleString()}</p>}
+        {status === "ready" && updatedAt && <p className="mt-4 text-right text-xs text-gray-600">Data supplied by {provider === "espn" ? "ESPN" : provider === "sportmonks" ? "Sportmonks" : "API-Football"} · Updated {new Date(updatedAt).toLocaleString()}</p>}
       </section>
       <SportsDeskFooter desk="Football Standings Desk" description="League tables and team rankings from Ghana and international football." onNavigate={onNavigate} />
     </main>

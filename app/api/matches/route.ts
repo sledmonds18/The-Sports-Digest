@@ -9,8 +9,15 @@ import {
   espnFixturesInRange,
   espnLiveMatches,
   espnResultsInRange,
+  espnSeasons,
+  espnStandings,
   espnWarmTeamIndex,
 } from "../../components/lib/espnFootball";
+import {
+  fotmobDetailFromTeams,
+  fotmobMatchDetail,
+  fotmobMatchIdForTeams,
+} from "../../components/lib/fotmobFootball";
 import { lsLiveMatches } from "../../components/lib/livescoreFootball";
 export const dynamic = "force-dynamic";
 
@@ -27,8 +34,12 @@ const leagueSeasonsCache = new Map<string, StandingsCache>();
 // Every fixture declares which provider issued its id. The live slate is a
 // merge of Sportmonks/API-Sports/ESPN/Livescore, and a detail lookup sent to
 // the wrong provider always comes back "not found".
-type ProviderName = "sportmonks" | "api-sports" | "espn" | "livescore" | "thesportsdb";
-type FixtureEnvelope = { provider?: ProviderName; detail?: { source: ProviderName; id: string } };
+type ProviderName = "sportmonks" | "api-sports" | "espn" | "livescore" | "thesportsdb" | "fotmob";
+type FixtureEnvelope = {
+  provider?: ProviderName;
+  detail?: { source: ProviderName; id: string };
+  teams?: { home?: { name?: string }; away?: { name?: string } };
+};
 
 function stamped(item: unknown, provider: ProviderName): unknown {
   return item !== null && typeof item === "object" && !Array.isArray(item)
@@ -105,10 +116,41 @@ export async function GET(request: Request) {
     away: searchParams.get("away") || "",
   };
 
-  // Standings and seasons have no ESPN equivalent; keep the primary provider's
-  // behaviour, including its "plan coverage" error messages.
+  // Standings and seasons: prefer the configured paid provider, but fall back
+  // to ESPN's keyless public standings when the provider is unconfigured,
+  // suspended, or errors. This keeps tables working while API-Sports is down.
   if (view === "standings" || view === "seasons") {
-    return isSportmonksEnabled() ? sportmonksMatches(request) : apiSportsMatches(request);
+    const primary = isSportmonksEnabled()
+      ? await sportmonksMatches(request)
+      : await apiSportsMatches(request);
+    let primaryStatus = "";
+    try {
+      const body = await primary.clone().json() as { status?: string };
+      primaryStatus = typeof body.status === "string" ? body.status : "";
+    } catch {
+      primaryStatus = "";
+    }
+    if (primary.ok && primaryStatus === "ok") return primary;
+    const shouldFallback = ["unconfigured", "error", "season_unavailable"].includes(primaryStatus) || primary.status >= 500 || !primary.ok;
+    if (!shouldFallback) return primary;
+
+    const league = Number(searchParams.get("league") || "");
+    const season = Number(searchParams.get("season") || "");
+    const standingsHeaders = { "Cache-Control": "public, s-maxage=21600, stale-while-revalidate=43200" };
+    if (view === "seasons") {
+      const seasons = Number.isFinite(league) ? await espnSeasons(league) : null;
+      if (seasons && seasons.length > 0) {
+        return Response.json({ response: seasons, status: "ok", provider: "espn", updatedAt: new Date().toISOString() }, { headers: standingsHeaders });
+      }
+      return primary;
+    }
+    const standings = Number.isFinite(league) && Number.isFinite(season)
+      ? await espnStandings(league, season)
+      : null;
+    if (standings && standings.length > 0) {
+      return Response.json({ response: standings, status: "ok", provider: "espn", updatedAt: new Date().toISOString() }, { headers: standingsHeaders });
+    }
+    return primary;
   }
 
   // ESPN event ids do not exist on the paid providers, so a detail lookup
@@ -119,12 +161,27 @@ export async function GET(request: Request) {
   if (view === "detail" && detailSource === "livescore") {
     // Livescore ids mean nothing to ESPN, but its team pair may still resolve
     // to a real ESPN fixture — borrow that feed for scorers, cards and line-ups.
-    const matched = await espnDetailFromTeams(detailTeams.home, detailTeams.away);
-    if (matched) return espnDetailPayload(matched);
+    const espnDetail = await espnDetailFromTeams(detailTeams.home, detailTeams.away);
+    if (espnDetail) return espnDetailPayload(espnDetail);
+    // Otherwise fall through to the FotMob keyless fallback.
+    const fotmobDetail = await fotmobDetailFromTeams(detailTeams.home, detailTeams.away);
+    if (fotmobDetail) return fotmobDetailPayload(fotmobDetail);
     return Response.json({
       response: null,
       status: "unavailable",
       message: "The live provider for this match publishes scores only, not events, line-ups or statistics.",
+      updatedAt: null,
+    }, { status: 404, headers: { "Cache-Control": "no-store" } });
+  }
+
+  // FotMob is keyless and covers leagues ESPN does not (Azadegan).
+  if (view === "detail" && detailSource === "fotmob") {
+    const fotmobDetail = await fotmobMatchDetail(detailId);
+    if (fotmobDetail) return fotmobDetailPayload(fotmobDetail);
+    return Response.json({
+      response: null,
+      status: "not_found",
+      message: "No detailed feed is available for this match.",
       updatedAt: null,
     }, { status: 404, headers: { "Cache-Control": "no-store" } });
   }
@@ -171,6 +228,9 @@ export async function GET(request: Request) {
     if (twinId) twinnedEspnIds.add(twinId);
     return twinned;
   });
+  // Fill in FotMob detail ids for Livescore fixtures ESPN does not carry, so
+  // clicking them straight away returns a FotMob normalized detail payload.
+  await fillFotmobTwins(livescoreWithTwins);
   const fallbackItems = [
     ...espnItems
       .filter((item) => !twinnedEspnIds.has(fixtureId(item)))
@@ -251,6 +311,40 @@ function espnDetailPayload(detail: Record<string, unknown>): Response {
   );
 }
 
+function fotmobDetailPayload(detail: Record<string, unknown>): Response {
+  return espnDetailPayload(detail);
+}
+
+// Fills in FotMob detail ids for Livescore fixtures ESPN also covers (the ESPN
+// twin wins) and otherwise provides a usable detail source for matches ESPN
+// does not carry.
+async function fillFotmobTwins(items: unknown[]): Promise<void> {
+  await Promise.all(items.map(async (item) => {
+    const value = item as FixtureEnvelope | null;
+    const teams = value?.teams;
+    const home = textName(teams?.home, "");
+    const away = textName(teams?.away, "");
+    if (!home || !away) return;
+    if (value?.detail?.source) return; // ESPN (or another source) already attached.
+    const matchId = await fotmobMatchIdForTeams(home, away);
+    if (matchId) {
+      (value as { detail?: { source: ProviderName; id: string } }).detail = {
+        source: "fotmob",
+        id: matchId,
+      };
+    }
+  }));
+}
+
+function textName(value: unknown, fallback: string): string {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object") {
+    const name = (value as { name?: unknown }).name;
+    if (typeof name === "string") return name;
+  }
+  return fallback;
+}
+
 // Resolve an ESPN fixture from a team pair when the provider id cannot be
 // looked up. The scoreboard index covers today and yesterday, so an in-play
 // match is found even though the caller only knows the Livescore/API-Sports id.
@@ -279,6 +373,11 @@ async function espnDetailResponse(
   let espnDetail = await espnFixtureDetail(id);
   if (!espnDetail && teams?.home && teams?.away) {
     espnDetail = await espnDetailFromTeams(teams.home, teams.away);
+  }
+  if (!espnDetail && teams?.home && teams?.away) {
+    // FotMob is the keyless fallback for leagues ESPN does not carry.
+    const fotmobDetail = await fotmobDetailFromTeams(teams.home, teams.away);
+    if (fotmobDetail) return fotmobDetailPayload(fotmobDetail);
   }
   if (espnDetail) return espnDetailPayload(espnDetail);
   if (fallback && fallbackPayload !== undefined) return replay(fallback, fallbackPayload);

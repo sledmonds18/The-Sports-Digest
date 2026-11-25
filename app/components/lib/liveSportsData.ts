@@ -20,7 +20,8 @@ export type LiveDetailSource =
   | "livescore"
   | "sportmonks"
   | "api-sports"
-  | "thesportsdb";
+  | "thesportsdb"
+  | "fotmob";
 
 export interface LiveSportEvent {
   id: string;
