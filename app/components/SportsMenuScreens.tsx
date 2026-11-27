@@ -2,6 +2,7 @@
 
     export type MenuScreen =
     | "main"
+    | "news"
     | "football"
     | "ghana"
     | "international"
@@ -43,6 +44,31 @@
 
     return (
         <>
+        {/* =========================
+            NEWS
+        ========================== */}
+        {menuScreen === "news" && (
+            <div className="menu-screen">
+            <button className="menu-back" onClick={goBack}>
+                ← News
+            </button>
+
+            <button
+                className="menu-parent"
+                onClick={() => handleNavigate("ghana-sports")}
+            >
+                <span>🇬🇭 Ghana Sports News</span>
+            </button>
+
+            <button
+                className="menu-parent"
+                onClick={() => handleNavigate("international-sports-news")}
+            >
+                <span>🌍 International Sports News</span>
+            </button>
+            </div>
+        )}
+
         {/* =========================
             FOOTBALL
         ========================== */}

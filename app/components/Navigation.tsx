@@ -254,6 +254,15 @@
                     OTHER SECTIONS
                 ========================== */}
 
+                {/* News */}
+                <button
+                className="menu-link"
+                onClick={() => onMenuScreenChange("news")}
+                tabIndex={menu ? 0 : -1}
+                >
+                NEWS
+                </button>
+
                 {/* About */}
                 <button
                 className="menu-link"
